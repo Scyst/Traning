@@ -224,6 +224,17 @@ MONITOR_HTML = """<!DOCTYPE html>
   .modal-box { width: 100%; max-width: 980px; max-height: 90vh; background: #1e293b; border: 1px solid #475569; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
   .modal-head { padding: 12px 16px; border-bottom: 1px solid #334155; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
   .modal-body { margin: 0; padding: 14px 16px; overflow: auto; background: #0b1120; color: #e2e8f0; font-family: Consolas, monospace; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+  .audit-wrap { overflow: auto; max-height: 540px; max-width: 100%; border: 1px solid #334155; border-radius: 10px; background: #0f172a; margin-top: 10px; }
+  .audit-tbl { width: max-content; min-width: 100%; border-collapse: collapse; font-size: 12px; }
+  .audit-tbl th, .audit-tbl td { border: 1px solid #334155; padding: 4px; text-align: center; white-space: nowrap; }
+  .audit-tbl thead th { position: sticky; top: 0; background: #1e293b; color: #e2e8f0; z-index: 2; font-size: 11px; }
+  .audit-in { width: 100%; min-width: 42px; padding: 3px 4px; border: 1px solid #475569; border-radius: 5px; background: #0b1120; color: #f8fafc; font-size: 12px; text-align: center; box-sizing: border-box; }
+  .audit-in.txt { text-align: left; min-width: 86px; }
+  .audit-in.sm { width: 42px; min-width: 42px; }
+  .audit-in.md { width: 68px; min-width: 68px; }
+  .audit-calc { font-weight: 700; color: #fde047; }
+  .audit-pass { color: #6ee7b7; font-weight: 700; }
+  .audit-fail { color: #fca5a5; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -288,7 +299,7 @@ MONITOR_HTML = """<!DOCTYPE html>
       <div class="tabs">
         <button class="tab-btn active" id="tab-exam" onclick="switchTab('exam')">⚡ ผลสอบปฏิบัติ &amp; Auto-Grader (50)</button>
         <button class="tab-btn" id="tab-ws" onclick="switchTab('ws')">📚 ติดตาม Workshop 1–4 (20)</button>
-        <button class="tab-btn" id="tab-audit" onclick="switchTab('audit')">📊 รวมคะแนนออก Excel Audit v2 (100)</button>
+        <button class="tab-btn" id="tab-audit" onclick="switchTab('audit')">📊 จัดการรายชื่อ &amp; Audit / พิมพ์ PDF (100)</button>
       </div>
 
       <div class="panel" id="panel-exam">
@@ -335,18 +346,69 @@ MONITOR_HTML = """<!DOCTYPE html>
 
       <div class="panel" id="panel-audit" style="display:none;">
         <h2>
-          <span>📊 รวมคะแนนทุกหมวด &amp; ดาวน์โหลด Excel Audit v2 (Leelawadee UI พร้อมทำ PDF)</span>
+          <span>📊 จัดการรายชื่อผู้เรียน &amp; สรุปคะแนน Audit v2 (<span id="audit-row-count">0</span> คน)</span>
+          <span id="audit-summary" style="font-size:12.5px;color:#93c5fd;"></span>
         </h2>
         <p style="font-size:13px;color:#cbd5e1;margin:0 0 10px;">
-          1. แนบไฟล์ <strong>.csv</strong> ที่ดาวน์โหลดจาก Google Sheet แท็บ <code>สรุปคะแนน_Audit</code> (ถ้าสอบทฤษฎีผ่าน LAN ระบบจะรวมให้อัตโนมัติอยู่แล้ว · พบใน LAN: <b id="theory-count">0</b> คน)<br>
-          2. ระบุชื่อรุ่น แล้วกดสร้างไฟล์ <strong>.xlsx</strong> (รวม ทฤษฎี 30 + Workshop 20 + ปฏิบัติ 50 = 100 + ชีตหลักฐาน Help Log)
+          ใช้แก้ไข/สลับ/เพิ่มรายชื่อหน้างานแทนไฟล์ Excel ล่วงหน้า · ดึงผลอัตโนมัติจาก Workshop + สอบปฏิบัติ + ทฤษฎี LAN (พบใน LAN: <b id="theory-count">0</b> คน) + ไฟล์ <b>.csv</b> จาก Google Sheet แล้วพิมพ์เป็น PDF A4 แนวนอนหรือดาวน์โหลด <b>.xlsx</b> ได้ทันที
         </p>
-        <div class="controls" style="margin-bottom:10px;">
-          <input id="audit-cohort" class="inline-input" type="text" value="รุ่นที่ 4" placeholder="ชื่อรุ่น เช่น รุ่นที่ 4">
+        <div class="controls" style="margin-bottom:8px;">
+          <input id="audit-cohort" class="inline-input" type="text" value="รุ่นที่ 4" placeholder="ชื่อรุ่น เช่น รุ่นที่ 4" style="max-width:160px;">
+          <input id="audit-date-range" class="inline-input" type="text" value="" placeholder="วันที่อบรม/หมายเหตุหัวกระดาษ เช่น วันที่ 24-27 พ.ย. 2569">
           <input id="theory-csv-file" type="file" accept=".csv" style="color:#cbd5e1;">
-          <button class="btn green" onclick="downloadAuditExcel()">📥 สร้าง &amp; ดาวน์โหลด Excel Audit v2 (.xlsx)</button>
         </div>
-        <div id="audit-msg" style="font-size:13px;color:#93c5fd;"></div>
+        <div class="controls" style="margin-bottom:8px;">
+          <button class="btn blue" onclick="buildAuditRows()">🔄 ดึงรายชื่อ &amp; คะแนนล่าสุด</button>
+          <button class="btn" onclick="addAuditRow()">➕ เพิ่มผู้เรียน</button>
+          <button class="btn amber" onclick="saveAuditRows()">💾 บันทึกตาราง</button>
+          <button class="btn" style="background:#7c3aed;border-color:#7c3aed;" onclick="openAuditPrint()">🖨️ เปิดหน้าพิมพ์ / Save PDF</button>
+          <button class="btn green" onclick="downloadAuditExcel()">📥 ดาวน์โหลด Excel v2 (.xlsx)</button>
+        </div>
+        <div id="audit-msg" style="font-size:13px;color:#93c5fd;min-height:18px;"></div>
+        <div class="audit-wrap">
+          <table class="audit-tbl">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>ที่นั่ง</th>
+                <th>รหัสพนักงาน</th>
+                <th>คำนำหน้า</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>สังกัด</th>
+                <th>Pre (20)</th>
+                <th>Post HR (20)</th>
+                <th>H1 (5)</th>
+                <th>H2 (5)</th>
+                <th>H3 (5)</th>
+                <th>H4 (5)</th>
+                <th>H5 (5)</th>
+                <th>H6 (5)</th>
+                <th>ทฤษฎี (30)</th>
+                <th>W1 (5)</th>
+                <th>W2 (5)</th>
+                <th>W3 (5)</th>
+                <th>W4 (5)</th>
+                <th>หัก WS</th>
+                <th>WS (20)</th>
+                <th title="TODO 1: แสดงผลและเช็กสถานะ (12)">T1 (12)</th>
+                <th title="TODO 2: ดึงค่า API + ตั้งเวลา Polling (12)">T2 (12)</th>
+                <th title="TODO 3: ส่ง Webhook แจ้งเตือน (8)">T3 (8)</th>
+                <th title="TODO 4: ป้องกันส่งซ้ำ / State Management (8)">T4 (8)</th>
+                <th title="TODO 5: Live Test Pass Bonus + Code Clean (10)">T5 (10)</th>
+                <th>หักสอบ</th>
+                <th>ปฏิบัติ (50)</th>
+                <th>สุทธิ (100)</th>
+                <th>เกรด / ผล</th>
+                <th>หมายเหตุ Audit</th>
+                <th>ลบ</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody">
+              <tr><td colspan="33" style="color:#64748b;padding:18px;">กดปุ่ม "🔄 ดึงรายชื่อ &amp; คะแนนล่าสุด" หรือ "➕ เพิ่มผู้เรียน" เพื่อเริ่มต้นแก้ไขรายชื่อและคะแนนสำหรับรุ่นนี้</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -462,18 +524,205 @@ async function runAutoGradeWorkshops() {
   refresh();
 }
 
+let auditRows = [], auditInitialized = false, auditDirty = false;
+
+function round1(v) { return Math.round((Number(v) || 0) * 10) / 10; }
+function numOrNull(v) {
+  if (v === '' || v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function numOrZero(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function ensureAuditShape(r) {
+  const row = Object.assign({
+    emp_id: '', prefix: '', first_name: '', last_name: '', full_name: '', dept: '',
+    seat: '', sender: '', pre_20: null, post_hr_20: null,
+    topics: [0,0,0,0,0,0], workshops: [0,0,0,0], ws_help_penalty: 0,
+    practical_todos: [0,0,0,0,0], practical_deduct: 0, audit_note: ''
+  }, r || {});
+  const t = Array.isArray(row.topics) ? row.topics.slice(0, 6) : [];
+  while (t.length < 6) t.push(0);
+  const w = Array.isArray(row.workshops) ? row.workshops.slice(0, 4) : [];
+  while (w.length < 4) w.push(0);
+  const p = Array.isArray(row.practical_todos) ? row.practical_todos.slice(0, 5) : [];
+  while (p.length < 5) p.push(0);
+  row.topics = t; row.workshops = w; row.practical_todos = p;
+  return row;
+}
+function calcAuditSummary(row) {
+  let tSum = 0; for (let k = 0; k < 6; k++) tSum += numOrZero(row.topics[k]);
+  const theory30 = round1(Math.max(0, Math.min(30, tSum)));
+  let wRaw = 0; for (let k = 0; k < 4; k++) wRaw += numOrZero(row.workshops[k]);
+  const workshop20 = round1(Math.max(0, Math.min(20, wRaw - Math.max(0, numOrZero(row.ws_help_penalty)))));
+  let pRaw = 0; for (let k = 0; k < 5; k++) pRaw += numOrZero(row.practical_todos[k]);
+  const practical50 = round1(Math.max(0, Math.min(50, pRaw - Math.max(0, numOrZero(row.practical_deduct)))));
+  const total100 = round1(theory30 + workshop20 + practical50);
+  let grade = 'F';
+  if (total100 >= 80) grade = 'A';
+  else if (total100 >= 75) grade = 'B+';
+  else if (total100 >= 70) grade = 'B';
+  else if (total100 >= 65) grade = 'C+';
+  else if (total100 >= 60) grade = 'C';
+  const pass = total100 >= 60;
+  return { theory30, workshop20, practical50, total100, grade, pass, status_th: pass ? 'ผ่าน' : 'ไม่ผ่าน' };
+}
+function updateAuditSummaryBanner() {
+  document.getElementById('audit-row-count').textContent = auditRows.length;
+  const sumEl = document.getElementById('audit-summary');
+  if (!auditRows.length) { sumEl.textContent = ''; return; }
+  let passCnt = 0, totSum = 0;
+  for (const r of auditRows) {
+    const s = calcAuditSummary(r);
+    if (s.pass) passCnt++;
+    totSum += s.total100;
+  }
+  const avg = round1(totSum / auditRows.length);
+  sumEl.textContent = `ผ่าน ${passCnt}/${auditRows.length} คน · เฉลี่ย ${avg}/100`;
+}
+function renderAuditTable() {
+  const tbody = document.getElementById('audit-tbody');
+  if (!auditRows.length) {
+    tbody.innerHTML = '<tr><td colspan="33" style="color:#64748b;padding:18px;">ยังไม่มีรายชื่อในตาราง Audit — กดปุ่ม "🔄 ดึงรายชื่อ &amp; คะแนนล่าสุด" หรือ "➕ เพิ่มผู้เรียน"</td></tr>';
+    updateAuditSummaryBanner();
+    return;
+  }
+  tbody.innerHTML = auditRows.map((raw, i) => {
+    const r = auditRows[i] = ensureAuditShape(raw);
+    const s = calcAuditSummary(r);
+    const numVal = (v) => (v === null || v === undefined || v === '') ? '' : String(v);
+    const arrInputs = (arr, key, cnt, step = '0.5', maxV = 5) => Array.from({length: cnt}, (_, k) =>
+      `<td><input class="audit-in sm" type="number" step="${step}" min="0" max="${maxV}" value="${esc(numVal(arr[k]))}" oninput="updateAuditField(${i}, '${key}', ${k}, this.value)"></td>`
+    ).join('');
+    const todoMax = [12, 12, 8, 8, 10];
+    const todoInputs = Array.from({length: 5}, (_, k) =>
+      `<td><input class="audit-in sm" type="number" step="0.5" min="0" max="${todoMax[k]}" value="${esc(numVal(r.practical_todos[k]))}" oninput="updateAuditField(${i}, 'practical_todos', ${k}, this.value)"></td>`
+    ).join('');
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><input class="audit-in sm" type="text" value="${esc(r.seat || '')}" oninput="updateAuditField(${i}, 'seat', -1, this.value)"></td>
+      <td><input class="audit-in txt md" type="text" value="${esc(r.emp_id || '')}" oninput="updateAuditField(${i}, 'emp_id', -1, this.value)"></td>
+      <td><input class="audit-in txt sm" type="text" value="${esc(r.prefix || '')}" oninput="updateAuditField(${i}, 'prefix', -1, this.value)"></td>
+      <td><input class="audit-in txt" type="text" value="${esc(r.first_name || '')}" oninput="updateAuditField(${i}, 'first_name', -1, this.value)"></td>
+      <td><input class="audit-in txt" type="text" value="${esc(r.last_name || '')}" oninput="updateAuditField(${i}, 'last_name', -1, this.value)"></td>
+      <td><input class="audit-in txt md" type="text" value="${esc(r.dept || '')}" oninput="updateAuditField(${i}, 'dept', -1, this.value)"></td>
+      <td><input class="audit-in sm" type="number" step="0.5" min="0" max="20" value="${esc(numVal(r.pre_20))}" oninput="updateAuditField(${i}, 'pre_20', -1, this.value)"></td>
+      <td><input class="audit-in sm" type="number" step="0.5" min="0" max="20" value="${esc(numVal(r.post_hr_20))}" oninput="updateAuditField(${i}, 'post_hr_20', -1, this.value)"></td>
+      ${arrInputs(r.topics, 'topics', 6, '0.5', 5)}
+      <td class="audit-calc" id="ar-t-${i}">${s.theory30}</td>
+      ${arrInputs(r.workshops, 'workshops', 4, '0.5', 5)}
+      <td><input class="audit-in sm" type="number" step="0.5" min="0" max="20" value="${esc(numVal(r.ws_help_penalty))}" oninput="updateAuditField(${i}, 'ws_help_penalty', -1, this.value)"></td>
+      <td class="audit-calc" id="ar-w-${i}">${s.workshop20}</td>
+      ${todoInputs}
+      <td><input class="audit-in sm" type="number" step="0.5" min="0" max="50" value="${esc(numVal(r.practical_deduct))}" oninput="updateAuditField(${i}, 'practical_deduct', -1, this.value)"></td>
+      <td class="audit-calc" id="ar-p-${i}">${s.practical50}</td>
+      <td class="audit-calc" id="ar-tot-${i}" style="font-size:13px;">${s.total100}</td>
+      <td id="ar-g-${i}" class="${s.pass ? 'audit-pass' : 'audit-fail'}">${esc(s.grade)} (${esc(s.status_th)})</td>
+      <td><input class="audit-in txt" style="min-width:140px;" type="text" value="${esc(r.audit_note || '')}" oninput="updateAuditField(${i}, 'audit_note', -1, this.value)"></td>
+      <td><button class="btn red" style="min-height:26px;padding:2px 7px;font-size:11px;" onclick="deleteAuditRow(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  updateAuditSummaryBanner();
+}
+function updateAuditField(idx, field, subIdx, val) {
+  const row = auditRows[idx];
+  if (!row) return;
+  auditDirty = true;
+  if (subIdx >= 0) {
+    row[field][subIdx] = numOrNull(val) ?? 0;
+  } else if (['pre_20', 'post_hr_20'].includes(field)) {
+    row[field] = numOrNull(val);
+  } else if (['ws_help_penalty', 'practical_deduct'].includes(field)) {
+    row[field] = numOrNull(val) ?? 0;
+  } else {
+    row[field] = val;
+    if (['prefix', 'first_name', 'last_name'].includes(field)) {
+      row.full_name = `${row.prefix || ''}${row.first_name || ''} ${row.last_name || ''}`.trim();
+    }
+  }
+  const s = calcAuditSummary(row);
+  const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  setTxt(`ar-t-${idx}`, s.theory30);
+  setTxt(`ar-w-${idx}`, s.workshop20);
+  setTxt(`ar-p-${idx}`, s.practical50);
+  setTxt(`ar-tot-${idx}`, s.total100);
+  const gEl = document.getElementById(`ar-g-${idx}`);
+  if (gEl) {
+    gEl.textContent = `${s.grade} (${s.status_th})`;
+    gEl.className = s.pass ? 'audit-pass' : 'audit-fail';
+  }
+  updateAuditSummaryBanner();
+}
+function addAuditRow() {
+  auditDirty = true;
+  auditRows.push(ensureAuditShape({
+    seat: String(auditRows.length + 1).padStart(2, '0'),
+    prefix: '',
+    first_name: '',
+    last_name: '',
+    dept: '',
+    audit_note: 'เพิ่ม/สลับรายชื่อหน้างาน'
+  }));
+  renderAuditTable();
+}
+function deleteAuditRow(idx) {
+  auditDirty = true;
+  auditRows.splice(idx, 1);
+  renderAuditTable();
+}
+async function readSelectedTheoryCsv() {
+  const fileEl = document.getElementById('theory-csv-file');
+  return (fileEl.files && fileEl.files[0]) ? await fileEl.files[0].text() : '';
+}
+async function buildAuditRows() {
+  const msgEl = document.getElementById('audit-msg');
+  const cohort = document.getElementById('audit-cohort').value.trim() || 'รุ่นที่ 4';
+  const date_range = document.getElementById('audit-date-range').value.trim();
+  const theory_csv = await readSelectedTheoryCsv();
+  msgEl.textContent = 'กำลังดึงรายชื่อ & คะแนนล่าสุด (ปฏิบัติ + Workshop + ทฤษฎี + CSV)...';
+  const res = await fetch('/api/audit/build', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cohort, date_range, theory_csv })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { msgEl.textContent = 'ดึงข้อมูลไม่สำเร็จ: ' + (data.error || res.status); return; }
+  auditRows = (data.rows || []).map(ensureAuditShape);
+  auditInitialized = true; auditDirty = false;
+  renderAuditTable();
+  msgEl.textContent = `ดึงข้อมูลล่าสุดสำเร็จ (${auditRows.length} คน) · แก้ไขในตารางได้เลย ✓`;
+}
+async function saveAuditRows(silent = false) {
+  const msgEl = document.getElementById('audit-msg');
+  const cohort = document.getElementById('audit-cohort').value.trim() || 'รุ่นที่ 4';
+  const date_range = document.getElementById('audit-date-range').value.trim();
+  if (!silent) msgEl.textContent = 'กำลังบันทึกตาราง Audit...';
+  const res = await fetch('/api/audit/save', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ cohort, date_range, rows: auditRows })
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { msgEl.textContent = 'บันทึกไม่สำเร็จ: ' + (data.error || res.status); return false; }
+  auditRows = (data.rows || []).map(ensureAuditShape);
+  auditInitialized = true; auditDirty = false;
+  renderAuditTable();
+  if (!silent) msgEl.textContent = `บันทึกข้อมูล ${auditRows.length} คนเรียบร้อย ✓`;
+  return true;
+}
+async function openAuditPrint() {
+  const ok = await saveAuditRows(true);
+  if (!ok) return;
+  document.getElementById('audit-msg').textContent = 'เปิดหน้าพิมพ์ A4 แนวนอน / Save as PDF (/audit/print) แล้ว ✓';
+  window.open('/audit/print', '_blank');
+}
 async function downloadAuditExcel() {
   const msgEl = document.getElementById('audit-msg');
   const cohort = document.getElementById('audit-cohort').value.trim() || 'รุ่นที่ 4';
-  const fileEl = document.getElementById('theory-csv-file');
-  let theoryCsv = '';
-  if (fileEl.files && fileEl.files[0]) {
-    theoryCsv = await fileEl.files[0].text();
-  }
-  msgEl.textContent = 'กำลังตรวจคำนวณล่าสุดและสร้างไฟล์ Excel v2...';
+  const date_range = document.getElementById('audit-date-range').value.trim();
+  const theory_csv = await readSelectedTheoryCsv();
+  msgEl.textContent = 'กำลังสร้างไฟล์ Excel Audit v2 (.xlsx)...';
+  const payload = auditRows.length ? { cohort, date_range, rows: auditRows } : { cohort, date_range, theory_csv };
   const res = await fetch('/api/audit/export', {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ cohort, theory_csv: theoryCsv })
+    body: JSON.stringify(payload)
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -609,6 +858,17 @@ async function refresh() {
       <span>อัปเดต: <b>${esc(r.updatedAt.slice(11, 19))}</b></span>
     `;
     document.getElementById('theory-count').textContent = (d.theory_submissions || []).length;
+    if (!auditInitialized && !auditDirty) {
+      auditInitialized = true;
+      if (d.audit_meta) {
+        if (d.audit_meta.cohort) document.getElementById('audit-cohort').value = d.audit_meta.cohort;
+        if (d.audit_meta.date_range !== undefined) document.getElementById('audit-date-range').value = d.audit_meta.date_range;
+      }
+      if (Array.isArray(d.audit_rows) && d.audit_rows.length) {
+        auditRows = d.audit_rows.map(ensureAuditShape);
+        renderAuditTable();
+      }
+    }
 
     const list = Object.values(d.students || {});
     list.sort((a, b) => a.sender.localeCompare(b.sender, 'th'));

@@ -5,14 +5,111 @@ without Thai font rendering issues (zero tofu boxes on Windows Export-to-PDF).
 """
 
 import csv
+import html as html_lib
 import io
-from typing import Any, Dict, List, Optional
+import re
+from typing import Any, Dict, List, Optional, Tuple
 
 import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
+from grading_rules import clamp_score, compute_final_grade
+
 FONT_NAME = "Leelawadee UI"
+THAI_PREFIXES = ("นางสาว", "นาง", "นาย", "น.ส.")
+
+
+def split_thai_name(full_name: str) -> Tuple[str, str, str]:
+    """Split 'นางสาวสมหญิง ใจดี' or '01-สมชาย ดีใจ' into (prefix, first_name, last_name)."""
+    raw = re.sub(r"^\d+[-_\s]+", "", str(full_name or "").strip()).strip()
+    prefix = ""
+    for p in THAI_PREFIXES:
+        if raw.startswith(p):
+            prefix = p
+            raw = raw[len(p):].strip()
+            break
+    parts = raw.split()
+    if len(parts) >= 2:
+        return prefix, parts[0], " ".join(parts[1:])
+    return prefix, raw, ""
+
+
+def _opt_float(val: Any) -> Optional[float]:
+    if val is None or str(val).strip() == "":
+        return None
+    try:
+        return round(float(val), 1)
+    except (TypeError, ValueError):
+        return None
+
+
+def _opt_list(vals: Any, length: int) -> List[Optional[float]]:
+    src = list(vals) if isinstance(vals, (list, tuple)) else []
+    out: List[Optional[float]] = []
+    for i in range(length):
+        out.append(_opt_float(src[i]) if i < len(src) else None)
+    return out
+
+
+def normalize_audit_row(rec: Dict[str, Any]) -> Dict[str, Any]:
+    """Normalize arbitrary/partial student record into full editable Audit v2 row with computed totals."""
+    prefix = str(rec.get("prefix") or "").strip()
+    first_name = str(rec.get("first_name") or "").strip()
+    last_name = str(rec.get("last_name") or "").strip()
+    full_name = str(rec.get("full_name") or rec.get("name") or "").strip()
+    if not first_name and full_name:
+        p, fn, ln = split_thai_name(full_name)
+        prefix = prefix or p
+        first_name = fn
+        last_name = last_name or ln
+
+    topics = _opt_list(rec.get("topics"), 6)
+    workshops = _opt_list(rec.get("workshops"), 4)
+    ws_pen = _opt_float(rec.get("ws_help_penalty")) or 0.0
+    todos = _opt_list(rec.get("practical_todos"), 5)
+    prac_pen = _opt_float(rec.get("practical_deduct")) or 0.0
+
+    has_t = any(x is not None for x in topics)
+    has_w = any(x is not None for x in workshops)
+    has_p = any(x is not None for x in todos)
+
+    t_sum = clamp_score(sum(x or 0.0 for x in topics), 0.0, 30.0) if has_t else None
+    w_sum = clamp_score(sum(x or 0.0 for x in workshops) - ws_pen, 0.0, 20.0) if has_w else None
+    p_sum = clamp_score(sum(x or 0.0 for x in todos) - prac_pen, 0.0, 50.0) if has_p else None
+
+    if has_t or has_w or has_p:
+        graded = compute_final_grade(t_sum or 0.0, w_sum or 0.0, p_sum or 0.0)
+        total_100: Optional[float] = graded["total_100"]
+        grade = graded["grade"]
+        status_th = graded["status_th"]
+    else:
+        total_100 = None
+        grade = ""
+        status_th = ""
+
+    return {
+        "sender": str(rec.get("sender") or "").strip(),
+        "emp_id": str(rec.get("emp_id") or "").strip(),
+        "prefix": prefix,
+        "first_name": first_name,
+        "last_name": last_name,
+        "dept": str(rec.get("dept") or "").strip(),
+        "pre_20": _opt_float(rec.get("pre_20")),
+        "post_hr_20": _opt_float(rec.get("post_hr_20")),
+        "topics": topics,
+        "theory_30": t_sum,
+        "workshops": workshops,
+        "ws_help_penalty": ws_pen,
+        "workshop_20": w_sum,
+        "practical_todos": todos,
+        "practical_deduct": prac_pen,
+        "practical_50": p_sum,
+        "total_100": total_100,
+        "grade": grade,
+        "status_th": status_th,
+        "audit_note": str(rec.get("audit_note") or "").strip(),
+    }
 
 
 def _font(size: int = 10, bold: bool = False, color: str = "000000") -> Font:
@@ -209,52 +306,39 @@ def export_audit_workbook(
         r = start_row + idx
         ws.row_dimensions[r].height = 20
         rec = records[idx] if idx < len(records) else {}
-
-        # Split name heuristics cleanly when only full name given
-        full_name = str(rec.get("full_name") or "").strip()
-        prefix = str(rec.get("prefix") or "").strip()
-        first_name = str(rec.get("first_name") or "").strip()
-        last_name = str(rec.get("last_name") or "").strip()
-        if full_name and not first_name:
-            parts = full_name.split()
-            if len(parts) >= 2:
-                first_name = parts[0]
-                last_name = " ".join(parts[1:])
-            else:
-                first_name = full_name
+        norm = normalize_audit_row(rec)
 
         ws.cell(r, 1, idx + 1)
-        ws.cell(r, 2, rec.get("emp_id", ""))
-        ws.cell(r, 3, prefix)
-        ws.cell(r, 4, first_name)
-        ws.cell(r, 5, last_name)
-        ws.cell(r, 6, rec.get("dept", ""))
-        if rec.get("pre_20") is not None:
-            ws.cell(r, 7, rec.get("pre_20"))
-        if rec.get("post_hr_20") is not None:
-            ws.cell(r, 8, rec.get("post_hr_20"))
+        ws.cell(r, 2, norm["emp_id"])
+        ws.cell(r, 3, norm["prefix"])
+        ws.cell(r, 4, norm["first_name"])
+        ws.cell(r, 5, norm["last_name"])
+        ws.cell(r, 6, norm["dept"])
+        if norm["pre_20"] is not None:
+            ws.cell(r, 7, norm["pre_20"])
+        if norm["post_hr_20"] is not None:
+            ws.cell(r, 8, norm["post_hr_20"])
 
-        topics = rec.get("topics") or []
-        for t_i in range(6):
-            if t_i < len(topics) and topics[t_i] is not None:
-                ws.cell(r, 9 + t_i, topics[t_i])
+        for t_i, val in enumerate(norm["topics"]):
+            if val is not None:
+                ws.cell(r, 9 + t_i, val)
 
         ws.cell(r, 15, f'=IF(COUNT(I{r}:N{r})=0,"",SUM(I{r}:N{r}))')
 
-        ws_scores = rec.get("workshops") or []
-        for w_i in range(4):
-            if w_i < len(ws_scores) and ws_scores[w_i] is not None:
-                ws.cell(r, 16 + w_i, ws_scores[w_i])
-        if rec.get("ws_help_penalty") is not None and rec.get("workshops"):
-            ws.cell(r, 20, rec.get("ws_help_penalty"))
+        has_ws = any(v is not None for v in norm["workshops"])
+        for w_i, val in enumerate(norm["workshops"]):
+            if val is not None:
+                ws.cell(r, 16 + w_i, val)
+        if has_ws and norm["ws_help_penalty"]:
+            ws.cell(r, 20, norm["ws_help_penalty"])
         ws.cell(r, 21, f'=IF(COUNT(P{r}:S{r})=0,"",MAX(0,MIN(20,SUM(P{r}:S{r})-SUM(T{r}))))')
 
-        todos = rec.get("practical_todos") or []
-        for p_i in range(5):
-            if p_i < len(todos) and todos[p_i] is not None:
-                ws.cell(r, 22 + p_i, todos[p_i])
-        if rec.get("practical_deduct") is not None and rec.get("practical_todos"):
-            ws.cell(r, 27, rec.get("practical_deduct"))
+        has_prac = any(v is not None for v in norm["practical_todos"])
+        for p_i, val in enumerate(norm["practical_todos"]):
+            if val is not None:
+                ws.cell(r, 22 + p_i, val)
+        if has_prac and norm["practical_deduct"]:
+            ws.cell(r, 27, norm["practical_deduct"])
         ws.cell(r, 28, f'=IF(COUNT(V{r}:Z{r})=0,"",MAX(0,MIN(50,SUM(V{r}:Z{r})-SUM(AA{r}))))')
 
         ws.cell(r, 29, f'=IF(COUNT(O{r},U{r},AB{r})=0,"",SUM(O{r},U{r},AB{r}))')
@@ -348,6 +432,191 @@ def export_audit_workbook(
 
     wb.save(output_path)
     return output_path
+
+
+def _fmt_num(val: Optional[float], one_dec: bool = False) -> str:
+    if val is None:
+        return ""
+    if one_dec or (val % 1 != 0):
+        return f"{val:.1f}"
+    return str(int(val))
+
+
+def render_audit_print_html(
+    cohort_title: str,
+    date_subtitle: str,
+    rows_data: Optional[List[Dict[str, Any]]] = None,
+    help_requests: Optional[List[Dict[str, Any]]] = None,
+) -> str:
+    """Render an A4-landscape Print-to-PDF HTML sheet styled to match official BOI Audit forms."""
+    e = html_lib.escape
+    norm_rows = [normalize_audit_row(r) for r in (rows_data or [])]
+    body_rows = []
+    for idx, r in enumerate(norm_rows, 1):
+        t_cells = "".join(f"<td>{e(_fmt_num(v))}</td>" for v in r["topics"])
+        w_cells = "".join(f"<td>{e(_fmt_num(v))}</td>" for v in r["workshops"])
+        p_cells = "".join(f"<td>{e(_fmt_num(v))}</td>" for v in r["practical_todos"])
+        w_pen = e(_fmt_num(r["ws_help_penalty"])) if any(x is not None for x in r["workshops"]) else ""
+        p_pen = e(_fmt_num(r["practical_deduct"])) if any(x is not None for x in r["practical_todos"]) else ""
+        status_cls = "pass" if r["status_th"] == "ผ่าน" else ("fail" if r["status_th"] == "ไม่ผ่าน" else "")
+        body_rows.append(
+            f"<tr>"
+            f"<td>{idx}</td><td>{e(r['emp_id'])}</td>"
+            f"<td class='name-p'>{e(r['prefix'])}</td><td class='name-f'>{e(r['first_name'])}</td><td class='name-l'>{e(r['last_name'])}</td>"
+            f"<td>{e(r['dept'])}</td>"
+            f"<td class='orange'>{e(_fmt_num(r['pre_20']))}</td>"
+            f"<td class='orange'>{e(_fmt_num(r['post_hr_20']))}</td>"
+            f"{t_cells}<td class='fsum'><b>{e(_fmt_num(r['theory_30'], True))}</b></td>"
+            f"{w_cells}<td class='pen'>{w_pen}</td><td class='wsum'><b>{e(_fmt_num(r['workshop_20'], True))}</b></td>"
+            f"{p_cells}<td class='pen'>{p_pen}</td><td class='psum'><b>{e(_fmt_num(r['practical_50'], True))}</b></td>"
+            f"<td class='tot'><b>{e(_fmt_num(r['total_100'], True))}</b></td>"
+            f"<td><b>{e(r['grade'])}</b></td>"
+            f"<td class='{status_cls}'><b>{e(r['status_th'])}</b></td>"
+            f"</tr>"
+        )
+
+    def _avg(vals: List[Optional[float]]) -> str:
+        nums = [v for v in vals if v is not None]
+        return f"{sum(nums) / len(nums):.1f}" if nums else ""
+
+    avg_row = (
+        f"<tr class='avg-row'><td colspan='6' style='text-align:right;font-weight:700;'>ค่าเฉลี่ยทั้งรุ่น</td>"
+        f"<td>{_avg([r['pre_20'] for r in norm_rows])}</td>"
+        f"<td>{_avg([r['post_hr_20'] for r in norm_rows])}</td>"
+        f"<td colspan='6'></td><td>{_avg([r['theory_30'] for r in norm_rows])}</td>"
+        f"<td colspan='5'></td><td>{_avg([r['workshop_20'] for r in norm_rows])}</td>"
+        f"<td colspan='6'></td><td>{_avg([r['practical_50'] for r in norm_rows])}</td>"
+        f"<td>{_avg([r['total_100'] for r in norm_rows])}</td><td colspan='2'></td></tr>"
+    )
+
+    ev_rows = []
+    for req in (help_requests or []):
+        msg = f"{req.get('topic', '')}{' — ' + req.get('note', '') if req.get('note') else ''}"
+        ev_rows.append(
+            f"<tr><td>{e(str(req.get('time', '')))}</td><td>{e(str(req.get('scope', '')))}</td>"
+            f"<td>{e(str(req.get('sender', '')))}</td><td>{e(msg)}</td>"
+            f"<td>{e(str(req.get('status', '')))}</td><td>{e(str(req.get('resolution', '')))}</td></tr>"
+        )
+    for r in norm_rows:
+        if r["audit_note"]:
+            full = f"{r['prefix']}{r['first_name']} {r['last_name']}".strip()
+            ev_rows.append(
+                f"<tr><td>Auto-Grader</td><td>Summary</td><td>{e(full or r['sender'])}</td>"
+                f"<td colspan='3'>{e(r['audit_note'])}</td></tr>"
+            )
+    ev_section = ""
+    if ev_rows:
+        ev_section = (
+            "<div class='page page-break'>"
+            "<div class='b1'>หลักฐานการขอความช่วยเหลือผู้สอน &amp; ผลการตรวจโค้ดอัตโนมัติ (Help &amp; Auto-Grade Log)</div>"
+            "<table class='ev-table'><thead><tr>"
+            "<th style='width:80px;'>เวลา</th><th style='width:85px;'>ช่วงงาน</th><th style='width:160px;'>ผู้เรียน</th>"
+            "<th>อาการ / รายละเอียด / ผลตรวจ Auto-Grader</th><th style='width:85px;'>สถานะ</th><th style='width:95px;'>การช่วยเหลือ</th>"
+            "</tr></thead><tbody>" + "".join(ev_rows) + "</tbody></table></div>"
+        )
+
+    return f"""<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>พิมพ์สรุปคะแนน Audit v2</title>
+<style>
+  @page {{ size: A4 landscape; margin: 7mm; }}
+  * {{ box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }}
+  body {{ margin: 0; padding: 16px; background: #e2e8f0; color: #000; font-family: "Leelawadee UI", "Sarabun", Tahoma, sans-serif; }}
+  .toolbar {{ position: sticky; top: 0; z-index: 20; background: #0f172a; color: #fff; padding: 10px 18px; border-radius: 10px;
+    margin: 0 auto 14px; max-width: 283mm; display: flex; justify-content: space-between; align-items: center; gap: 12px; }}
+  .toolbar button, .toolbar a {{ padding: 8px 16px; border-radius: 8px; border: 0; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; }}
+  .toolbar .print-btn {{ background: #2563eb; color: #fff; }}
+  .toolbar .back-btn {{ background: #334155; color: #fff; }}
+  .page {{ background: #fff; width: 283mm; margin: 0 auto 16px; padding: 6mm; box-shadow: 0 3px 14px rgba(0,0,0,0.12); }}
+  .page-break {{ page-break-before: always; }}
+  .b1, .b2, .b3 {{ text-align: center; padding: 4px; font-weight: 700; }}
+  .b1 {{ background: #FCE4D6; font-size: 14px; }}
+  .b2 {{ background: #F8CBAD; font-size: 12.5px; }}
+  .b3 {{ background: #FCE4D6; font-size: 11px; font-weight: 400; margin-bottom: 6px; }}
+  table {{ width: 100%; border-collapse: collapse; border: 2px solid #000; font-size: 10px; }}
+  th, td {{ border: 1px solid #000; padding: 3px 2px; text-align: center; vertical-align: middle; }}
+  .blue-h {{ background: #8EA9DB; font-weight: 700; }}
+  .pre-h {{ background: #F4B084; font-weight: 700; }}
+  .post-h {{ background: #ED7D31; font-weight: 700; }}
+  .th-top {{ background: #9BC2E6; font-weight: 700; }}
+  .th-sub {{ background: #BDD7EE; font-weight: 700; font-size: 9px; }}
+  .ws-top {{ background: #FFE699; font-weight: 700; }}
+  .ws-sub {{ background: #FFF2CC; font-weight: 700; font-size: 9px; }}
+  .pr-top {{ background: #A9D08E; font-weight: 700; }}
+  .pr-sub {{ background: #C6E0B4; font-weight: 700; font-size: 9px; }}
+  .wt {{ background: #FCE4D6; color: #C00000; font-weight: 700; font-size: 9px; }}
+  .fsum {{ background: #DDEBF7; }}
+  .wsum {{ background: #FFF2CC; }}
+  .psum {{ background: #FCE4D6; }}
+  .pen {{ background: #FCE4D6; color: #991B1B; }}
+  .tot {{ background: #C6E0B4; }}
+  .orange {{ color: #C65911; font-weight: 700; }}
+  .pass {{ background: #DCFCE7; color: #166534; }}
+  .fail {{ background: #FEE2E2; color: #991B1B; }}
+  .name-p {{ border-right: none !important; text-align: left !important; padding-left: 3px !important; }}
+  .name-f {{ border-left: none !important; border-right: none !important; text-align: left !important; }}
+  .name-l {{ border-left: none !important; text-align: left !important; padding-right: 3px !important; }}
+  .avg-row {{ background: #F1F5F9; font-weight: 700; }}
+  .ev-table th {{ background: #1E293B; color: #fff; padding: 5px; font-size: 11px; }}
+  .ev-table td {{ text-align: left; padding: 4px 6px; font-size: 10.5px; }}
+  @media print {{
+    body {{ background: #fff; padding: 0; }}
+    .toolbar {{ display: none !important; }}
+    .page {{ box-shadow: none; width: 100%; margin: 0; padding: 0; }}
+  }}
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>🖨️ หน้าพร้อมพิมพ์ใบคะแนน Audit v2 (A4 แนวนอน · เลือก Printer: <b>Save as PDF</b>)</span>
+    <div style="display:flex;gap:8px;">
+      <button class="print-btn" onclick="window.print()">🖨️ พิมพ์ / Save as PDF</button>
+      <a class="back-btn" href="/">← กลับกระดานผู้สอน</a>
+    </div>
+  </div>
+  <div class="page">
+    <div class="b1">สรุปคะแนนการสอบและการปฏิบัติงานระหว่างเรียน (v2 · Audit &amp; HR)</div>
+    <div class="b2">{e(cohort_title)}</div>
+    <div class="b3">{e(date_subtitle)}</div>
+    <table>
+      <thead>
+        <tr>
+          <th rowspan="3" class="blue-h" style="width:26px;">ที่</th>
+          <th rowspan="3" class="blue-h" style="width:52px;">รหัส</th>
+          <th rowspan="3" colspan="3" class="blue-h">ชื่อ - นามสกุล</th>
+          <th rowspan="3" class="blue-h" style="width:44px;">สังกัด</th>
+          <th rowspan="3" class="pre-h" style="width:34px;">Pre<br>(20)</th>
+          <th rowspan="3" class="post-h" style="width:36px;">Post<br>HR(20)</th>
+          <th colspan="6" class="th-top">ทฤษฎี 6 หัวข้อ (30)</th>
+          <th rowspan="3" class="fsum" style="width:36px;">รวม<br>ทฤษฎี<br>(30)</th>
+          <th colspan="5" class="ws-top">Workshop (20)</th>
+          <th rowspan="3" class="wsum" style="width:36px;">รวม<br>WS<br>(20)</th>
+          <th colspan="6" class="pr-top">สอบปฏิบัติ Final (50)</th>
+          <th rowspan="3" class="psum" style="width:36px;">รวม<br>ปฏิบัติ<br>(50)</th>
+          <th rowspan="3" class="tot" style="width:38px;">รวม<br>(100)</th>
+          <th rowspan="3" style="width:26px;">เกรด</th>
+          <th rowspan="3" style="background:#D9D9D9;width:44px;">ผล<br>(&gt;=60)</th>
+        </tr>
+        <tr>
+          <th class="th-sub">H1<br>OT/IT</th><th class="th-sub">H2<br>UI/CSS</th><th class="th-sub">H3<br>JS/DOM</th>
+          <th class="th-sub">H4<br>JSON</th><th class="th-sub">H5<br>Hook</th><th class="th-sub">H6<br>Sec/QA</th>
+          <th class="ws-sub">W1</th><th class="ws-sub">W2</th><th class="ws-sub">W3</th><th class="ws-sub">W4</th><th class="wt">หัก<br>Help</th>
+          <th class="pr-sub">T1</th><th class="pr-sub">T2</th><th class="pr-sub">T3</th><th class="pr-sub">T4</th><th class="pr-sub">T5</th><th class="wt">หัก<br>Help</th>
+        </tr>
+        <tr>
+          <th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th>
+          <th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">(5)</th><th class="wt">-5max</th>
+          <th class="wt">(10)</th><th class="wt">(10)</th><th class="wt">(10)</th><th class="wt">(10)</th><th class="wt">(10)</th><th class="wt">-10max</th>
+        </tr>
+      </thead>
+      <tbody>{"".join(body_rows) if body_rows else "<tr><td colspan='31'>ยังไม่มีข้อมูลผู้เรียน</td></tr>"}{avg_row}</tbody>
+    </table>
+  </div>
+  {ev_section}
+</body>
+</html>"""
 
 
 if __name__ == "__main__":
