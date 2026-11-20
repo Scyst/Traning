@@ -12,16 +12,17 @@ Design goals:
 
 from typing import Any, Dict, List, Optional
 
-EXAM_HELP_HINT_DECAY = (1.0, 2.0, 3.0)  # 1st=1, 2nd=2, 3rd=3, 4th+=1
-EXAM_HELP_CODE_FIX_PENALTY = 3.0
-EXAM_HELP_MAX_PENALTY = 15.0
+EXAM_HELP_HINT_DECAY = (0.5, 1.0, 1.5)  # 1st=0.5, 2nd=1.0, 3rd=1.5, 4th+=0.5
+EXAM_HELP_CODE_FIX_PENALTY = 2.0
+EXAM_HELP_MAX_PENALTY = 10.0
 
 WORKSHOP_FREE_HINTS = 2
 WORKSHOP_HELP_HINT_PENALTY = 0.5
-WORKSHOP_HELP_CODE_FIX_PENALTY = 1.5
-WORKSHOP_HELP_MAX_PENALTY = 8.0
+WORKSHOP_HELP_CODE_FIX_PENALTY = 1.0
+WORKSHOP_HELP_MAX_PENALTY = 5.0
 
-DEFAULT_PASS_SCORE = 70.0
+HELP_MAX_EARNED_SHARE = 0.4  # Student always keeps at least 60% of their earned raw score
+DEFAULT_PASS_SCORE = 60.0
 
 
 def clamp_score(value: float, low: float = 0.0, high: float = 100.0) -> float:
@@ -53,7 +54,7 @@ def preview_next_exam_hint_cost(resolved_hints_so_far: int) -> float:
         resolved_hints_so_far = 0
     if resolved_hints_so_far < len(EXAM_HELP_HINT_DECAY):
         return EXAM_HELP_HINT_DECAY[resolved_hints_so_far]
-    return 1.0
+    return 0.5
 
 
 def calculate_help_penalty(
@@ -97,10 +98,10 @@ def calculate_help_penalty(
     scope_cap = EXAM_HELP_MAX_PENALTY if norm_scope == "exam" else WORKSHOP_HELP_MAX_PENALTY
     capped_penalty = min(scope_cap, round(raw_penalty, 1))
 
-    # Floor protection: help requests can never drop a student below 50% of earned raw score
+    # Floor protection: help requests can never drop a student below 60% of earned raw score
     if raw_earned is not None:
         earned = max(0.0, float(raw_earned))
-        floor_cap = round(earned * 0.5, 1)
+        floor_cap = round(earned * HELP_MAX_EARNED_SHARE, 1)
         applied_penalty = min(capped_penalty, floor_cap)
     else:
         applied_penalty = capped_penalty

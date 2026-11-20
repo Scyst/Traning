@@ -158,8 +158,12 @@ def refresh_student_help_summaries() -> None:
         by_sender.setdefault(req.get("sender", ""), []).append(req)
     for sender, st in state["students"].items():
         reqs = by_sender.get(sender, [])
-        st["exam_help_info"] = calculate_help_penalty(reqs, scope="exam")
-        st["workshop_help_info"] = calculate_help_penalty(reqs, scope="workshop")
+        ag = st.get("auto_grade") or {}
+        exam_raw = max(0.0, round(float(ag.get("raw_50") or 0) - float(ag.get("dup_penalty") or 0) - float(ag.get("false_alarm_penalty") or 0), 1)) if ag.get("ok") else None
+        ws_grades = st.get("workshop_grades") or {}
+        ws_raw = round(sum(float(v.get("raw_5") or 0) for v in ws_grades.values() if v.get("ok")), 1) if ws_grades else None
+        st["exam_help_info"] = calculate_help_penalty(reqs, scope="exam", raw_earned=exam_raw)
+        st["workshop_help_info"] = calculate_help_penalty(reqs, scope="workshop", raw_earned=ws_raw)
 
 
 def load_saved_progress() -> None:

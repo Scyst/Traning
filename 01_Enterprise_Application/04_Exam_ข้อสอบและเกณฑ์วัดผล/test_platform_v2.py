@@ -248,24 +248,24 @@ class TestGradingRules(unittest.TestCase):
     def test_exam_help_decay_and_cap(self) -> None:
         reqs = [
             {"scope": "exam", "status": "resolved", "resolution": "tech_issue"},  # 0
-            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -1
-            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -2
-            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -3
-            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -1 (total -7)
+            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -0.5
+            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -1.0
+            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -1.5
+            {"scope": "exam", "status": "resolved", "resolution": "hint"},        # -0.5 (total -3.5)
             {"scope": "exam", "status": "waiting", "resolution": ""},             # ignored
         ]
         res = grading_rules.calculate_help_penalty(reqs, scope="exam", raw_earned=45.0)
         self.assertEqual(res["tech_issue_count"], 1)
         self.assertEqual(res["hint_count"], 4)
-        self.assertEqual(res["applied_penalty"], 7.0)
+        self.assertEqual(res["applied_penalty"], 3.5)
 
-        # Extreme help spam should NEVER exceed max cap (15) or drop >50% of earned score
+        # Extreme help spam should NEVER exceed max cap (10) or drop >40% of earned score
         spam = [{"scope": "exam", "status": "resolved", "resolution": "code_fix"} for _ in range(10)]
         capped = grading_rules.calculate_help_penalty(spam, scope="exam", raw_earned=50.0)
-        self.assertEqual(capped["applied_penalty"], 15.0)
+        self.assertEqual(capped["applied_penalty"], 10.0)
 
         floor_protected = grading_rules.calculate_help_penalty(spam, scope="exam", raw_earned=20.0)
-        self.assertEqual(floor_protected["applied_penalty"], 10.0)  # Never drops earned 20 below 10!
+        self.assertEqual(floor_protected["applied_penalty"], 8.0)  # Keeps >=60% (12.0) of 20 earned!
 
         zero_earned = grading_rules.calculate_help_penalty(spam, scope="exam", raw_earned=0.0)
         self.assertEqual(zero_earned["applied_penalty"], 0.0)
@@ -275,14 +275,19 @@ class TestGradingRules(unittest.TestCase):
             {"scope": "workshop", "status": "resolved", "resolution": "hint"},     # free #1
             {"scope": "workshop", "status": "resolved", "resolution": "hint"},     # free #2
             {"scope": "workshop", "status": "resolved", "resolution": "hint"},     # -0.5
-            {"scope": "workshop", "status": "resolved", "resolution": "code_fix"}, # -1.5 => -2.0
+            {"scope": "workshop", "status": "resolved", "resolution": "code_fix"}, # -1.0 => -1.5
         ]
         ws_res = grading_rules.calculate_help_penalty(ws_reqs, scope="workshop", raw_earned=20.0)
-        self.assertEqual(ws_res["applied_penalty"], 2.0)
+        self.assertEqual(ws_res["applied_penalty"], 1.5)
+
+        ws_spam = [{"scope": "workshop", "status": "resolved", "resolution": "code_fix"} for _ in range(10)]
+        self.assertEqual(grading_rules.calculate_help_penalty(ws_spam, scope="workshop", raw_earned=20.0)["applied_penalty"], 5.0)
+        self.assertEqual(grading_rules.calculate_help_penalty(ws_spam, scope="workshop", raw_earned=5.0)["applied_penalty"], 2.0)
 
         self.assertEqual(grading_rules.compute_final_grade(25, 19, 36)["grade"], "A")
         self.assertEqual(grading_rules.compute_final_grade(25, 19, 35.9)["grade"], "B")
-        self.assertFalse(grading_rules.compute_final_grade(20, 15, 34)["passed"])
+        self.assertTrue(grading_rules.compute_final_grade(10, 15, 35)["passed"])   # 60.0 -> C Pass!
+        self.assertFalse(grading_rules.compute_final_grade(9, 15, 35)["passed"])   # 59.0 -> D Fail!
         self.assertEqual(grading_rules.clamp_score(float("nan")), 0.0)
         self.assertEqual(grading_rules.clamp_score(-5.0), 0.0)
         self.assertEqual(grading_rules.clamp_score(120.0), 100.0)
@@ -500,11 +505,12 @@ class TestPortalAndServerIntegration(unittest.TestCase):
                     with urllib.request.urlopen(exp_req) as r:
                         wb = openpyxl.load_workbook(io.BytesIO(r.read()), data_only=False)
                         ws = wb["สรุปคะแนนการสอบ_v2"]
-                        # Verify Theory topic 1..6 populated, W1=5, Practical TODO1..5=10 each, Help deduct=1
+                        # Verify Theory topic 1..6 populated, W1=5, Practical TODO1..5=10 each, 1st Exam hint deduct=0.5, pass >=60
                         self.assertEqual([ws.cell(9, c).value for c in range(9, 15)], [4, 5, 4, 4, 5, 4])
                         self.assertEqual(ws.cell(9, 16).value, 5.0)
                         self.assertEqual([ws.cell(9, c).value for c in range(22, 27)], [10.0, 10.0, 10.0, 10.0, 10.0])
-                        self.assertEqual(ws.cell(9, 27).value, 1.0)
+                        self.assertEqual(ws.cell(9, 27).value, 0.5)
+                        self.assertIn(">=60", str(ws.cell(9, 31).value))
                         ws_log = wb["หลักฐาน_Help_และ_AutoGrade"]
                         self.assertEqual(ws_log.cell(2, 3).value, "01-Tester")
 

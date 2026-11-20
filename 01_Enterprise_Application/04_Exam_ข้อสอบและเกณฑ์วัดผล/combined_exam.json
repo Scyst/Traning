@@ -9,7 +9,7 @@
     "workshopMax": 20,
     "practicalMax": 50,
     "totalMax": 100,
-    "passScore": 70
+    "passScore": 60
   },
   "topics": [
     { "topicNo": 1, "code": "T1", "label": "สถาปัตยกรรมระบบ OT / IT และ Enterprise App", "maxPoints": 5 },
