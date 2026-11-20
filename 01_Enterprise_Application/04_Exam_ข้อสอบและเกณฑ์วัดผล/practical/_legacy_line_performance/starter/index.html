@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Performance</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ห้ามเปลี่ยนหรือลบ id ในไฟล์นี้ ผู้สอนใช้ตรวจงาน -->
+  <header>
+    <h1>Line Performance</h1>
+    <p id="line">Line – · กะ –</p>
+  </header>
+
+  <main>
+    <section class="cards">
+      <article class="card">
+        <p class="label">ผลิตได้ (ชิ้น)</p>
+        <p class="value" id="actual">–</p>
+      </article>
+      <article class="card">
+        <p class="label">เป้าหมาย (ชิ้น)</p>
+        <p class="value" id="target">–</p>
+      </article>
+      <article class="card">
+        <p class="label">ชิ้นงานเสีย</p>
+        <p class="value" id="defect">–</p>
+      </article>
+      <article class="card">
+        <p class="label">Performance</p>
+        <p class="value" id="performance">–</p>
+        <p class="status off" id="status">ไม่มีข้อมูล</p>
+      </article>
+    </section>
+
+    <section class="actions">
+      <input id="sender" type="text" placeholder="ชื่อผู้แจ้ง (เช่น 05 สมชาย)">
+      <button id="alert-btn" type="button" disabled>แจ้งหัวหน้างาน</button>
+      <p id="alert-result"></p>
+    </section>
+
+    <p id="message"></p>
+    <p id="updated"></p>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

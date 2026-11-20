@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ใบบันทึก Test Case (T6) · The Performance Update</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: "Sarabun", "Segoe UI", Tahoma, sans-serif;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+    .wrap {
+      max-width: 1240px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    h1 { margin: 0 0 4px; font-size: 1.45rem; color: #0e5930; }
+    p.sub { margin: 0 0 18px; color: #475569; }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    label { display: block; font-weight: 700; font-size: 0.88rem; margin-bottom: 4px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.92rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      vertical-align: top;
+    }
+    th { background: #f8fafc; font-size: 0.9rem; text-align: left; }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    button {
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .btn-primary { background: #147a42; color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .wrap { border: 0; box-shadow: none; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ใบบันทึก Test Case (T6) · สอบปฏิบัติ The Performance Update</h1>
+  <p class="sub">บันทึกอย่างน้อย 5 กรณี: ปกติ · ค่าขอบ 85.0% · ค่าขอบ 60.0% · ต่ำกว่าเป้าและส่งแจ้งเตือน · โหลดข้อมูลไม่สำเร็จ (404) — เสร็จแล้วกดบันทึกเป็น CSV หรือ PDF ใส่ในโฟลเดอร์งานก่อนส่ง</p>
+
+  <div class="meta-grid">
+    <div><label>รุ่น / คอร์ส</label><input type="text" id="cohort" value="คอร์สที่ 1"></div>
+    <div><label>เลขที่</label><input type="text" id="seatNo" placeholder="เช่น 05"></div>
+    <div><label>ชื่อ - นามสกุล</label><input type="text" id="studentName" placeholder="กรอกชื่อ-นามสกุล"></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:78px;">ID</th>
+        <th style="width:205px;">ข้อมูลทดสอบ (ไฟล์)</th>
+        <th style="width:220px;">ขั้นตอนการทดสอบ</th>
+        <th style="width:220px;">ผลที่คาดหวัง</th>
+        <th style="width:200px;">ผลจริงที่หน้าจอ</th>
+        <th style="width:105px;">สถานะ</th>
+      </tr>
+    </thead>
+    <tbody id="tc-body"></tbody>
+  </table>
+
+  <div class="btn-row no-print">
+    <button class="btn-secondary" type="button" onclick="addRow()">+ เพิ่มแถว</button>
+    <button class="btn-primary" type="button" onclick="downloadCSV()">ดาวน์โหลดไฟล์ Test Case (.csv) เพื่อแนบส่ง</button>
+    <button class="btn-secondary" type="button" onclick="window.print()">พิมพ์ / บันทึกเป็น PDF</button>
+  </div>
+</div>
+
+<script>
+const PLACEHOLDERS = [
+  ['TC-01', 'normal.json (กรณีปกติ)', 'เปิดหน้าเว็บผ่าน Live Server', 'ระบุผลที่คาดหวัง (เช่น % สถานะ สี ปุ่ม)'],
+  ['TC-02', 'boundary-85.json (ค่าขอบ 85.0)', 'สลับไฟล์ข้อมูลเป็น boundary-85.json', 'ระบุผลที่คาดหวัง'],
+  ['TC-03', 'boundary-60.json (ค่าขอบ 60.0)', 'สลับไฟล์ข้อมูลเป็น boundary-60.json', 'ระบุผลที่คาดหวัง'],
+  ['TC-04', 'low.json (ต่ำกว่าเป้า + แจ้งเตือน)', 'สลับไฟล์เป็น low.json แล้วกดแจ้งเตือน', 'ระบุผลที่คาดหวัง + การกันกดซ้ำ'],
+  ['TC-05', 'กรณีโหลดไม่สำเร็จ (404)', 'เปลี่ยนชื่อ performance.json ชั่วคราว', 'ระบุข้อความแจ้งเตือนและค่าเดิมบนจอ']
+];
+
+const tbody = document.getElementById('tc-body');
+
+function createRow(id='', phFile='ชื่อไฟล์ / กรณีทดสอบ', phStep='ขั้นตอนการทดสอบ', phExp='ผลลัพธ์ที่คาดหวัง') {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="f-id" value="${id}"></td>
+    <td><textarea rows="2" class="f-file" placeholder="${phFile}"></textarea></td>
+    <td><textarea rows="2" class="f-step" placeholder="${phStep}"></textarea></td>
+    <td><textarea rows="2" class="f-exp" placeholder="${phExp}"></textarea></td>
+    <td><textarea rows="2" class="f-act" placeholder="กรอกผลที่สังเกตเห็นจริง..."></textarea></td>
+    <td>
+      <select class="f-st">
+        <option value="Pass">Pass</option>
+        <option value="Fail">Fail</option>
+      </select>
+    </td>
+  `;
+  tbody.appendChild(tr);
+}
+
+PLACEHOLDERS.forEach(p => createRow(p[0], p[1], p[2], p[3]));
+
+function addRow() {
+  const n = tbody.querySelectorAll('tr').length + 1;
+  createRow(`TC-0${n}`);
+}
+
+function downloadCSV() {
+  const cohort = document.getElementById('cohort').value.trim();
+  const seat = document.getElementById('seatNo').value.trim();
+  const name = document.getElementById('studentName').value.trim() || 'student';
+  let csv = `รุ่น,${cohort},เลขที่,${seat},ชื่อ,${name}\n`;
+  csv += 'ID,ข้อมูลทดสอบ,ขั้นตอน,ผลที่คาดหวัง,ผลจริง,Pass/Fail\n';
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const vals = [
+      tr.querySelector('.f-id').value,
+      tr.querySelector('.f-file').value,
+      tr.querySelector('.f-step').value,
+      tr.querySelector('.f-exp').value,
+      tr.querySelector('.f-act').value,
+      tr.querySelector('.f-st').value
+    ].map(v => '"' + String(v).replace(/"/g, '""').replace(/\n/g, ' ') + '"');
+    csv += vals.join(',') + '\n';
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `TestCase_${seat || '00'}_${name}.csv`;
+  a.click();
+}
+</script>
+</body>
+</html>

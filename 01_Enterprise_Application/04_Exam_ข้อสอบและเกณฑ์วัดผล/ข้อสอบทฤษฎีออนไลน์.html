@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ข้อสอบทฤษฎีออนไลน์ · การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร</title>
+  <style>
+    :root {
+      --boi-green: #147a42;
+      --boi-green-dark: #0e5930;
+      --boi-red: #d32f2f;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --border: #dce1e7;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Sarabun", "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--boi-green), var(--boi-green-dark));
+      color: #fff;
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .header-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.35rem; }
+    header p { margin: 2px 0 0; font-size: 0.92rem; opacity: 0.92; }
+    .progress-pill {
+      background: rgba(255,255,255,0.18);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .container {
+      max-width: 980px;
+      margin: 24px auto 60px;
+      padding: 0 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      color: var(--boi-green-dark);
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .grid-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+    label.field-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    textarea.code-input {
+      font-family: Consolas, "Courier New", monospace;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 210px;
+      line-height: 1.5;
+    }
+    .rules-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #334155;
+    }
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      transition: border-color 0.15s;
+    }
+    .q-card.answered {
+      border-left: 4px solid var(--boi-green);
+    }
+    .q-card.correct {
+      border-left: 5px solid #16a34a;
+      background: #f0fdf4;
+    }
+    .q-card.wrong {
+      border-left: 5px solid #dc2626;
+      background: #fef2f2;
+    }
+    .q-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .q-stem {
+      font-weight: 600;
+      font-size: 1.02rem;
+      margin-bottom: 10px;
+      white-space: pre-wrap;
+    }
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .choice-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f8fafc;
+      transition: all 0.12s;
+    }
+    .choice-label:hover {
+      background: #eef2ff;
+      border-color: #94a3b8;
+    }
+    .choice-label input {
+      margin-top: 4px;
+      transform: scale(1.15);
+    }
+    .explain-box {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      font-size: 0.9rem;
+    }
+    pre.code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+    }
+    table.tc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table.tc-table th, table.tc-table td {
+      border: 1px solid #cbd5e1;
+      padding: 8px;
+      text-align: left;
+    }
+    table.tc-table th {
+      background: #f1f5f9;
+      font-size: 0.9rem;
+    }
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    button.btn {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+    }
+    .btn-primary {
+      background: var(--boi-green);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--boi-green-dark); }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
+    .btn-outline {
+      background: #fff;
+      border: 1px solid #94a3b8 !important;
+      color: #334155;
+    }
+    #result-banner {
+      display: none;
+      border: 2px solid var(--boi-green);
+      background: #ecfdf5;
+    }
+    .score-big {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--boi-green-dark);
+    }
+    @media print {
+      header { position: static; }
+      .no-print { display: none !important; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>ข้อสอบทฤษฎีออนไลน์ (50 คะแนน)</h1>
+      <p>วิชา: การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร · กติกา Open-World (เปิดสไลด์ / ใช้ AI / ปรึกษาเพื่อนและอาจารย์ได้)</p>
+    </div>
+    <div class="progress-pill" id="progress-text">ตอบแล้ว 0 / 30 ข้อ</div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- กล่องแสดงผลคะแนนหลังส่ง -->
+  <div class="card" id="result-banner">
+    <h2>ผลการสอบทฤษฎีของคุณ</h2>
+    <div class="score-big" id="score-summary">0 / 50 คะแนน (0%)</div>
+    <p id="score-detail"></p>
+    <div class="btn-row no-print">
+      <button class="btn btn-primary" type="button" onclick="downloadResultJSON()">1. ดาวน์โหลดไฟล์ผลสอบ (.json) ส่งอาจารย์</button>
+      <button class="btn btn-secondary" type="button" onclick="downloadSingleCSV()">2. ดาวน์โหลดคะแนน (.csv)</button>
+      <button class="btn btn-outline" type="button" onclick="window.print()">3. พิมพ์ / บันทึกเป็น PDF</button>
+    </div>
+  </div>
+
+  <!-- ข้อมูลผู้เข้าสอบ -->
+  <div class="card">
+    <h2>ข้อมูลผู้เข้าสอบ</h2>
+    <div class="grid-form">
+      <div>
+        <label class="field-label" for="cohort">รุ่น / คอร์ส</label>
+        <input type="text" id="cohort" placeholder="เช่น คอร์สที่ 1" value="คอร์สที่ 1">
+      </div>
+      <div>
+        <label class="field-label" for="seatNo">เลขที่ (ตามใบรายชื่อ)</label>
+        <input type="number" id="seatNo" min="1" max="100" placeholder="เช่น 5">
+      </div>
+      <div>
+        <label class="field-label" for="studentName">ชื่อ - นามสกุล</label>
+        <input type="text" id="studentName" placeholder="กรอกชื่อ-นามสกุล">
+      </div>
+      <div>
+        <label class="field-label" for="dept">แผนก / หน่วยงาน</label>
+        <input type="text" id="dept" placeholder="เช่น Production / PE">
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;">
+    <ul class="rules-list">
+      <li>ข้อสอบมี 2 ตอน รวม 50 คะแนน เวลา 60 นาที (ตอนที่ 1 ปรนัย 30 คะแนน · ตอนที่ 2 อัตนัย 20 คะแนน)</li><li>กติกา Open-World: อนุญาตให้เปิดสไลด์ โค้ดตัวอย่าง อินเทอร์เน็ต ใช้ AI ปรึกษาเพื่อน และถามอาจารย์ผู้สอนได้ทุกช่องทาง</li><li>เน้นความเข้าใจและการนำไปใช้จริง: ตอนที่ 2 ให้เขียนอธิบายด้วยภาษาของตนเองและยกตัวอย่างให้ตรงตามโจทย์</li>
+    </ul>
+  </div>
+
+  <!-- ตอนที่ 1 ปรนัย 30 ข้อ -->
+  <div class="card">
+    <h2>ตอนที่ 1: ข้อสอบปรนัย 30 ข้อ (30 คะแนน · ข้อละ 1 คะแนน)</h2>
+    <div id="partA-container"></div>
+  </div>
+
+  <!-- ตอนที่ 2 อัตนัย 2 ข้อ -->
+  <div class="card">
+    <h2>ตอนที่ 2: ข้อสอบอัตนัย 2 ข้อ (20 คะแนน)</h2>
+
+    <!-- ข้อ 1 -->
+    <div class="q-card" style="margin-bottom:24px;">
+      <div class="q-meta">ข้อที่ 1 (10 คะแนน · วัด CLO02, CLO05)</div>
+      <div class="q-stem">API ของไลน์ผลิตตอบกลับเป็น JSON ดังนี้:</div>
+      <pre class="code-block">{"line": "A", "output": 1050, "target": 1200}</pre>
+      <p>ผู้เรียนคนหนึ่งเขียนโค้ดดึงข้อมูลดังนี้ แต่หน้าเว็บไม่แสดงตัวเลข 1050:</p>
+      <pre class="code-block">async function loadLine() {
+  const res = await fetch('/api/line/A');
+  const data = res.json();
+  document.querySelector('#output').textContent = data.output;
+}</pre>
+
+      <div style="margin-top:14px;">
+        <label class="field-label" for="b1_explain">(ก) ตัวแปร data เก็บค่าอะไร และทำไม data.output ถึงไม่ได้ค่า 1050? (3 คะแนน)</label>
+        <textarea id="b1_explain" rows="3" placeholder="อธิบายสาเหตุ..."></textarea>
+      </div>
+      <div style="margin-top:14px;">
+        <label class="field-label" for="b1_code">(ข) และ (ค) แก้ไขโค้ดด้านล่างให้แสดงค่า 1050 ได้ถูกต้อง พร้อมเพิ่มการตรวจ response.ok และ try/catch เพื่อแสดงข้อความ "โหลดข้อมูลไม่สำเร็จ" ใน #output เมื่อเกิดข้อผิดพลาด (7 คะแนน)</label>
+        <textarea id="b1_code" class="code-input">async function loadLine() {
+  const res = await fetch('/api/line/A');
+  const data = res.json();
+  document.querySelector('#output').textContent = data.output;
+}</textarea>
+      </div>
+      <div class="explain-box" id="b1-feedback"></div>
+    </div>
+
+    <!-- ข้อ 2 -->
+    <div class="q-card">
+      <div class="q-meta">ข้อที่ 2 (10 คะแนน · วัด CLO06 Software Testing)</div>
+      <div class="q-stem">Requirement: ช่องกรอก "จำนวนชิ้นงานเสีย" รับเฉพาะจำนวนเต็มตั้งแต่ 0 ถึง 100 ถ้ากรอกค่าที่เกิน 100 ค่าติดลบ หรือค่าที่ไม่ใช่ตัวเลข ระบบต้องแสดงข้อความ "ข้อมูลไม่ถูกต้อง" และไม่บันทึกข้อมูล</div>
+      <p style="margin:6px 0;">จงเขียน Test Case อย่างน้อย 4 กรณี (ครอบคลุม: กรณีปกติ, ค่าขอบ 0 และ 100, ค่านอกขอบ -1 และ 101, และข้อมูลผิดรูปแบบ เช่น ตัวอักษร/ทศนิยม)</p>
+      <table class="tc-table">
+        <thead>
+          <tr>
+            <th style="width:110px;">Test Case ID</th>
+            <th style="width:180px;">ข้อมูลทดสอบ (Input)</th>
+            <th>ขั้นตอนการทดสอบ</th>
+            <th>ผลลัพธ์ที่คาดหวัง (Expected Result)</th>
+          </tr>
+        </thead>
+        <tbody id="tc-rows"></tbody>
+      </table>
+      <div class="explain-box" id="b2-feedback"></div>
+    </div>
+  </div>
+
+  <!-- ปุ่มส่งข้อสอบ -->
+  <div class="card no-print">
+    <div class="btn-row">
+      <button class="btn btn-primary" type="button" onclick="submitExam()">ส่งข้อสอบและตรวจคะแนนทันที</button>
+      <button class="btn btn-outline" type="button" onclick="toggleInstructorPanel()">สำหรับผู้สอน: รวมไฟล์คะแนนทั้งห้อง (.csv)</button>
+    </div>
+  </div>
+
+  <!-- โหมดผู้สอนสำหรับรวมไฟล์ .json ของทั้งห้องเป็น .csv -->
+  <div class="card no-print" id="instructor-panel" style="display:none; border: 2px dashed #64748b;">
+    <h2>สำหรับผู้สอน: รวมไฟล์ผลสอบ (.json) ของผู้เรียนทั้งห้องเป็นตาราง Excel (.csv)</h2>
+    <p>เลือกไฟล์ผลสอบ <code>.json</code> ที่ผู้เรียนส่งมาทั้งหมดพร้อมกัน ระบบจะรวมคะแนนตอนที่ 1, ตอนที่ 2 และคะแนนรวม (%) ออกมาเป็นไฟล์ CSV เพื่อนำไปวางในชีต <code>ผู้เรียน</code> ได้ทันที</p>
+    <input type="file" id="batch-files" multiple accept=".json" onchange="mergeStudentFiles(event)">
+    <div id="batch-output" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<script>
+const EXAM_DATA = {"title": "ข้อสอบทฤษฎี", "subject": "การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร", "minutes": 60, "instructions": ["ข้อสอบมี 2 ตอน รวม 50 คะแนน เวลา 60 นาที (ตอนที่ 1 ปรนัย 30 คะแนน · ตอนที่ 2 อัตนัย 20 คะแนน)", "กติกา Open-World: อนุญาตให้เปิดสไลด์ โค้ดตัวอย่าง อินเทอร์เน็ต ใช้ AI ปรึกษาเพื่อน และถามอาจารย์ผู้สอนได้ทุกช่องทาง", "เน้นความเข้าใจและการนำไปใช้จริง: ตอนที่ 2 ให้เขียนอธิบายด้วยภาษาของตนเองและยกตัวอย่างให้ตรงตามโจทย์"], "partA": [{"clo": "CLO01", "topic": "Digital Transformation", "q": "ข้อใดเป็นข้อดีของระบบดิจิทัลเมื่อเทียบกับระบบเอกสารกระดาษ", "choices": ["ไม่ต้องสำรองข้อมูลอีกต่อไป", "ไม่ต้องกำหนดสิทธิ์ว่าใครเข้าถึงข้อมูลได้", "มีประวัติการแก้ไข ตรวจสอบย้อนหลังได้ว่าใครแก้อะไร", "ใช้ได้ทันทีโดยไม่ต้องเปลี่ยนวิธีทำงานของคน"], "answer": 2, "why": "ระบบดิจิทัลเก็บประวัติการแก้ไขได้ ส่วนการสำรองข้อมูล การกำหนดสิทธิ์ และการปรับวิธีทำงานยังจำเป็นเสมอ"}, {"clo": "CLO01", "topic": "Application Architecture", "q": "ข้อใดอธิบายสถาปัตยกรรมแบบ Microservices ได้ถูกต้อง", "choices": ["รวมทุกฟังก์ชันไว้ในโปรแกรมเดียวขนาดใหญ่", "แบ่งระบบเป็นบริการย่อยที่พัฒนาและอัปเดตแยกกันได้", "แอปที่ทำงานได้เฉพาะบนเครื่องของผู้ใช้", "ฐานข้อมูลที่มีตารางเดียวสำหรับทุกระบบ"], "answer": 1, "why": "Microservices แยกระบบเป็นบริการเล็ก ๆ แต่ละบริการ deploy และขยายได้อิสระ"}, {"clo": "CLO01", "topic": "IT vs OT", "q": "ระยะเวลาตอบสนอง (Response Time) ที่ระบบ OT ต้องการโดยทั่วไปอยู่ในระดับใด", "choices": ["ระดับมิลลิวินาทีถึงวินาที (Real-time)", "ระดับวินาทีถึงนาที ยอมให้ช้าได้บ้าง", "ระดับชั่วโมง", "ไม่มีข้อกำหนดเรื่องเวลา"], "answer": 0, "why": "OT ควบคุมเครื่องจักรจึงต้องตอบสนองแบบ Real-time ส่วน IT ยอมรับเวลาระดับวินาทีถึงนาทีได้ (อ้างอิง NIST SP 800-82 Rev.3)"}, {"clo": "CLO01", "topic": "IT vs OT", "q": "เหตุใดการอัปเดตซอฟต์แวร์ในระบบ OT จึงทำได้ไม่บ่อยเท่าระบบ IT", "choices": ["เพราะระบบ OT ไม่มีซอฟต์แวร์", "เพราะระบบ OT ใช้งานได้เฉพาะบน Cloud", "เพราะกฎหมายห้ามอัปเดตระบบในโรงงาน", "เพราะมักต้องหยุดเครื่องจักร ซึ่งกระทบการผลิตและความปลอดภัย"], "answer": 3, "why": "OT ทนต่อการหยุดเครื่องได้น้อย การอัปเดตจึงต้องวางแผนและทำนาน ๆ ครั้ง (อ้างอิง NIST SP 800-82 Rev.3)"}, {"clo": "CLO04", "topic": "UX/UI", "q": "Wireframe คืออะไร", "choices": ["หน้าจอจริงที่ลงสีและใส่ข้อมูลครบแล้ว", "เอกสารที่ผู้ใช้ลงชื่อยอมรับระบบ", "ไฟล์ CSS ที่กำหนดสีของระบบ", "ภาพร่างโครงหน้าจอแบบง่าย ใช้คุยเรื่องการจัดวางก่อนลงรายละเอียด"], "answer": 3, "why": "Wireframe คือโครงร่างหน้าจอ (Low-fidelity) ใช้ตกลงการจัดวางก่อนทำ UI จริง (อ้างอิง ISO 9241-210 ใช้ต้นแบบหน้าจอเพื่อทดสอบกับผู้ใช้ตั้งแต่ต้น)"}, {"clo": "CLO04", "topic": "UX/UI", "q": "หน้าจอบนแท็บเล็ตที่พนักงานใช้หน้างาน ปุ่มควรมีขนาดอย่างน้อยเท่าไร", "choices": ["16 × 16 px", "24 × 24 px", "44 × 44 px และเว้นระยะระหว่างปุ่ม 8 px ขึ้นไป", "ไม่ต้องกำหนด เพราะผู้ใช้ซูมได้เอง"], "answer": 2, "why": "ปุ่มสำหรับการแตะต้องมีขนาดอย่างน้อย 44 × 44 px และเว้นระยะ เพื่อลดการกดพลาด (อ้างอิง WCAG 2.2 เกณฑ์ 2.5.5 แนะนำ 44 × 44 px (AAA) ส่วนขั้นต่ำตามเกณฑ์ 2.5.8 คือ 24 × 24 px (AA))"}, {"clo": "CLO04", "topic": "UX/UI", "q": "เหตุใดหน้าจอแสดงสถานะเครื่องจักรควรมีไอคอนหรือข้อความกำกับคู่กับสี", "choices": ["เพราะผู้ใช้บางคนแยกสีไม่ได้ ไอคอนและข้อความช่วยให้อ่านสถานะได้ทุกคน", "เพื่อให้หน้าจอดูสวยขึ้นเท่านั้น", "เพราะเบราว์เซอร์บางตัวแสดงสีไม่ได้", "เพราะการใช้สีทำให้หน้าเว็บโหลดช้า"], "answer": 0, "why": "ประมาณ 8% ของผู้ชายมีภาวะตาบอดสี จึงไม่ควรใช้สีเป็นสัญญาณเพียงอย่างเดียว (อ้างอิง WCAG 2.2 เกณฑ์ 1.4.1 Use of Color)"}, {"clo": "CLO03", "topic": "HTML", "q": "เนื้อหาที่อยู่ในส่วนใดของเอกสาร HTML จะแสดงให้ผู้ใช้เห็นบนหน้าเว็บ", "choices": ["<head>", "<body>", "<!DOCTYPE html>", "<meta>"], "answer": 1, "why": "<body> เก็บเนื้อหาที่แสดงผล ส่วน <head> เก็บข้อมูลเกี่ยวกับหน้า เช่น title และการเชื่อมไฟล์ CSS (อ้างอิง HTML Living Standard (WHATWG))"}, {"clo": "CLO03", "topic": "HTML", "q": "ต้องการใช้สไตล์จากไฟล์ style.css ภายนอก ต้องเขียนแท็กใดใน <head>", "choices": ["<style src=\"style.css\">", "<css href=\"style.css\">", "<script href=\"style.css\">", "<link rel=\"stylesheet\" href=\"style.css\">"], "answer": 3, "why": "ไฟล์ CSS ภายนอกเชื่อมด้วย <link rel=\"stylesheet\" href=\"...\">"}, {"clo": "CLO03", "topic": "HTML", "q": "ข้อใดถูกต้องเกี่ยวกับ id และ class", "choices": ["id ต้องไม่ซ้ำกันในหน้าเดียว ส่วน class ใช้ซ้ำกับหลาย element ได้", "class ต้องไม่ซ้ำกัน ส่วน id ใช้ซ้ำได้", "ทั้ง id และ class ใช้ซ้ำไม่ได้", "id ใช้ได้เฉพาะกับแท็ก <div>"], "answer": 0, "why": "id ระบุ element เดียว เหมาะให้ JavaScript เลือก ส่วน class ใช้กับกลุ่ม element ที่แต่งแบบเดียวกัน (อ้างอิง HTML Living Standard กำหนดให้ id ไม่ซ้ำกันในเอกสาร)"}, {"clo": "CLO03", "topic": "CSS", "q": "ต้องการให้การ์ด 3 ใบเรียงต่อกันเป็นแถวเดียว ควรเขียน CSS ใดที่กล่องที่ครอบการ์ด", "choices": ["display: flex;", "display: none;", "position: absolute;", "text-align: center;"], "answer": 0, "why": "display: flex ที่กล่องแม่ทำให้ลูกเรียงเป็นแถว และใช้ gap กำหนดระยะห่างได้ (อ้างอิง CSS Flexible Box Layout Module Level 1 (W3C))"}, {"clo": "CLO03", "topic": "CSS", "q": "ลำดับชั้นของ Box Model จากด้านในออกไปด้านนอกคือข้อใด", "choices": ["content → margin → border → padding", "padding → content → border → margin", "content → padding → border → margin", "border → padding → content → margin"], "answer": 2, "why": "เนื้อหา (content) ถูกล้อมด้วย padding, border และ margin ตามลำดับ (อ้างอิง CSS Box Model Module Level 3 (W3C))"}, {"clo": "CLO03", "topic": "JavaScript", "q": "เมื่อรันโค้ด  const total = 10;  total = 20;  จะเกิดอะไรขึ้น", "choices": ["total มีค่า 20", "total มีค่า 30", "total ยังเป็น 10 โดยไม่มี error", "เกิด error เพราะ const กำหนดค่าใหม่ไม่ได้"], "answer": 3, "why": "ตัวแปร const กำหนดค่าใหม่ไม่ได้ (TypeError: Assignment to constant variable) ถ้าต้องเปลี่ยนค่าให้ใช้ let (อ้างอิง ECMAScript 2015 (ECMA-262 ฉบับที่ 6))"}, {"clo": "CLO03", "topic": "JavaScript", "q": "let temp = 85; ถ้า temp > 90 ได้ 'วิกฤต', else if temp > 80 ได้ 'เตือน', else ได้ 'ปกติ' ผลลัพธ์คือข้อใด", "choices": ["'วิกฤต'", "'เตือน'", "'ปกติ'", "ได้ทั้ง 'เตือน' และ 'ปกติ'"], "answer": 1, "why": "85 ไม่มากกว่า 90 แต่มากกว่า 80 จึงเข้าเงื่อนไข else if และหยุดเช็กเงื่อนไขที่เหลือ"}, {"clo": "CLO03", "topic": "JavaScript", "q": "ถ้า running = true และ temp = 70 นิพจน์ใดได้ผลเป็น true", "choices": ["running && temp > 80", "!running", "running || temp > 80", "temp > 80"], "answer": 2, "why": "|| เป็นจริงเมื่อมีอย่างน้อยหนึ่งฝั่งเป็นจริง running เป็น true จึงได้ true"}, {"clo": "CLO03", "topic": "JavaScript", "q": "const parts = ['A', 'B', 'C']; parts.push('D'); ค่า parts[3] คืออะไร", "choices": ["'C'", "เกิด error เพราะ parts เป็น const", "undefined", "'D'"], "answer": 3, "why": "push เพิ่ม 'D' ต่อท้ายที่ index 3 และ const ห้ามแค่กำหนดค่าใหม่ทั้งตัวแปร แต่แก้ข้างใน Array ได้ (อ้างอิง ECMAScript 2015 (ECMA-262 ฉบับที่ 6))"}, {"clo": "CLO03", "topic": "DOM", "q": "document.querySelector('.card') ได้ผลลัพธ์เป็นอะไร", "choices": ["element แรกในหน้าที่มี class=\"card\"", "ทุก element ที่มี class=\"card\"", "element ที่มี id=\"card\"", "ข้อความทั้งหมดใน element ที่ชื่อ card"], "answer": 0, "why": "querySelector คืน element แรกที่ตรงกับ CSS Selector ถ้าต้องการทุกตัวใช้ querySelectorAll"}, {"clo": "CLO03", "topic": "DOM", "q": "ต้องการแสดงข้อความที่ผู้ใช้พิมพ์ลงบนหน้าเว็บอย่างปลอดภัย ควรใช้คำสั่งใด", "choices": ["element.innerHTML = text", "element.textContent = text", "document.write(text)", "element.outerHTML = text"], "answer": 1, "why": "textContent แสดงเป็นข้อความเสมอ ส่วน innerHTML จะตีความแท็ก HTML จึงเปิดช่องให้ฝังโค้ดอันตราย (XSS) (อ้างอิง OWASP Cross Site Scripting Prevention Cheat Sheet)"}, {"clo": "CLO03", "topic": "DOM", "q": "ในฟังก์ชันที่รับ Event เช่น function onClick(event) ค่า event.target คืออะไร", "choices": ["เวลาที่เกิด Event", "ชื่อฟังก์ชันที่ถูกเรียก", "element ที่ทำให้เกิด Event เช่น ปุ่มที่ถูกกด", "หน้าเว็บทั้งหน้า"], "answer": 2, "why": "event.target ชี้ไปที่ element ต้นเหตุ ทำให้ใช้ฟังก์ชันเดียวกับหลายปุ่มได้"}, {"clo": "CLO02", "topic": "JSON", "q": "ข้อใดเป็น JSON ที่ถูกต้อง", "choices": ["{\"temp\": 72.5, \"online\": true}", "{\"temp\": 72.5,}", "{'temp': 72.5}", "{\"temp\": 72.5 // องศา}"], "answer": 0, "why": "JSON ต้องใช้เครื่องหมายคำพูดคู่ ห้ามมี comma ตัวสุดท้าย และห้ามมี comment (อ้างอิง RFC 8259)"}, {"clo": "CLO02", "topic": "JSON", "q": "data = {\"lines\": [{\"name\": \"A\", \"machines\": [{\"id\": \"M-01\"}, {\"id\": \"M-02\"}]}]}  ต้องเขียนอย่างไรจึงได้ \"M-02\"", "choices": ["data.machines[1].id", "data.lines[0].machines[1].id", "data.lines.machines[2].id", "data[0].machines[1]"], "answer": 1, "why": "ไล่ทีละชั้น: lines เป็น Array เลือกตัวแรก [0] แล้ว machines เป็น Array เลือกตัวที่สอง [1] แล้วอ่าน .id"}, {"clo": "CLO02", "topic": "JSON", "q": "JSON.stringify(obj) ใช้ทำอะไร", "choices": ["แปลงข้อความ JSON เป็น Object", "ตรวจว่า JSON ถูกต้องหรือไม่", "ลบ key ที่ไม่ใช้ออกจาก Object", "แปลง Object เป็นข้อความ JSON เพื่อส่งไปยัง Server"], "answer": 3, "why": "stringify แปลง Object เป็นข้อความ ใช้ตอนส่ง body ส่วน JSON.parse ทำกลับกัน"}, {"clo": "CLO02", "topic": "JSON", "q": "ใน JSON  {\"alarm\": null}  ค่า null หมายถึงอะไร", "choices": ["ข้อความว่าง \"\"", "ตัวเลข 0", "ไม่มีค่า (ว่างโดยตั้งใจ)", "ข้อมูลผิดพลาด"], "answer": 2, "why": "null แปลว่าไม่มีค่า เช่น ตอนนี้ไม่มี alarm ต่างจากข้อความว่างหรือเลข 0 (อ้างอิง RFC 8259)"}, {"clo": "CLO05", "topic": "HTTP Method", "q": "ต้องการแก้สถานะของเครื่อง M-01 ที่มีอยู่แล้วผ่าน REST API ควรใช้ HTTP Method ใด", "choices": ["GET", "PUT", "POST", "DELETE"], "answer": 1, "why": "GET อ่าน, POST สร้างใหม่, PUT แก้ไขข้อมูลเดิม, DELETE ลบ (อ้างอิง RFC 9110 HTTP Semantics: PUT แทนที่ข้อมูลเดิมและเป็น idempotent)"}, {"clo": "CLO05", "topic": "HTTP Status", "q": "API ตอบกลับด้วย Status 404 หมายถึงอะไร", "choices": ["สำเร็จ", "ไม่มีสิทธิ์เข้าถึง", "Server เกิดข้อผิดพลาดภายใน", "ไม่พบข้อมูลหรือ URL ที่ขอ"], "answer": 3, "why": "404 Not Found คือ URL ผิดหรือไม่มีข้อมูลนั้น ส่วน 500 คือ Server พัง และ 401/403 เกี่ยวกับสิทธิ์ (อ้างอิง RFC 9110 HTTP Semantics หมวด Status Codes)"}, {"clo": "CLO05", "topic": "fetch", "q": "เหตุใดหลังเรียก fetch แล้วควรตรวจ response.ok ก่อนใช้ข้อมูล", "choices": ["เพราะ fetch ไม่ throw error เมื่อ Server ตอบ 404 หรือ 500 ต้องตรวจเอง", "เพราะถ้าไม่ตรวจ ข้อมูลจะไม่ถูกแปลงเป็น JSON", "เพราะ response.ok ทำให้เรียก API ได้เร็วขึ้น", "เพราะเป็นข้อบังคับของ HTML5"], "answer": 0, "why": "fetch จะเข้า catch เฉพาะตอนต่อเครือข่ายไม่ได้ ถ้าได้ 404/500 ต้องเช็ก response.ok แล้วจัดการเอง (อ้างอิง Fetch Living Standard (WHATWG): fetch reject เฉพาะเมื่อเกิด network error)"}, {"clo": "CLO05", "topic": "fetch", "q": "การส่งข้อมูล JSON ไปยัง API ด้วย fetch แบบ POST ต้องกำหนด header ใด", "choices": ["'Accept-Language': 'th'", "'Cache-Control': 'no-cache'", "'Content-Type': 'application/json'", "'Content-Type': 'text/html'"], "answer": 2, "why": "Content-Type: application/json บอก Server ว่า body เป็น JSON และต้องใช้คู่กับ JSON.stringify (อ้างอิง RFC 8259 กำหนด media type application/json)"}, {"clo": "CLO05", "topic": "Webhook", "q": "สถานการณ์ใดเหมาะกับการใช้ Webhook มากที่สุด", "choices": ["แจ้งหัวหน้างานทันทีเมื่อเครื่องจักรหยุด", "แสดงกราฟอุณหภูมิที่เปลี่ยนทุกวินาที", "โหลดรายชื่อพนักงานครั้งเดียวตอนเปิดหน้า", "คำนวณคะแนนในเบราว์เซอร์"], "answer": 0, "why": "Webhook ส่งข้อมูลทันทีเมื่อเกิดเหตุการณ์ (Push) เหมาะกับการแจ้งเตือนที่เกิดไม่บ่อยแต่ต้องรู้ทันที"}, {"clo": "CLO06", "topic": "Levels of Testing", "q": "การทดสอบว่าหน้าเว็บกับ API ทำงานร่วมกันได้ถูกต้อง เป็นการทดสอบระดับใด", "choices": ["Unit Testing", "Integration Testing", "User Acceptance Testing", "ไม่ต้องทดสอบ"], "answer": 1, "why": "Integration Testing ทดสอบการเชื่อมต่อระหว่างส่วนต่าง ๆ ของระบบ (อ้างอิง ISO/IEC/IEEE 29119 และ ISTQB Glossary)"}, {"clo": "CLO06", "topic": "Test Case", "q": "ระบบต้องแจ้งเตือนเมื่อแรงดัน \"เกิน 240 V\" ข้อมูลทดสอบชุดใดตรวจค่าขอบ (Boundary) ได้ดีที่สุด", "choices": ["100 และ 500", "0 อย่างเดียว", "230 อย่างเดียว", "240 (ต้องไม่เตือน) และ 240.1 (ต้องเตือน)"], "answer": 3, "why": "ค่าขอบคือค่าที่อยู่ตรงเส้นแบ่ง ถ้าเงื่อนไขเขียนผิดเป็น >= จะจับได้จากค่า 240 (อ้างอิง Boundary Value Analysis ตาม ISO/IEC/IEEE 29119-4 และ ISTQB)"}], "partB": [{"clo": "CLO02, CLO05", "points": 10, "q": "API ของไลน์ผลิตตอบกลับเป็น JSON นี้\n{\"line\": \"A\", \"output\": 1050, \"target\": 1200}\n\nผู้เรียนคนหนึ่งเขียนโค้ดดังนี้\n\nasync function loadLine() {\n  const res = await fetch('/api/line/A');\n  const data = res.json();\n  document.querySelector('#output').textContent = data.output;\n}", "tasks": ["(ก) ตัวแปร data เก็บอะไร และ data.output มีค่าอะไร เพราะเหตุใด (3 คะแนน)", "(ข) แก้โค้ดให้แสดงค่า 1050 ได้ถูกต้อง (3 คะแนน)", "(ค) เพิ่มการตรวจ response.ok และแสดงข้อความ \"โหลดข้อมูลไม่สำเร็จ\" ใน #output เมื่อเกิดข้อผิดพลาด (4 คะแนน)"], "lines": 24, "key": ["(ก) data เก็บ Promise ไม่ใช่ข้อมูล เพราะ res.json() ทำงานแบบ async แต่ไม่ได้ใส่ await ดังนั้น data.output มีค่า undefined (3: บอกได้ว่าเป็น Promise 1 คะแนน, undefined 1 คะแนน, สาเหตุคือขาด await 1 คะแนน)", "(ข) เปลี่ยนเป็น const data = await res.json(); (3: ใส่ await ถูกตำแหน่ง)", "(ค) ใส่ try/catch, ถ้า !res.ok ให้ throw new Error('HTTP ' + res.status) และใน catch กำหนด textContent = 'โหลดข้อมูลไม่สำเร็จ' (4: ตรวจ res.ok 2 คะแนน, แสดงข้อความเมื่อผิดพลาดรวมกรณีเครือข่ายล่ม 2 คะแนน)", "อ้างอิง: Fetch Living Standard (WHATWG) fetch reject เฉพาะเมื่อเกิด network error จึงต้องตรวจ response.ok เอง"], "sample": "async function loadLine() {\n  const out = document.querySelector('#output');\n  try {\n    const res = await fetch('/api/line/A');\n    if (!res.ok) throw new Error('HTTP ' + res.status);\n    const data = await res.json();\n    out.textContent = data.output;\n  } catch (err) {\n    out.textContent = 'โหลดข้อมูลไม่สำเร็จ';\n  }\n}"}, {"clo": "CLO06", "points": 10, "q": "Requirement: ช่องกรอก \"จำนวนชิ้นงานเสีย\" รับเฉพาะจำนวนเต็มตั้งแต่ 0 ถึง 100 ถ้ากรอกค่าที่เกิน 100 ค่าติดลบ หรือค่าที่ไม่ใช่ตัวเลข ระบบต้องแสดงข้อความ \"ข้อมูลไม่ถูกต้อง\" และไม่บันทึกข้อมูล", "tasks": ["เขียน Test Case อย่างน้อย 4 กรณี ในตารางด้านล่าง ให้มีทั้งกรณีปกติ กรณีค่าขอบ และกรณีข้อมูลผิดรูปแบบ (10 คะแนน)"], "table": ["Test Case ID", "ข้อมูลทดสอบ", "ขั้นตอน", "ผลที่คาดหวัง"], "rows": 7, "key": ["กรณีปกติ เช่น กรอก 5 แล้วบันทึกได้ (2 คะแนน)", "ค่าขอบด้านล่างและบน: 0 และ 100 ต้องบันทึกได้ (2 คะแนน)", "นอกขอบ: -1 และ 101 ต้องแสดง \"ข้อมูลไม่ถูกต้อง\" และไม่บันทึก (2 คะแนน)", "ข้อมูลผิดรูปแบบ: ตัวอักษร เช่น abc หรือทศนิยม เช่น 2.5 ต้องแสดง \"ข้อมูลไม่ถูกต้อง\" (2 คะแนน)", "ผลที่คาดหวังเขียนให้วัดได้ชัดเจน เช่น ระบุข้อความที่ต้องแสดงและบอกว่าบันทึกหรือไม่บันทึก (2 คะแนน)", "อ้างอิง: เทคนิค Boundary Value Analysis และ Equivalence Partitioning ตาม ISO/IEC/IEEE 29119-4 และ ISTQB"], "sample": "TC-01 | 5 | กรอกแล้วกดบันทึก | บันทึกสำเร็จ ไม่มีข้อความแจ้งเตือน\nTC-02 | 0 และ 100 | กรอกทีละค่าแล้วกดบันทึก | บันทึกสำเร็จทั้งสองค่า\nTC-03 | -1 และ 101 | กรอกทีละค่าแล้วกดบันทึก | แสดง \"ข้อมูลไม่ถูกต้อง\" และไม่บันทึก\nTC-04 | abc | กรอกแล้วกดบันทึก | แสดง \"ข้อมูลไม่ถูกต้อง\" และไม่บันทึก\nTC-05 | 2.5 | กรอกแล้วกดบันทึก | แสดง \"ข้อมูลไม่ถูกต้อง\" และไม่บันทึก"}]};
+const LETTERS = ['ก', 'ข', 'ค', 'ง'];
+let lastSubmission = null;
+
+// สร้างข้อสอบตอนที่ 1
+function renderPartA() {
+  const container = document.getElementById('partA-container');
+  container.innerHTML = EXAM_DATA.partA.map((q, idx) => {
+    const choicesHtml = q.choices.map((c, cIdx) => `
+      <label class="choice-label">
+        <input type="radio" name="q_${idx}" value="${cIdx}" onchange="updateProgress()">
+        <span><strong>${LETTERS[cIdx]}.</strong> ${escapeHtml(c)}</span>
+      </label>
+    `).join('');
+    return `
+      <div class="q-card" id="qcard_${idx}">
+        <div class="q-meta">ข้อที่ ${idx + 1} · ${q.clo} (${q.topic})</div>
+        <div class="q-stem">${idx + 1}. ${escapeHtml(q.q)}</div>
+        <div class="choices">${choicesHtml}</div>
+        <div class="explain-box" id="exp_${idx}"></div>
+      </div>
+    `;
+  }).join('');
+
+  // สร้างตาราง Test Case 5 แถว
+  const tcBody = document.getElementById('tc-rows');
+  let rowsHtml = '';
+  for (let i = 1; i <= 5; i++) {
+    const tcId = `TC-0${i}`;
+    rowsHtml += `
+      <tr>
+        <td><input type="text" id="tc_id_${i}" value="${tcId}"></td>
+        <td><input type="text" id="tc_in_${i}" placeholder="เช่น 50, 0, 100, -1, abc"></td>
+        <td><input type="text" id="tc_step_${i}" placeholder="กรอกค่าแล้วกดบันทึก" value="กรอกค่าแล้วกดบันทึก"></td>
+        <td><input type="text" id="tc_exp_${i}" placeholder="ระบุว่าบันทึกสำเร็จ หรือ แสดงข้อความใด"></td>
+      </tr>
+    `;
+  }
+  tcBody.innerHTML = rowsHtml;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function updateProgress() {
+  let count = 0;
+  EXAM_DATA.partA.forEach((_, idx) => {
+    const checked = document.querySelector(`input[name="q_${idx}"]:checked`);
+    const card = document.getElementById(`qcard_${idx}`);
+    if (checked) {
+      count++;
+      card.classList.add('answered');
+    }
+  });
+  document.getElementById('progress-text').textContent = `ตอบแล้ว ${count} / ${EXAM_DATA.partA.length} ข้อ`;
+}
+
+function gradePartB() {
+  // ตรวจข้อ 1 (10 คะแนน)
+  const exp = document.getElementById('b1_explain').value.toLowerCase();
+  const code = document.getElementById('b1_code').value;
+  let b1Score = 0;
+  let b1Notes = [];
+
+  if (exp.includes('promise') || exp.includes('await') || exp.includes('undefined') || exp.includes('ยังไม่เสร็จ')) {
+    b1Score += 3;
+    b1Notes.push('✓ (ก) อธิบายสาเหตุเรื่อง Promise / ขาด await ได้ถูกต้อง (+3)');
+  } else if (exp.trim().length > 10) {
+    b1Score += 1.5;
+    b1Notes.push('△ (ก) มีคำอธิบาย แต่ควรระบุให้ชัดว่า res.json() คืนค่าเป็น Promise จึงต้องใช้ await (+1.5)');
+  } else {
+    b1Notes.push('✗ (ก) ยังไม่ได้อธิบายสาเหตุ (+0)');
+  }
+
+  if (/await\s+res\.json\s*\(\s*\)/.test(code)) {
+    b1Score += 3;
+    b1Notes.push('✓ (ข) ใส่ await res.json() ถูกต้อง (+3)');
+  } else {
+    b1Notes.push('✗ (ข) ยังไม่ได้ใส่ await หน้า res.json() (+0)');
+  }
+
+  if (code.includes('res.ok') || code.includes('response.ok')) {
+    b1Score += 2;
+    b1Notes.push('✓ (ค) มีการตรวจสอบ res.ok (+2)');
+  } else {
+    b1Notes.push('✗ (ค) ขาดการตรวจ res.ok (+0)');
+  }
+
+  if (code.includes('catch') && code.includes('โหลดข้อมูลไม่สำเร็จ')) {
+    b1Score += 2;
+    b1Notes.push('✓ (ค) มี try/catch และแสดงข้อความ "โหลดข้อมูลไม่สำเร็จ" (+2)');
+  } else if (code.includes('โหลดข้อมูลไม่สำเร็จ')) {
+    b1Score += 1;
+    b1Notes.push('△ (ค) มีข้อความแจ้งเตือน แต่ควรครอบด้วย try/catch (+1)');
+  } else {
+    b1Notes.push('✗ (ค) ขาดการแสดงข้อความ "โหลดข้อมูลไม่สำเร็จ" ใน catch (+0)');
+  }
+
+  // ตรวจข้อ 2 (10 คะแนน)
+  let allInputs = '';
+  let allExps = '';
+  let filledRows = 0;
+  const tcList = [];
+  for (let i = 1; i <= 5; i++) {
+    const idVal = document.getElementById(`tc_id_${i}`).value.trim();
+    const inVal = document.getElementById(`tc_in_${i}`).value.trim();
+    const stepVal = document.getElementById(`tc_step_${i}`).value.trim();
+    const expVal = document.getElementById(`tc_exp_${i}`).value.trim();
+    if (inVal || expVal) {
+      filledRows++;
+      allInputs += ' ' + inVal.toLowerCase();
+      allExps += ' ' + expVal.toLowerCase();
+      tcList.push({ id: idVal, input: inVal, step: stepVal, expected: expVal });
+    }
+  }
+
+  let b2Score = 0;
+  let b2Notes = [];
+  if (filledRows >= 1) {
+    b2Score += 2;
+    b2Notes.push('✓ มีการระบุกรณีทดสอบปกติ (+2)');
+  }
+  if (/\b0\b/.test(allInputs) || /\b100\b/.test(allInputs)) {
+    b2Score += 2;
+    b2Notes.push('✓ มีการทดสอบค่าขอบ 0 หรือ 100 (+2)');
+  } else {
+    b2Notes.push('✗ ขาดการทดสอบค่าขอบ (0 และ 100)');
+  }
+  if (allInputs.includes('-1') || allInputs.includes('101') || allInputs.includes('-')) {
+    b2Score += 2;
+    b2Notes.push('✓ มีการทดสอบค่านอกขอบ เช่น ค่าติดลบ หรือ เกิน 100 (+2)');
+  } else {
+    b2Notes.push('✗ ขาดการทดสอบค่านอกขอบ (-1 หรือ 101)');
+  }
+  if (/[a-zก-ฮ]|\d+\.\d+/.test(allInputs)) {
+    b2Score += 2;
+    b2Notes.push('✓ มีการทดสอบข้อมูลผิดรูปแบบ เช่น ตัวอักษรหรือทศนิยม (+2)');
+  } else {
+    b2Notes.push('✗ ขาดการทดสอบข้อมูลผิดรูปแบบ (เช่น abc หรือ 2.5)');
+  }
+  if (filledRows >= 4 && (allExps.includes('ข้อมูลไม่ถูกต้อง') || allExps.includes('สำเร็จ') || allExps.includes('บันทึก'))) {
+    b2Score += 2;
+    b2Notes.push('✓ เขียนครบอย่างน้อย 4 กรณี และระบุผลลัพธ์ที่คาดหวังชัดเจน (+2)');
+  }
+
+  return {
+    b1Score: Math.min(10, b1Score),
+    b1Notes,
+    b2Score: Math.min(10, b2Score),
+    b2Notes,
+    tcList
+  };
+}
+
+function submitExam() {
+  const studentName = document.getElementById('studentName').value.trim();
+  const seatNo = document.getElementById('seatNo').value.trim();
+  if (!studentName) {
+    alert('กรุณากรอกชื่อ-นามสกุลก่อนส่งข้อสอบครับ');
+    document.getElementById('studentName').focus();
+    return;
+  }
+
+  let partAScore = 0;
+  const partAAnswers = [];
+
+  EXAM_DATA.partA.forEach((q, idx) => {
+    const checked = document.querySelector(`input[name="q_${idx}"]:checked`);
+    const selected = checked ? Number(checked.value) : -1;
+    const isCorrect = selected === q.answer;
+    if (isCorrect) partAScore++;
+    partAAnswers.push(selected);
+
+    const card = document.getElementById(`qcard_${idx}`);
+    card.classList.remove('answered', 'correct', 'wrong');
+    card.classList.add(isCorrect ? 'correct' : 'wrong');
+
+    const expBox = document.getElementById(`exp_${idx}`);
+    expBox.style.display = 'block';
+    expBox.innerHTML = isCorrect
+      ? `<strong>✓ ถูกต้อง (+1 คะแนน)</strong> · เฉลย: ${LETTERS[q.answer]}. ${escapeHtml(q.choices[q.answer])}<br><span style="color:#475569">${escapeHtml(q.why)}</span>`
+      : `<strong>✗ ยังไม่ถูก (0 คะแนน)</strong> · คำตอบที่ถูกคือ <strong>${LETTERS[q.answer]}. ${escapeHtml(q.choices[q.answer])}</strong><br><span style="color:#475569">${escapeHtml(q.why)}</span>`;
+  });
+
+  const partBResult = gradePartB();
+  const totalScore = partAScore + partBResult.b1Score + partBResult.b2Score;
+  const percentScore = (totalScore * 2).toFixed(1);
+
+  const b1Fb = document.getElementById('b1-feedback');
+  b1Fb.style.display = 'block';
+  b1Fb.innerHTML = `<strong>ผลตรวจข้อ 1 เบื้องต้น: ${partBResult.b1Score} / 10 คะแนน</strong><br>` + partBResult.b1Notes.join('<br>');
+
+  const b2Fb = document.getElementById('b2-feedback');
+  b2Fb.style.display = 'block';
+  b2Fb.innerHTML = `<strong>ผลตรวจข้อ 2 เบื้องต้น: ${partBResult.b2Score} / 10 คะแนน</strong><br>` + partBResult.b2Notes.join('<br>');
+
+  const banner = document.getElementById('result-banner');
+  banner.style.display = 'block';
+  document.getElementById('score-summary').textContent = `${totalScore} / 50 คะแนน (คิดเป็น ${percentScore}%)`;
+  document.getElementById('score-detail').innerHTML =
+    `ผู้เข้าสอบ: <strong>${escapeHtml(studentName)}</strong> (เลขที่ ${escapeHtml(seatNo || '-')}) · ` +
+    `ตอนที่ 1 ปรนัย: <strong>${partAScore} / 30</strong> · ` +
+    `ตอนที่ 2 ข้อ 1: <strong>${partBResult.b1Score} / 10</strong> · ` +
+    `ตอนที่ 2 ข้อ 2: <strong>${partBResult.b2Score} / 10</strong>`;
+
+  lastSubmission = {
+    submittedAt: new Date().toISOString(),
+    cohort: document.getElementById('cohort').value.trim(),
+    seatNo: seatNo,
+    studentName: studentName,
+    department: document.getElementById('dept').value.trim(),
+    partAScore: partAScore,
+    partB1Score: partBResult.b1Score,
+    partB2Score: partBResult.b2Score,
+    totalScore50: totalScore,
+    percent100: Number(percentScore),
+    partAAnswers: partAAnswers,
+    partB1Explain: document.getElementById('b1_explain').value,
+    partB1Code: document.getElementById('b1_code').value,
+    partB2TestCases: partBResult.tcList
+  };
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadResultJSON() {
+  if (!lastSubmission) return;
+  const safeName = (lastSubmission.studentName || 'student').replace(/[^a-zA-Z0-9ก-๙_-]/g, '_');
+  const seat = lastSubmission.seatNo ? String(lastSubmission.seatNo).padStart(2, '0') : '00';
+  const blob = new Blob([JSON.stringify(lastSubmission, null, 2)], { type: 'application/json;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ผลสอบทฤษฎี_${seat}_${safeName}.json`;
+  a.click();
+}
+
+function downloadSingleCSV() {
+  if (!lastSubmission) return;
+  const s = lastSubmission;
+  const header = 'รุ่น,เลขที่,ชื่อ-นามสกุล,แผนก,ปรนัย (30),อัตนัย ข้อ 1 (10),อัตนัย ข้อ 2 (10),รวม (50),สอบทฤษฎี (%)\n';
+  const row = `"${s.cohort}","${s.seatNo}","${s.studentName}","${s.department}",${s.partAScore},${s.partB1Score},${s.partB2Score},${s.totalScore50},${s.percent100}\n`;
+  const blob = new Blob(['\uFEFF' + header + row], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `คะแนนสอบทฤษฎี_${s.seatNo || '00'}_${s.studentName}.csv`;
+  a.click();
+}
+
+function toggleInstructorPanel() {
+  const p = document.getElementById('instructor-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+async function mergeStudentFiles(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  const records = [];
+  for (const f of files) {
+    try {
+      const txt = await f.text();
+      records.push(JSON.parse(txt));
+    } catch (e) {
+      console.error('อ่านไฟล์ไม่สำเร็จ:', f.name, e);
+    }
+  }
+  records.sort((a, b) => Number(a.seatNo || 999) - Number(b.seatNo || 999));
+
+  let csv = 'รุ่น,เลขที่,ชื่อ-นามสกุล,แผนก,ปรนัย (30),อัตนัย 1 (10),อัตนัย 2 (10),คะแนนรวม (50),สอบทฤษฎี (%)\n';
+  records.forEach(r => {
+    csv += `"${r.cohort || ''}","${r.seatNo || ''}","${r.studentName || ''}","${r.department || ''}",${r.partAScore},${r.partB1Score},${r.partB2Score},${r.totalScore50},${r.percent100}\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  document.getElementById('batch-output').innerHTML =
+    `<p>รวมผลสอบสำเร็จ <strong>${records.length} คน</strong></p>` +
+    `<a class="btn btn-primary" style="display:inline-block;text-decoration:none;" href="${url}" download="สรุปคะแนนสอบทฤษฎีทั้งห้อง.csv">ดาวน์โหลดไฟล์รวมคะแนนทั้งห้อง (.csv)</a>`;
+}
+
+renderPartA();
+</script>
+</body>
+</html>

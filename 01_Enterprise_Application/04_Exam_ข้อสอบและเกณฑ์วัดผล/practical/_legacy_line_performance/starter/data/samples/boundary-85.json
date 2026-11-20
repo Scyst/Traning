@@ -1,0 +1,12 @@
+{
+  "line": {
+    "name": "A",
+    "shift": "Day"
+  },
+  "output": {
+    "target": 1200,
+    "actual": 1020
+  },
+  "defect": 18,
+  "updatedAt": "2026-11-05T10:30:00+07:00"
+}

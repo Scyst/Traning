@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สอบปฏิบัติ: Electrical Meter Alert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Electrical Meter Alert</h1>
+    <p class="sub">ระบบติดตามค่ามิเตอร์และแจ้งเตือนความผิดปกติ</p>
+  </header>
+
+  <main>
+    <!-- การ์ดแสดงค่าจาก API (ต่อจาก Workshop 4) -->
+    <section class="cards">
+      <article class="card">
+        <p class="label">Voltage (แรงดัน)</p>
+        <p class="value voltage"><span id="voltage">–</span> <span class="unit">V</span></p>
+      </article>
+      <article class="card">
+        <p class="label">Current (กระแส)</p>
+        <p class="value current"><span id="current">–</span> <span class="unit">A</span></p>
+      </article>
+      <article class="card">
+        <p class="label">Water Flow (น้ำไหล)</p>
+        <p class="value water"><span id="water">–</span> <span class="unit">m³/h</span></p>
+      </article>
+      <article class="card">
+        <p class="label">Power (กำลังไฟฟ้า = V × A)</p>
+        <p class="value power"><span id="power">–</span> <span class="unit">W</span></p>
+      </article>
+    </section>
+
+    <!-- แผงสถานะและปุ่มตรวจสอบ (ใช้ onclick / onchange ตามสไลด์ที่เรียน) -->
+    <section class="panel">
+      <div class="status-row">
+        <span class="label">สถานะเครื่องจักร</span>
+        <span id="status" class="badge">รอตรวจสอบ</span>
+      </div>
+
+      <div class="input-group">
+        <label for="student-name">ชื่อผู้ส่งแจ้งเตือน (เลขที่-ชื่อ เช่น 01-สมชาย)</label>
+        <input id="student-name" type="text" placeholder="กรอกเลขที่-ชื่อของคุณ">
+      </div>
+
+      <div class="buttons">
+        <button id="check-btn" type="button" onclick="checkMachine()">ดึงข้อมูลและตรวจสอบ</button>
+        <label class="auto-box">
+          <input id="auto-toggle" type="checkbox" onchange="toggleAuto(this)">
+          <span>ตรวจอัตโนมัติทุก 5 วินาที</span>
+        </label>
+      </div>
+
+      <p id="updated" class="note">ยังไม่ได้ดึงข้อมูล</p>
+      <p id="notify-result" class="note"></p>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

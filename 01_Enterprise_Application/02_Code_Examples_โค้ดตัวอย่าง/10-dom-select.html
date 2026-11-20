@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<!-- เลือก element ด้วย JavaScript (Select DOM) · สไลด์ 58–62
+     เปิดในเบราว์เซอร์แล้วกด F12 › Console เพื่อดูผล -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Select DOM</title>
+</head>
+<body>
+  <h1 id="title">ข้อมูลผู้ปฏิบัติงาน</h1>
+
+  <input id="firstname" type="text" value="สมชาย">
+  <input id="lastname" type="text" value="ใจดี">
+
+  <p>ความสนใจ:</p>
+  <label><input class="interest" type="checkbox" value="PLC" checked> PLC</label>
+  <label><input class="interest" type="checkbox" value="Web"> Web</label>
+
+  <p>กะการทำงาน:</p>
+  <label><input type="radio" name="shift" value="Day" checked> Day</label>
+  <label><input type="radio" name="shift" value="Night"> Night</label>
+  <label><input type="radio" name="shift" value="OT"> OT</label>
+
+  <!-- วาง script ท้าย body (หรือใส่ defer) เพื่อให้ HTML ด้านบนสร้างเสร็จก่อน -->
+  <script>
+    // ---------------------------------------------- getElementById: เลือกด้วย id ได้ 1 ตัว
+    const first = document.getElementById('firstname');
+    console.log('ชื่อ:', first.value);                       // → ชื่อ: สมชาย
+
+    // ---------------------------------------------- getElementsByClassName: เลือกด้วย class ได้หลายตัว
+    // ชื่อมี s (Elements) และ N ตัวใหญ่ (ClassName)
+    const interests = document.getElementsByClassName('interest');
+    console.log('จำนวน checkbox:', interests.length);         // → จำนวน checkbox: 2
+    for (const box of interests) {
+      console.log(box.value, box.checked);                   // → PLC true / Web false
+    }
+
+    // ---------------------------------------------- querySelector: ใช้ CSS Selector ได้ตัวแรก
+    // แนะนำให้ใช้เป็นหลัก เพราะเลือกแบบเดียวกับ CSS
+    const last = document.querySelector('#lastname');         // # = id
+    const firstBox = document.querySelector('.interest');     // . = class
+    const textInput = document.querySelector('input[type=text]');  // เลือกตาม attribute
+    console.log(last.value, firstBox.value, textInput.id);    // → ใจดี PLC firstname
+
+    // ---------------------------------------------- querySelectorAll: ได้ทุกตัว แล้ววนด้วย forEach
+    document.querySelectorAll('input[name=shift]').forEach(radio => {
+      console.log('กะ', radio.value, radio.checked);          // → กะ Day true / Night false / OT false
+    });
+    const selected = document.querySelector('input[name=shift]:checked');
+    console.log('กะที่เลือก:', selected.value);                // → กะที่เลือก: Day
+
+    // ---------------------------------------------- กับดัก: หาไม่เจอได้ null
+    const missing = document.getElementById('firstName');     // ตัว N ใหญ่ ไม่ตรงกับ id="firstname"
+    console.log(missing);                                    // → null
+    // missing.value จะ error: Cannot read properties of null
+    // สาเหตุที่พบบ่อย: สะกด id ไม่ตรง (ตัวพิมพ์เล็กใหญ่ต่างกันก็ไม่ตรง) หรือ script รันก่อน HTML สร้างเสร็จ
+  </script>
+</body>
+</html>

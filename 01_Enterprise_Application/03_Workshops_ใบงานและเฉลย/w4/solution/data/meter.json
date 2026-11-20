@@ -1,0 +1,6 @@
+{
+  "line": "A",
+  "electric": { "voltage": 231.4, "current": 15.6 },
+  "water": { "flow": 3.2 },
+  "updatedAt": "2026-11-04T11:05:00+07:00"
+}

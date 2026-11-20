@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<!-- อ่านและเขียนเนื้อหา: textContent, innerText, innerHTML · สไลด์ 67–69 -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>DOM Content</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 24px; }
+    .out { border: 1px solid #ccc; padding: 8px; margin: 6px 0 16px; min-height: 24px; }
+  </style>
+</head>
+<body>
+  <h2 id="heading">Line A <span style="display: none">(ซ่อนอยู่)</span><em>Day</em></h2>
+  <button id="read-btn">อ่านหัวข้อ 3 แบบ</button>
+  <div id="read-out" class="out"></div>
+
+  <p>พิมพ์ข้อความแล้วกดแสดง (ลองพิมพ์ <code>&lt;b&gt;ตัวหนา&lt;/b&gt;</code>)</p>
+  <input id="msg" type="text" value="<b>ตัวหนา</b>">
+  <button id="safe-btn">แสดงด้วย textContent</button>
+  <button id="unsafe-btn">แสดงด้วย innerHTML</button>
+  <div id="msg-out" class="out"></div>
+
+  <button id="list-btn">สร้างรายการเครื่องจักร</button>
+  <ul id="machines"></ul>
+
+  <script>
+    const heading = document.getElementById('heading');
+
+    // ---------------------------------------------- อ่านเนื้อหา 3 แบบ
+    document.getElementById('read-btn').addEventListener('click', () => {
+      const out = document.getElementById('read-out');
+      out.textContent =
+        'textContent: ' + heading.textContent +          // ข้อความทั้งหมด รวมส่วนที่ซ่อน
+        ' | innerText: ' + heading.innerText +           // เฉพาะที่มองเห็น
+        ' | innerHTML: ' + heading.innerHTML;            // ได้แท็ก HTML ข้างในด้วย
+      // → textContent: Line A (ซ่อนอยู่)Day | innerText: Line A Day | innerHTML: Line A <span ...>...</span><em>Day</em>
+    });
+
+    // ---------------------------------------------- เขียนเนื้อหา: textContent ปลอดภัยกว่า
+    const msg = document.getElementById('msg');
+    const msgOut = document.getElementById('msg-out');
+
+    document.getElementById('safe-btn').addEventListener('click', () => {
+      msgOut.textContent = msg.value;       // แสดงเป็นตัวอักษรตามที่พิมพ์ ไม่ตีความแท็ก
+    });
+
+    document.getElementById('unsafe-btn').addEventListener('click', () => {
+      msgOut.innerHTML = msg.value;         // ตีความแท็ก ถ้าผู้ใช้พิมพ์โค้ดอันตรายเข้ามา จะถูกรัน (XSS)
+    });
+    // กติกา: ข้อความที่มาจากผู้ใช้หรือจาก API ให้ใช้ textContent เสมอ
+
+    // ---------------------------------------------- สร้าง element ใหม่จากข้อมูล
+    const machines = [
+      { id: 'M-01', status: 'RUNNING' },
+      { id: 'M-02', status: 'STOP' }
+    ];
+    document.getElementById('list-btn').addEventListener('click', () => {
+      const list = document.getElementById('machines');
+      list.replaceChildren();               // ล้างของเดิมก่อน กันกดแล้วซ้ำ
+      machines.forEach(m => {
+        const li = document.createElement('li');
+        li.textContent = `${m.id}: ${m.status}`;
+        list.appendChild(li);
+      });
+    });
+  </script>
+</body>
+</html>

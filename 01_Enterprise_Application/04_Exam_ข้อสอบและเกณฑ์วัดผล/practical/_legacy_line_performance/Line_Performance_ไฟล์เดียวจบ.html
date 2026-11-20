@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Line Performance (ไฟล์เดียวจบ HTML + CSS + JS)</title>
+
+  <!-- ==========================================
+       ส่วนที่ 1: CSS ตกแต่งหน้าเว็บ
+       ========================================== -->
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: "Leelawadee UI", Tahoma, sans-serif;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    header h1 { margin: 0; font-size: 28px; }
+    #line { margin: 4px 0 16px; color: #9ca3af; }
+
+    /* ปุ่มสลับเคสข้อมูลสำหรับทดสอบในไฟล์เดียว */
+    .case-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+    }
+    .case-switcher span { font-weight: 700; color: #9ca3af; margin-right: 4px; }
+    .case-btn {
+      padding: 8px 14px;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      background: #111827;
+      color: #e5e7eb;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .case-btn:hover { background: #374151; }
+
+    /* การ์ดแสดงผล 4 ใบเรียงกัน */
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .card {
+      flex: 1 1 200px;
+      padding: 20px;
+      border-radius: 10px;
+      background: #1f2937;
+    }
+    .label { margin: 0; color: #9ca3af; }
+    .value { margin: 8px 0 0; font-size: 40px; font-weight: 700; }
+
+    /* ป้ายสีสถานะ: เขียว (ปกติ) / เหลือง (เฝ้าระวัง) / แดง (ต่ำกว่าเป้า) */
+    .status {
+      display: inline-block;
+      margin: 12px 0 0;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .status.ok   { background: #22c55e; color: #052e16; }
+    .status.warn { background: #eab308; color: #422006; }
+    .status.bad  { background: #ef4444; color: #ffffff; }
+
+    /* ส่วนกรอกชื่อและปุ่มกดส่ง Webhook */
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    #sender {
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #e5e7eb;
+      font: inherit;
+      min-width: 240px;
+    }
+    #alert-btn {
+      min-height: 44px;
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 8px;
+      background: #ef4444;
+      color: #ffffff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #alert-btn:disabled {
+      background: #374151;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+    #updated { color: #9ca3af; font-size: 14px; margin-top: 16px; }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       ส่วนที่ 2: โครงสร้างหน้าเว็บ (HTML)
+       ========================================== -->
+  <header>
+    <h1>Line Performance</h1>
+    <p id="line">Line A · กะ Day</p>
+  </header>
+
+  <!-- ปุ่มกดเลือกเคสข้อมูล (ไม่ต้องดึงจากไฟล์อื่น) -->
+  <div class="case-switcher">
+    <span>เลือกเคสทดสอบ:</span>
+    <button class="case-btn" type="button" onclick="selectCase('normal')">🟢 เคสปกติ (92.0%)</button>
+    <button class="case-btn" type="button" onclick="selectCase('watch')">🟡 เคสเฝ้าระวัง (75.0%)</button>
+    <button class="case-btn" type="button" onclick="selectCase('low')">🔴 เคสต่ำกว่าเป้า (50.0%)</button>
+  </div>
+
+  <main>
+    <section class="cards">
+      <article class="card">
+        <p class="label">ผลิตได้ (ชิ้น)</p>
+        <p class="value" id="actual">–</p>
+      </article>
+      <article class="card">
+        <p class="label">เป้าหมาย (ชิ้น)</p>
+        <p class="value" id="target">–</p>
+      </article>
+      <article class="card">
+        <p class="label">ชิ้นงานเสีย</p>
+        <p class="value" id="defect">–</p>
+      </article>
+      <article class="card">
+        <p class="label">Performance</p>
+        <p class="value" id="performance">–</p>
+        <p class="status ok" id="status">ปกติ</p>
+      </article>
+    </section>
+
+    <section class="actions">
+      <input id="sender" type="text" placeholder="ชื่อผู้แจ้ง (เช่น 05 สมชาย)">
+      <button id="alert-btn" type="button" disabled onclick="sendAlert()">แจ้งหัวหน้างาน</button>
+      <p id="alert-result"></p>
+    </section>
+
+    <p id="updated"></p>
+  </main>
+
+  <!-- ==========================================
+       ส่วนที่ 3: JavaScript (ข้อมูล + คำนวณ + ส่ง Webhook)
+       ========================================== -->
+  <script>
+    // 1. ตั้งค่า URL Webhook ของอาจารย์
+    const WEBHOOK_URL = 'http://10.1.9.112:8000/api/notify';
+
+    // 2. ข้อมูลจำลองทั้ง 3 เคส อยู่ในไฟล์นี้เลย ไม่ต้องโหลดไฟล์แยก
+    const CASES = {
+      normal: { line: 'A', shift: 'Day', actual: 1104, target: 1200, defect: 18 }, // 92.0% (ปกติ)
+      watch:  { line: 'A', shift: 'Day', actual: 900,  target: 1200, defect: 18 }, // 75.0% (เฝ้าระวัง)
+      low:    { line: 'A', shift: 'Day', actual: 600,  target: 1200, defect: 18 }  // 50.0% (ต่ำกว่าเป้า)
+    };
+
+    let currentData = CASES.normal;
+
+    // 3. ฟังก์ชันคำนวณ Performance (%) = (ผลิตได้ / เป้าหมาย) * 100
+    function calcPerformance(actual, target) {
+      return (actual / target) * 100;
+    }
+
+    // 4. ฟังก์ชันตัดสินสถานะและสีตามเกณฑ์
+    function getStatus(percent) {
+      if (percent >= 85) {
+        return { key: 'ok', text: 'ปกติ' };
+      } else if (percent >= 60) {
+        return { key: 'warn', text: 'เฝ้าระวัง' };
+      } else {
+        return { key: 'bad', text: 'ต่ำกว่าเป้า' };
+      }
+    }
+
+    // 5. ฟังก์ชันนำข้อมูลไปแสดงบนหน้าเว็บ
+    function render(data) {
+      const percent = calcPerformance(data.actual, data.target);
+      const status = getStatus(percent);
+
+      document.getElementById('line').textContent = `Line ${data.line} · กะ ${data.shift}`;
+      document.getElementById('actual').textContent = data.actual.toLocaleString();
+      document.getElementById('target').textContent = data.target.toLocaleString();
+      document.getElementById('defect').textContent = data.defect;
+      document.getElementById('performance').textContent = percent.toFixed(1) + '%';
+
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = status.text;
+      statusEl.className = 'status ' + status.key;
+
+      document.getElementById('updated').textContent = 'อัปเดตล่าสุด ' + new Date().toLocaleTimeString('th-TH');
+      document.getElementById('alert-result').textContent = '';
+
+      // เปิดให้กดปุ่ม "แจ้งหัวหน้างาน" เฉพาะตอนที่สถานะเป็น "ต่ำกว่าเป้า" (bad)
+      document.getElementById('alert-btn').disabled = (status.key !== 'bad');
+    }
+
+    // 6. ฟังก์ชันเมื่อกดปุ่มสลับเคส
+    function selectCase(caseName) {
+      currentData = CASES[caseName];
+      render(currentData);
+    }
+
+    // 7. ฟังก์ชันส่งข้อความแจ้งเตือนเข้า Webhook ของอาจารย์
+    async function sendAlert() {
+      const sender = document.getElementById('sender').value.trim();
+      const resultEl = document.getElementById('alert-result');
+      const btn = document.getElementById('alert-btn');
+
+      if (!sender) {
+        resultEl.textContent = '⚠️ กรุณากรอกชื่อผู้แจ้งก่อนส่ง';
+        return;
+      }
+
+      const percent = calcPerformance(currentData.actual, currentData.target);
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sender: sender,
+            title: `Line ${currentData.line} ต่ำกว่าเป้า`,
+            message: `Performance ${percent.toFixed(1)}% (ผลิตได้ ${currentData.actual} จากเป้า ${currentData.target} ชิ้น)`
+          })
+        });
+
+        if (!response.ok) throw new Error('ส่งไม่สำเร็จ');
+        resultEl.textContent = `✅ ส่งแจ้งเตือนแล้ว (โดย ${sender})`;
+      } catch (error) {
+        btn.disabled = false;
+        resultEl.textContent = '❌ ส่งแจ้งเตือนไม่สำเร็จ';
+      }
+    }
+
+    // แสดงผลเคสปกติเป็นค่าเริ่มต้นเมื่อเปิดหน้าเว็บ
+    render(currentData);
+  </script>
+</body>
+</html>

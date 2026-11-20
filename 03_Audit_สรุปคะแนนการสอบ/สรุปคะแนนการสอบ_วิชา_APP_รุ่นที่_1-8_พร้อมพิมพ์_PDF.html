@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>สรุปคะแนนการสอบสำหรับ Audit - วิชา APP (รุ่นที่ 1-8)</title>
+  <style>
+    @page { size: A4 landscape; margin: 8mm; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { margin: 0; padding: 20px; font-family: "TH SarabunPSK", "Sarabun", Tahoma, sans-serif; background: #e2e8f0; color: #000; }
+    .toolbar {
+      position: sticky; top: 0; z-index: 100; background: #0f172a; color: #fff;
+      padding: 12px 20px; border-radius: 10px; margin-bottom: 20px;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+      font-family: "Leelawadee UI", Tahoma, sans-serif; font-size: 14px;
+    }
+    .toolbar button, .toolbar select {
+      padding: 8px 14px; border-radius: 6px; border: 1px solid #475569;
+      background: #1e293b; color: #fff; font: inherit; cursor: pointer; font-weight: 600;
+    }
+    .toolbar button.primary { background: #2563eb; border-color: #3b82f6; }
+    .sheet-page {
+      background: #fff; width: 281mm; margin: 0 auto 24px; padding: 10mm 8mm;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12); page-break-after: always;
+    }
+    .banner { text-align: center; font-weight: 700; font-size: 15px; padding: 5px; }
+    .b1, .b3 { background: #FCE4D6; }
+    .b2 { background: #F8CBAD; }
+    .b3 { margin-bottom: 8px; }
+    table.audit-table { width: 100%; border-collapse: collapse; font-size: 12.5px; border: 2px solid #000; }
+    .audit-table th, .audit-table td { border: 1px solid #000; padding: 3px 3px; text-align: center; vertical-align: middle; }
+    .blue-h { background: #8EA9DB; border: 2px solid #000 !important; }
+    .pre-h { background: #F4B084; border: 2px solid #000 !important; }
+    .post-h { background: #ED7D31; border: 2px solid #000 !important; }
+    .final-top { background: #9BC2E6; border: 2px solid #000 !important; font-size: 13.5px; }
+    .g-final { background: #BDD7EE; }
+    .fsum-h { background: #DDEBF7; border: 2px solid #000 !important; }
+    .fsum-bg { background: #DDEBF7; }
+    .prac-top { background: #A9D08E; border: 2px solid #000 !important; font-size: 13.5px; }
+    .g-prac { background: #C6E0B4; }
+    .psum-h { background: #F8CBAD; border: 2px solid #000 !important; }
+    .psum-bg { background: #FCE4D6; }
+    .tot-h { background: #C6E0B4; border: 2px solid #000 !important; }
+    .tot-bg { background: #C6E0B4; }
+    .grade-h { background: #FFFFFF; border: 2px solid #000 !important; }
+    .eval-h { background: #D9D9D9; border: 2px solid #000 !important; }
+    .eval-bg { background: #D9D9D9; }
+    .vert-row th { height: 145px; vertical-align: bottom; padding: 6px 2px; }
+    .vert div {
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      white-space: nowrap; display: inline-block; text-align: left; line-height: 1.25; font-size: 11.5px;
+    }
+    .weight { background: #FCE4D6; color: #C00000; font-weight: 700; border-bottom: 2px solid #000 !important; }
+    .b-med { border-left: 2px solid #000 !important; border-right: 2px solid #000 !important; }
+    .name-p { border-left: 2px solid #000 !important; border-right: none !important; text-align: left !important; padding-left: 5px !important; width: 48px; }
+    .name-f { border-left: none !important; border-right: none !important; text-align: left !important; width: 72px; }
+    .name-l { border-left: none !important; border-right: 2px solid #000 !important; text-align: left !important; width: 75px; }
+    .orange-txt { color: #C65911; font-weight: 600; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .toolbar { display: none !important; }
+      .sheet-page { box-shadow: none; margin: 0; width: 100%; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <div>
+      <b>📄 สรุปคะแนนการสอบวิชา APP สำหรับ Audit (Pre 20 + Post 20 | Final 30 + ปฏิบัติ 50 = รวม 100):</b> รุ่นที่ 1-2 กรอกแล้ว, รุ่นที่ 3-8 ฟอร์มเปล่า
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <label>เลือกรุ่นที่ต้องการดู/พิมพ์:</label>
+      <select onchange="filterSheet(this.value)">
+        <option value="all">แสดงครบทุกชีต (รุ่นที่ 1 - 8)</option><option value="c1">รุ่นที่ 1 (กรอกคะแนนแล้ว)</option><option value="c2_actual">รุ่นที่ 2 (ตามผู้เข้าสอบจริงใน Form)</option><option value="c2_excel">รุ่นที่ 2 (ตามรายชื่อใน Excel)</option><option value="c3">รุ่นที่ 3 (ฟอร์มเปล่า)</option><option value="c4">รุ่นที่ 4 (ฟอร์มเปล่า)</option><option value="c5">รุ่นที่ 5 (ฟอร์มเปล่า)</option><option value="c6">รุ่นที่ 6 (ฟอร์มเปล่า)</option><option value="c7">รุ่นที่ 7 (ฟอร์มเปล่า)</option><option value="c8">รุ่นที่ 8 (ฟอร์มเปล่า)</option>
+      </select>
+      <button class="primary" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+    </div>
+  </div>
+  
+        <section class="sheet-page" data-sheet="c1">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 1</div>
+          <div class="banner b3">วันที่ 2 พฤศจิกายน - 5 พฤศจิกายน  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">6308002</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">สถาพร</td>
+              <td class="name-l">ไชยเจริญ</td>
+              <td class="b-med">99IS</td>
+              <td class="b-med orange-txt">14</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>5</td>
+              <td class="b-med fsum-bg"><b>28</b></td>
+              <td>9</td><td>9</td><td>8</td><td>9</td><td>8</td>
+              <td class="b-med psum-bg"><b>43</b></td>
+              <td class="b-med tot-bg"><b>89</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">6408448</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">อนุชา</td>
+              <td class="name-l">รำพึงนิตย์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">13</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>4</td><td>5</td><td>4</td><td>5</td><td>4</td>
+              <td class="b-med fsum-bg"><b>27</b></td>
+              <td>9</td><td>8</td><td>9</td><td>8</td><td>8</td>
+              <td class="b-med psum-bg"><b>42</b></td>
+              <td class="b-med tot-bg"><b>87</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">6504213</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">อนุวัฒน์</td>
+              <td class="name-l">ทีสุกะ</td>
+              <td class="b-med">99IS</td>
+              <td class="b-med orange-txt">15</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>5</td><td>4</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>29</b></td>
+              <td>9</td><td>9</td><td>9</td><td>9</td><td>8</td>
+              <td class="b-med psum-bg"><b>44</b></td>
+              <td class="b-med tot-bg"><b>92</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">6902163</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ณภัทร</td>
+              <td class="name-l">นุ่มทอง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">18</td>
+              <td class="b-med orange-txt">20</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>30</b></td>
+              <td>10</td><td>9</td><td>9</td><td>9</td><td>9</td>
+              <td class="b-med psum-bg"><b>46</b></td>
+              <td class="b-med tot-bg"><b>96</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c2_actual">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 2</div>
+          <div class="banner b3">วันที่ 9 พฤศจิกายน - 12 พฤศจิกายน  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">6308011</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">กชพร</td>
+              <td class="name-l">บุญมีรัตน์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">9</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>27</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>36</b></td>
+              <td class="b-med tot-bg"><b>81</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">6208684</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">จารุพร</td>
+              <td class="name-l">ไทรชมภู</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">12</td>
+              <td class="b-med orange-txt">16</td>
+              <td>5</td><td>4</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>26</b></td>
+              <td>8</td><td>7</td><td>7</td><td>6</td><td>6</td>
+              <td class="b-med psum-bg"><b>34</b></td>
+              <td class="b-med tot-bg"><b>76</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">-</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">หรรษนันทน์</td>
+              <td class="name-l">อยู่เย็น</td>
+              <td class="b-med">-</td>
+              <td class="b-med orange-txt">18</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>25</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>35</b></td>
+              <td class="b-med tot-bg"><b>77</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">6505041</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">บงกช</td>
+              <td class="name-l">พรหมรักษา</td>
+              <td class="b-med">YALA</td>
+              <td class="b-med orange-txt">11</td>
+              <td class="b-med orange-txt">12</td>
+              <td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td>
+              <td class="b-med fsum-bg"><b>18</b></td>
+              <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td>
+              <td class="b-med psum-bg"><b>40</b></td>
+              <td class="b-med tot-bg"><b>70</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6902007</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ปวันรัตน์</td>
+              <td class="name-l">แววปราชญ์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">11</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>30</b></td>
+              <td>9</td><td>8</td><td>8</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>39</b></td>
+              <td class="b-med tot-bg"><b>88</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6909006</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ปิยะวรรณ</td>
+              <td class="name-l">บุณโยรส</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt">18</td>
+              <td class="b-med orange-txt">20</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>4</td><td>5</td>
+              <td class="b-med fsum-bg"><b>29</b></td>
+              <td>9</td><td>9</td><td>8</td><td>8</td><td>7</td>
+              <td class="b-med psum-bg"><b>41</b></td>
+              <td class="b-med tot-bg"><b>90</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6902018</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">พรรษชล</td>
+              <td class="name-l">เจริญยิ่ง</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">16</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>5</td><td>5</td><td>4</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>29</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>37</b></td>
+              <td class="b-med tot-bg"><b>83</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6408005</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ลลิตตา</td>
+              <td class="name-l">กูลวงศ์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">10</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>30</b></td>
+              <td>9</td><td>8</td><td>8</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>38</b></td>
+              <td class="b-med tot-bg"><b>87</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">-</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อลินา</td>
+              <td class="name-l">ฟักแสง</td>
+              <td class="b-med">-</td>
+              <td class="b-med orange-txt">9</td>
+              <td class="b-med orange-txt">16</td>
+              <td>4</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>24</b></td>
+              <td>7</td><td>7</td><td>7</td><td>6</td><td>6</td>
+              <td class="b-med psum-bg"><b>33</b></td>
+              <td class="b-med tot-bg"><b>73</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">5907645</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">สุธิษา</td>
+              <td class="name-l">เบ็ญเจิด</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt">8</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>5</td>
+              <td class="b-med fsum-bg"><b>28</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>37</b></td>
+              <td class="b-med tot-bg"><b>83</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6204058</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">จรินทร์</td>
+              <td class="name-l">กาศรี</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">8</td>
+              <td class="b-med orange-txt">17</td>
+              <td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td>3</td>
+              <td class="b-med fsum-bg"><b>21</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>35</b></td>
+              <td class="b-med tot-bg"><b>73</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6606003</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ธีรภัทร</td>
+              <td class="name-l">บรรพต</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt">17</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>27</b></td>
+              <td>8</td><td>8</td><td>8</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>38</b></td>
+              <td class="b-med tot-bg"><b>84</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">4807114</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">วรวุธ</td>
+              <td class="name-l">ยอดสวัสดิ์</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">5</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>4</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>26</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>36</b></td>
+              <td class="b-med tot-bg"><b>79</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c2_excel">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 2</div>
+          <div class="banner b3">วันที่ 9 พฤศจิกายน - 12 พฤศจิกายน  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">4807114</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">วรวุธ</td>
+              <td class="name-l">ยอดสวัสดิ์</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">5</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>4</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>26</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>36</b></td>
+              <td class="b-med tot-bg"><b>79</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">6110355</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">พัสวี</td>
+              <td class="name-l">ภูมิคง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">8</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>5</td>
+              <td class="b-med fsum-bg"><b>28</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>37</b></td>
+              <td class="b-med tot-bg"><b>83</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">6204058</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">จรินทร์</td>
+              <td class="name-l">กาศรี</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">8</td>
+              <td class="b-med orange-txt">17</td>
+              <td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td>3</td>
+              <td class="b-med fsum-bg"><b>21</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>35</b></td>
+              <td class="b-med tot-bg"><b>73</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">6208684</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">จารุพร</td>
+              <td class="name-l">ไทรชมภู</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">12</td>
+              <td class="b-med orange-txt">16</td>
+              <td>5</td><td>4</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>26</b></td>
+              <td>8</td><td>7</td><td>7</td><td>6</td><td>6</td>
+              <td class="b-med psum-bg"><b>34</b></td>
+              <td class="b-med tot-bg"><b>76</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6308011</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">กชพร</td>
+              <td class="name-l">บุญมีรัตน์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">9</td>
+              <td class="b-med orange-txt">18</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>27</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>36</b></td>
+              <td class="b-med tot-bg"><b>81</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6311028</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">จิรวรรณ</td>
+              <td class="name-l">วารีรัตน์</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt">17</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>4</td><td>5</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>27</b></td>
+              <td>8</td><td>8</td><td>8</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>38</b></td>
+              <td class="b-med tot-bg"><b>84</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6408005</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ลลิตตา</td>
+              <td class="name-l">กูลวงศ์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">10</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>30</b></td>
+              <td>9</td><td>8</td><td>8</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>38</b></td>
+              <td class="b-med tot-bg"><b>87</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6410126</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ปณัย</td>
+              <td class="name-l">ขัติยะนนท์</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">18</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>25</b></td>
+              <td>8</td><td>7</td><td>7</td><td>7</td><td>6</td>
+              <td class="b-med psum-bg"><b>35</b></td>
+              <td class="b-med tot-bg"><b>77</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6505041</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">บงกช</td>
+              <td class="name-l">พรหมรักษา</td>
+              <td class="b-med">YALA</td>
+              <td class="b-med orange-txt">11</td>
+              <td class="b-med orange-txt">12</td>
+              <td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td>
+              <td class="b-med fsum-bg"><b>18</b></td>
+              <td>8</td><td>8</td><td>8</td><td>8</td><td>8</td>
+              <td class="b-med psum-bg"><b>40</b></td>
+              <td class="b-med tot-bg"><b>70</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6604011</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">รัตนาภรณ์</td>
+              <td class="name-l">กองทอง</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">9</td>
+              <td class="b-med orange-txt">16</td>
+              <td>4</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td>
+              <td class="b-med fsum-bg"><b>24</b></td>
+              <td>7</td><td>7</td><td>7</td><td>6</td><td>6</td>
+              <td class="b-med psum-bg"><b>33</b></td>
+              <td class="b-med tot-bg"><b>73</b></td>
+              <td class="b-med orange-txt">B</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6902007</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ปวันรัตน์</td>
+              <td class="name-l">แววปราชญ์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt">11</td>
+              <td class="b-med orange-txt">19</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>30</b></td>
+              <td>9</td><td>8</td><td>8</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>39</b></td>
+              <td class="b-med tot-bg"><b>88</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6902018</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">พรรษชล</td>
+              <td class="name-l">เจริญยิ่ง</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt">16</td>
+              <td class="b-med orange-txt">17</td>
+              <td>5</td><td>5</td><td>5</td><td>4</td><td>5</td><td>5</td>
+              <td class="b-med fsum-bg"><b>29</b></td>
+              <td>8</td><td>8</td><td>7</td><td>7</td><td>7</td>
+              <td class="b-med psum-bg"><b>37</b></td>
+              <td class="b-med tot-bg"><b>83</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6909006</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ปิยะวรรณ</td>
+              <td class="name-l">บุณโยรส</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt">18</td>
+              <td class="b-med orange-txt">20</td>
+              <td>5</td><td>5</td><td>5</td><td>5</td><td>4</td><td>5</td>
+              <td class="b-med fsum-bg"><b>29</b></td>
+              <td>9</td><td>9</td><td>8</td><td>8</td><td>7</td>
+              <td class="b-med psum-bg"><b>41</b></td>
+              <td class="b-med tot-bg"><b>90</b></td>
+              <td class="b-med orange-txt">A</td>
+              <td class="b-med eval-bg"><b>ผ่าน</b></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c3">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 3</div>
+          <div class="banner b3">วันที่ 16 พฤศจิกายน - 19 พฤศจิกายน  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">4807125</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ปวีณา</td>
+              <td class="name-l">เพชราเวช</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5605017</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สุวนิต</td>
+              <td class="name-l">เปรื่องค้า</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">5804293</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">บุลาภรณ์</td>
+              <td class="name-l">บุญด้วง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">5904361</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อัจจิมา</td>
+              <td class="name-l">ภูมิมาโนช</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6408412</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">โชคสันติ</td>
+              <td class="name-l">ละครพล</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6506005</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วิภารัตน์</td>
+              <td class="name-l">นพพิบูลย์</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6606003</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ธีรภัทร</td>
+              <td class="name-l">บรรพต</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6706028</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ธเนศ</td>
+              <td class="name-l">ชาดง</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6801753</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ปณิธิ</td>
+              <td class="name-l">พรุเพชรแก้ว</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6811033</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สิริมา</td>
+              <td class="name-l">เจ้าสันเทียะ</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6812042</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ชุติมา</td>
+              <td class="name-l">สุทธิสาร</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6902024</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">กัลย์สุดา</td>
+              <td class="name-l">คำเมืองคุณ</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6904021</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">นิสารัตน์</td>
+              <td class="name-l">บุญไทยกลาง</td>
+              <td class="b-med">99IS</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">14</td>
+              <td class="b-med">6904023</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สุพรรษา</td>
+              <td class="name-l">ลำพองชาติ</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">15</td>
+              <td class="b-med">6905001</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">รุ่งวดี</td>
+              <td class="name-l">เจียรนำวงศ์</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">16</td>
+              <td class="b-med">6909002</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">พรสิริ</td>
+              <td class="name-l">เอนกรัชดาพร</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">17</td>
+              <td class="b-med">6909025</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สุกันต์ญา</td>
+              <td class="name-l">เนตะเทศ</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c4">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 4</div>
+          <div class="banner b3">วันที่ 23 พฤศจิกายน - 26 พฤศจิกายน  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">5105149</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">สมชาย</td>
+              <td class="name-l">งามกิจเจริญลาภ</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5604098</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ราเคน</td>
+              <td class="name-l">ฐิติธนานนท์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">5610441</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">มาณวิกา</td>
+              <td class="name-l">อาจใหญ่</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">5803219</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ศิรินทรา</td>
+              <td class="name-l">อาบสุวรรณ</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6309284</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ณัฐดนัย</td>
+              <td class="name-l">จั่นมา</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6408638</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ศุภณัฐ</td>
+              <td class="name-l">นามทอง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6712283</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อัญชลีพร</td>
+              <td class="name-l">พลกลาง</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6805003</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ศศิธร</td>
+              <td class="name-l">แก้วกลม</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6806004</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">นิศารัตน์</td>
+              <td class="name-l">เพ็ชรเภา</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6904019</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วัลวิภา</td>
+              <td class="name-l">พรหมภัทร</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6904020</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ธัญวลัย</td>
+              <td class="name-l">วินสน</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6906018</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">วัชร์ชัยนันท์</td>
+              <td class="name-l">พรรนธารางกูล</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c5">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 5</div>
+          <div class="banner b3">วันที่ 30 พฤศจิกายน - 3 ธันวาคม  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">5002146</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ศุภพร</td>
+              <td class="name-l">ชื่นชม</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5309351</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">วีระพล</td>
+              <td class="name-l">กุณโรจร</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">5907645</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">สุธิษา</td>
+              <td class="name-l">เบ็ญเจิด</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">5907647</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">จิราภรณ์</td>
+              <td class="name-l">ขจรกลิ่น</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">5907649</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ประเทือง</td>
+              <td class="name-l">น้อยอาษา</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6002289</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อุไรวรรณ์</td>
+              <td class="name-l">ภูคณะ</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6102073</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สินีนารถ</td>
+              <td class="name-l">ไทยสงวนวรกุล</td>
+              <td class="b-med">SNC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6212007</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">สิทธิพงศ์</td>
+              <td class="name-l">หิตะจารีย์</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6212188</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">เนตรชนก</td>
+              <td class="name-l">ไทยสงวนวรกุล</td>
+              <td class="b-med">SNC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6404033</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">รักษ์สุดา</td>
+              <td class="name-l">ชมดวงดาว</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6506007</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ชนิสรา</td>
+              <td class="name-l">ไทยสงวนวรกุล</td>
+              <td class="b-med">SNC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6710333</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ณัฏฐ์ฌาภัทร</td>
+              <td class="name-l">เฉื่อยกลั่น</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6905003</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">มงคล</td>
+              <td class="name-l">เจริญสุข</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c6">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 6</div>
+          <div class="banner b3">วันที่ 7 ธันวาคม - 10 ธันวาคม  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">4807139</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">วันเพ็ญ</td>
+              <td class="name-l">กล่ำแสง</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5906444</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">เบญจภัทร</td>
+              <td class="name-l">หมื่นทอง</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">6103159</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ณภัชกมล</td>
+              <td class="name-l">ละราคี</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">6403245</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ธนภัทร</td>
+              <td class="name-l">คงตุ้ง</td>
+              <td class="b-med">SAHP</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6408055</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ธฤต</td>
+              <td class="name-l">ปริศนา</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6503159</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">อดิศร</td>
+              <td class="name-l">โนเปือย</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6506057</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ภาณุพงศ์</td>
+              <td class="name-l">ศรีวิเศษ</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6609010</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">นิติกร</td>
+              <td class="name-l">คำหริ่ง</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6712280</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">โชษิตา</td>
+              <td class="name-l">มีเจริญ</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6805004</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ภวิตรา</td>
+              <td class="name-l">มาติ</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6904010</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">มธุรส</td>
+              <td class="name-l">ศรีวิเศษ</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6907006</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">กิติเมศวร์</td>
+              <td class="name-l">แก้วขาว</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6909003</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">เพ็ญนภา</td>
+              <td class="name-l">เณรธรณี</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">14</td>
+              <td class="b-med">6909024</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ณัฐสุภา</td>
+              <td class="name-l">พลมั่น</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c7">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 7</div>
+          <div class="banner b3">วันที่ 14 ธันวาคม - 17 ธันวาคม  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">4709353</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">รัฐภูมิ</td>
+              <td class="name-l">นันทปถวี</td>
+              <td class="b-med">SNC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5601301</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ไข่มุก</td>
+              <td class="name-l">คำแก้ว</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">5907038</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วรรณา</td>
+              <td class="name-l">ศิริทรัพย์วัฒนา</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">5907588</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">สว่าง</td>
+              <td class="name-l">บุตรมณี</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">5907604</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อารยา</td>
+              <td class="name-l">ขุมพิทักษ์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">5907646</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ชุติกาญจน์</td>
+              <td class="name-l">ขำแดง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6407011</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ฐิติกร</td>
+              <td class="name-l">วิชัย</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6711029</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">เบ็ญจวรรณ</td>
+              <td class="name-l">สระแก้ว</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6711188</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">นฤภร</td>
+              <td class="name-l">พุฒทอง</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6711499</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อรุณธิดา</td>
+              <td class="name-l">ยศชู</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6801256</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">มณัสวีย์</td>
+              <td class="name-l">เจริญจรูญศรี</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6904009</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">อภิญญา</td>
+              <td class="name-l">คำสวน</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6904022</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ญาณิศา</td>
+              <td class="name-l">เลิศแก้วศรี</td>
+              <td class="b-med">SAHP</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">14</td>
+              <td class="b-med">6905013</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วนิดา</td>
+              <td class="name-l">จงย่อกลาง</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">15</td>
+              <td class="b-med">6909016</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ลลิตตา</td>
+              <td class="name-l">มีกลี่</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+        <section class="sheet-page" data-sheet="c8">
+          <div class="banner b1">สรุปคะแนนการสอบ</div>
+          <div class="banner b2">หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) รุ่นที่ 8</div>
+          <div class="banner b3">วันที่ 21 ธันวาคม - 24 ธันวาคม  2569</div>
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th rowspan="4" class="blue-h" style="width:34px;">ลำดับ</th>
+                <th rowspan="4" class="blue-h" style="width:68px;">รหัสพนักงาน</th>
+                <th rowspan="4" colspan="3" class="blue-h" style="width:195px;">ชื่อ-นามสกุล</th>
+                <th rowspan="4" class="blue-h" style="width:52px;">สังกัด<br>บริษัท</th>
+                <th rowspan="4" class="pre-h" style="width:40px;">Pre-<br>Test<br>(20)</th>
+                <th rowspan="4" class="post-h" style="width:40px;">Post-<br>Test<br>(20)</th>
+                <th colspan="6" class="final-top">ข้อสอบ Final (ภาคทฤษฎี)</th>
+                <th rowspan="4" class="fsum-h" style="width:58px;">คะแนน<br>สอบ Final<br>(30)</th>
+                <th colspan="5" class="prac-top">สอบปฏิบัติ (ภาคปฏิบัติ)</th>
+                <th rowspan="4" class="psum-h" style="width:62px;">คะแนน<br>สอบปฏิบัติ<br>(50)</th>
+                <th rowspan="4" class="tot-h" style="width:56px;">คะแนนรวม<br>(100)</th>
+                <th rowspan="4" class="grade-h" style="width:38px;">เกรด</th>
+                <th rowspan="4" class="eval-h" style="width:64px;">เกณฑ์การ<br>ประเมิน<br><span style="color:#c00000;">(&gt;=70)</span></th>
+              </tr>
+              <tr>
+                <th colspan="6" class="g-final">ความรู้ตามหัวข้อที่อบรม (Architecture, Web UI, JS, API, SQL &amp; Security)</th>
+                <th colspan="5" class="g-prac">การพัฒนาเว็บ Line Performance &amp; ส่งแจ้งเตือน Webhook</th>
+              </tr>
+              <tr class="vert-row">
+                <th class="vert g-final"><div>สถาปัตยกรรมระบบ OT / IT<br>และ Enterprise App</div></th><th class="vert g-final"><div>โครงสร้างหน้าเว็บ HTML5<br>และการจัดวาง CSS Flexbox</div></th><th class="vert g-final"><div>การเขียนโปรแกรม JavaScript<br>ฟังก์ชัน และการจัดการ DOM</div></th><th class="vert g-final"><div>โครงสร้างข้อมูล JSON<br>และการสื่อสาร REST API</div></th><th class="vert g-final"><div>การเชื่อมต่อฐานข้อมูล SQL<br>และระบบแจ้งเตือน Webhook</div></th><th class="vert g-final"><div>ความมั่นคงปลอดภัยไซเบอร์<br>(Security) และการทำ UAT</div></th>
+                <th class="vert g-prac"><div>การวางโครงสร้าง HTML และ<br>ตกแต่งหน้าจอ Dashboard</div></th><th class="vert g-prac"><div>การจำลองเคสข้อมูลและแสดงผล<br>ค่าการผลิตผ่าน DOM</div></th><th class="vert g-prac"><div>การเขียนฟังก์ชันคำนวณค่า<br>Performance (%)</div></th><th class="vert g-prac"><div>การเขียนเงื่อนไขเปลี่ยนสี<br>และป้ายสถานะตามเกณฑ์</div></th><th class="vert g-prac"><div>การส่งข้อความแจ้งเตือนพร้อม<br>ชื่อผู้แจ้งผ่าน Webhook API</div></th>
+              </tr>
+              <tr>
+                <th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th><th class="weight">(5)</th>
+                <th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th><th class="weight">(10)</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+            <tr>
+              <td class="b-med">1</td>
+              <td class="b-med">4807119</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">มะลิ</td>
+              <td class="name-l">จำปาทิพย์</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">2</td>
+              <td class="b-med">5605395</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ศญาวี</td>
+              <td class="name-l">ศรีปัญญา</td>
+              <td class="b-med">SAHP</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">3</td>
+              <td class="b-med">5904358</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วิลาพร</td>
+              <td class="name-l">จันอนุ</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">4</td>
+              <td class="b-med">6310111</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ขวัญตา</td>
+              <td class="name-l">อินทร์เจริญ</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">5</td>
+              <td class="b-med">6408053</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">วิถีพร</td>
+              <td class="name-l">สุนันท์</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">6</td>
+              <td class="b-med">6505106</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">พรจิรา</td>
+              <td class="name-l">กองโคตร</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">7</td>
+              <td class="b-med">6604007</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">โสฬญา</td>
+              <td class="name-l">กิติชาติพรพัฒน์</td>
+              <td class="b-med">SCAN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">8</td>
+              <td class="b-med">6705017</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">กรรณิการ์</td>
+              <td class="name-l">พิมพ์รส</td>
+              <td class="b-med">SEREN</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">9</td>
+              <td class="b-med">6711104</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ธันสิริ</td>
+              <td class="name-l">นาคผ่อง</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">10</td>
+              <td class="b-med">6805010</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">รัชตา</td>
+              <td class="name-l">กลัดกลาย</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">11</td>
+              <td class="b-med">6812010</td>
+              <td class="name-p">นาย</td>
+              <td class="name-f">ว่าที่ร้อยตรีมงคล</td>
+              <td class="name-l">ธรเสนา</td>
+              <td class="b-med">HGC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">12</td>
+              <td class="b-med">6906003</td>
+              <td class="name-p">นาง</td>
+              <td class="name-f">ปริญดาพร</td>
+              <td class="name-l">สุขสิน</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">13</td>
+              <td class="b-med">6909005</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">วิรัลยา</td>
+              <td class="name-l">พิสันเทียะ</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">14</td>
+              <td class="b-med">6909021</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">สกาวเดือน</td>
+              <td class="name-l">ลำพุทธา</td>
+              <td class="b-med">IPC</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+            <tr>
+              <td class="b-med">15</td>
+              <td class="b-med">6909030</td>
+              <td class="name-p">นางสาว</td>
+              <td class="name-f">ยุพารัตน์</td>
+              <td class="name-l">ศรีดวงใจ</td>
+              <td class="b-med">HIE</td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med orange-txt"></td>
+              <td></td><td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med fsum-bg"><b></b></td>
+              <td></td><td></td><td></td><td></td><td></td>
+              <td class="b-med psum-bg"><b></b></td>
+              <td class="b-med tot-bg"><b></b></td>
+              <td class="b-med orange-txt"></td>
+              <td class="b-med eval-bg"></td>
+            </tr>
+            
+        <tr>
+          <td class="b-med">&nbsp;</td><td class="b-med"></td>
+          <td class="name-p"></td><td class="name-f"></td><td class="name-l"></td>
+          <td class="b-med"></td><td class="b-med"></td><td class="b-med"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med fsum-bg"></td>
+          <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td class="b-med psum-bg"></td>
+          <td class="b-med tot-bg"></td><td class="b-med"></td><td class="b-med eval-bg"></td>
+        </tr>
+        
+            </tbody>
+          </table>
+        </section>
+        
+  <script>
+    function filterSheet(val) {
+      document.querySelectorAll('.sheet-page').forEach(sec => {
+        sec.style.display = (val === 'all' || sec.dataset.sheet === val) ? 'block' : 'none';
+      });
+    }
+  </script>
+</body>
+</html>

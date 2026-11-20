@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แบบทดสอบวัดผลรวม (Post-Test + Final ทฤษฎี) · BOI Enterprise Application</title>
+  <style>
+    :root {
+      --green: #147a42;
+      --green-dark: #0e5930;
+      --blue: #1d4ed8;
+      --bg: #f4f6f8;
+      --card: #ffffff;
+      --border: #dce1e7;
+      --text: #1e293b;
+      --muted: #64748b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Sarabun", "Leelawadee UI", "Segoe UI", Tahoma, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--green), var(--green-dark));
+      color: #fff;
+      padding: 18px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    header h1 { margin: 0; font-size: 1.3rem; }
+    header p { margin: 2px 0 0; font-size: 0.9rem; opacity: 0.92; }
+    .progress-pill {
+      background: rgba(255,255,255,0.18);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .container { max-width: 960px; margin: 22px auto 60px; padding: 0 16px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.15rem;
+      color: var(--green-dark);
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .grid-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+    }
+    label.field-label { display: block; font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+    }
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .q-card.answered { border-left: 4px solid var(--green); }
+    .q-card.correct { border-left: 5px solid #16a34a; background: #f0fdf4; }
+    .q-card.wrong { border-left: 5px solid #dc2626; background: #fef2f2; }
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      background: #e2e8f0;
+      color: #334155;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    .tag.final { background: #dbeafe; color: #1e40af; }
+    .q-title { font-weight: 700; font-size: 1rem; margin-bottom: 10px; white-space: pre-wrap; }
+    .choice-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .choice-label:hover { background: #f8fafc; border-color: #94a3b8; }
+    .choice-label input { margin-top: 4px; accent-color: var(--green); }
+    .explain-box {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+    }
+    .btn {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 0.96rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-dark); }
+    .btn-secondary { background: #e2e8f0; color: #1e293b; }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    #result-banner {
+      display: none;
+      background: #ecfdf5;
+      border: 2px solid #10b981;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+    }
+    .score-big { font-size: 1.9rem; font-weight: 800; color: #065f46; }
+    .audit-grid {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.92rem;
+      background: #fff;
+    }
+    .audit-grid th, .audit-grid td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: left;
+    }
+    .audit-grid th { background: #f1f5f9; }
+    .audit-grid td.num { text-align: center; font-weight: 700; }
+    @media print {
+      header, .actions, .no-print { display: none !important; }
+      body { background: #fff; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1>📝 แบบทดสอบวัดผลรวม (Post-Test + Final ทฤษฎี)</h1>
+        <p>วิชา Enterprise Application · รวม 26 ข้อ (Post-Test 20 + Final 30 = 50 คะแนน)</p>
+      </div>
+      <div class="progress-pill" id="progress-text">ตอบแล้ว 0 / 26 ข้อ</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="result-banner">
+      <div class="score-big" id="score-summary">0 / 50 คะแนน</div>
+      <div id="score-detail" style="margin-top:6px;"></div>
+      <table class="audit-grid" id="audit-table"></table>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="downloadResultJSON()">💾 ดาวน์โหลดผลสอบ (.json ส่งผู้สอน)</button>
+        <button class="btn btn-blue" onclick="downloadSingleCSV()">📄 ดาวน์โหลด CSV กรอกลง Audit</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ พิมพ์ / บันทึก PDF</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>1. ข้อมูลผู้เข้าสอบ</h2>
+      <div class="grid-form">
+        <div>
+          <label class="field-label" for="cohort">รุ่นที่เข้าอบรม *</label>
+          <input id="cohort" type="text" placeholder="เช่น รุ่นที่ 3" value="รุ่นที่ 3">
+        </div>
+        <div>
+          <label class="field-label" for="seatNo">เลขที่ (ตามใบรายชื่อ) *</label>
+          <input id="seatNo" type="number" min="1" max="50" placeholder="เช่น 5">
+        </div>
+        <div>
+          <label class="field-label" for="studentName">ชื่อ - นามสกุล *</label>
+          <input id="studentName" type="text" placeholder="เช่น นางสาวสมหญิง ใจดี">
+        </div>
+        <div>
+          <label class="field-label" for="dept">สังกัด / บริษัท</label>
+          <input id="dept" type="text" placeholder="เช่น SCAN / HIE / IPC">
+        </div>
+      </div>
+      <ul style="margin:12px 0 0;padding-left:20px;color:#475569;font-size:0.93rem;">
+        <li>ตอนที่ 1 (ข้อ 1–20): วัดพัฒนาการ <strong>Post-Test</strong> ข้อละ 1 คะแนน (รวม 20 คะแนน)</li>
+        <li>ตอนที่ 2 (ข้อ 21–26): ข้อสอบ <strong>Final วิเคราะห์สถานการณ์</strong> 6 หัวข้อ ข้อละ 5 คะแนน (รวม 30 คะแนน)</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>2. ตอนที่ 1 — Post-Test (20 ข้อ · 20 คะแนน)</h2>
+      <div id="part1-container"></div>
+    </section>
+
+    <section class="card">
+      <h2>3. ตอนที่ 2 — Final วิเคราะห์สถานการณ์ 6 หัวข้อ (6 ข้อ · 30 คะแนน)</h2>
+      <div id="part2-container"></div>
+    </section>
+
+    <section class="card no-print">
+      <div class="actions" style="margin-top:0;">
+        <button class="btn btn-primary" onclick="submitExam()">✅ ส่งข้อสอบและตรวจคะแนนทันที</button>
+        <button class="btn btn-secondary" onclick="toggleInstructorPanel()">👩‍🏫 สำหรับผู้สอน: รวมไฟล์คะแนนทั้งห้อง</button>
+      </div>
+      <div id="instructor-panel" style="display:none;margin-top:16px;padding-top:16px;border-top:1px dashed #cbd5e1;">
+        <p style="margin:0 0 8px;">เลือกไฟล์ <code>ผลสอบรวม_*.json</code> ของผู้เรียนทุกคน เพื่อรวมเป็นตาราง CSV ตรงช่อง Audit (เรียงตามเลขที่อัตโนมัติ):</p>
+        <input type="file" id="batchFiles" accept=".json" multiple onchange="mergeStudentFiles(event)">
+        <div id="batch-output" style="margin-top:12px;"></div>
+      </div>
+    </section>
+  </main>
+
+<script>
+const EXAM = {"title": "แบบทดสอบวัดผลรวม (Post-Test + สอบ Final ภาคทฤษฎี)", "subject": "การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application)", "minutes": 40, "instructions": ["ข้อสอบฉบับนี้รวม Post-Test และ Final ภาคทฤษฎีไว้ในชุดเดียว รวม 26 ข้อ (50 คะแนน) ใช้เวลาประมาณ 35–40 นาที", "ตอนที่ 1 (ข้อ 1–20): วัดพัฒนาการ Post-Test (ข้อละ 1 คะแนน = 20 คะแนน เทียบคู่กับ Pre-Test)", "ตอนที่ 2 (ข้อ 21–26): ข้อสอบ Final วิเคราะห์สถานการณ์จริงตาม 6 หัวข้ออบรม (ข้อละ 5 คะแนน = 30 คะแนน)"], "part1": [{"clo": "CLO01", "q": "ข้อใดเป็นอุปกรณ์หรือระบบฝั่ง OT ทั้งหมด", "choices": ["ERP, CRM และอีเมลองค์กร", "PLC, HMI และเซนเซอร์วัดอุณหภูมิ", "ฐานข้อมูลบัญชี, HMI และ ERP", "เว็บไซต์บริษัท, PLC และอีเมลองค์กร"], "answer": 1, "why": "PLC, HMI และเซนเซอร์เกี่ยวข้องกับเครื่องจักรและสายการผลิตโดยตรง จึงเป็นฝั่ง OT ทั้งหมด"}, {"clo": "CLO01", "q": "ทีม IT ต้องการรีสตาร์ตเครื่องคอมพิวเตอร์ที่คุมเครื่องจักรทันทีระหว่างกะผลิต ข้อกังวลหลักจากมุมมอง OT คือข้อใด", "choices": ["หน้าจออาจเปลี่ยนสี", "ค่าลิขสิทธิ์ซอฟต์แวร์อาจสูงขึ้น", "ข้อมูลอาจถูกส่งออกไปนอกบริษัท", "อาจทำให้เครื่องจักรหยุดชะงัก กระทบการผลิตและความปลอดภัย"], "answer": 3, "why": "ระบบ OT ให้ความสำคัญกับความปลอดภัยและความพร้อมใช้งานของเครื่องจักร การอัปเดตหรือรีสตาร์ตจึงต้องวางแผนล่วงหน้า"}, {"clo": "CLO01", "q": "ในระบบ Web Application แบบ Client-Server หน้าที่ใดทำงานอยู่ฝั่ง Server", "choices": ["รับคำขอ (Request) แล้วประมวลผลหรือส่งข้อมูล JSON กลับให้หน้าเว็บ", "การเปลี่ยนสีตัวอักษรและจัดวางหน้าจอด้วย CSS", "การแสดงค่าตัวเลขลงในหน้าเว็บเมื่อเปิดผ่านเบราว์เซอร์", "การรับเหตุการณ์เมื่อผู้ใช้คลิกปุ่มบนหน้าจอ"], "answer": 0, "why": "Server ทำหน้าที่รับ Request ประมวลผล และส่งข้อมูล JSON กลับ ส่วนการจัดหน้าจอและแสดงผลทำที่ฝั่ง Client (เบราว์เซอร์)"}, {"clo": "CLO02", "q": "JSON ข้อใดเขียนถูกต้องทั้งหมด", "choices": ["{\"line\": \"A\", \"temps\": [72.5, 73.0,]}", "{\"line\": \"A\", \"online\": True}", "{\"line\": \"A\", \"temps\": [72.5, 73.0]}", "{\"line\": \"A\", \"note\": undefined}"], "answer": 2, "why": "JSON ต้องไม่มี comma ตัวสุดท้าย, boolean ต้องเขียน true ตัวเล็กทั้งหมด และไม่มีชนิดข้อมูล undefined"}, {"clo": "CLO02", "q": "จากข้อมูล data = { \"machines\": [ { \"id\": \"M-01\", \"temp\": 72 }, { \"id\": \"M-02\", \"temp\": 65 } ] } ต้องเขียนอย่างไรจึงจะได้ค่า 65", "choices": ["data.machines.temp", "data.machines[0].temp", "data.machines[1].temp", "data.machines[2].temp"], "answer": 2, "why": "machines เป็น Array โดย M-01 อยู่ที่ index 0 และ M-02 อยู่ที่ index 1 จึงเขียนเป็น data.machines[1].temp"}, {"clo": "CLO02", "q": "จาก {\"sensors\": [10, 20, 30, 40]} ค่า data.sensors[data.sensors.length - 2] คือเท่าไร", "choices": ["20", "30", "40", "undefined"], "answer": 1, "why": "length คือ 4 ดังนั้น length - 2 คือ index 2 ซึ่งเป็นตัวที่สาม ได้ 30 (index เริ่มที่ 0)"}, {"clo": "CLO02", "q": "จาก JSON { \"line\": \"A\", \"running\": true, \"alarm\": null } ค่าของ \"running\" และ \"alarm\" เป็นชนิดข้อมูลใดตามลำดับ", "choices": ["string และ number", "boolean และ null", "boolean และ undefined", "object และ array"], "answer": 1, "why": "true เป็นชนิด boolean ส่วน null เป็นค่าว่างของ JSON"}, {"clo": "CLO03", "q": "ต้องการทำแถบเมนูลิงก์ไปหน้าต่าง ๆ ของเว็บ ควรใช้แท็ก Semantic HTML ใดครอบเมนู", "choices": ["<div class=\"menu\">", "<span>", "<footer>", "<nav>"], "answer": 3, "why": "<nav> ใช้สำหรับส่วนนำทาง/เมนูของหน้าเว็บ ส่วน <footer> คือส่วนท้ายของหน้า"}, {"clo": "CLO03", "q": "ไฟล์ style.css กำหนด p { color: blue; } แต่ในหน้าเว็บเขียน <p style=\"color: red\">ข้อความ</p> ข้อความจะเป็นสีอะไร", "choices": ["แดง เพราะ style ที่เขียนในแท็กเจาะจงกว่า", "น้ำเงิน เพราะไฟล์ CSS ภายนอกสำคัญที่สุด", "ดำ เพราะกฎขัดกันจึงใช้ค่าเริ่มต้น", "ม่วง เพราะสีผสมกัน"], "answer": 0, "why": "Inline style ที่เขียนในแท็กมีลำดับความสำคัญสูงกว่า Selector ในไฟล์ CSS ภายนอก"}, {"clo": "CLO03", "q": "โค้ด JavaScript ข้อใดทำงานได้โดยไม่เกิด Error", "choices": ["const max = 240; max = 250;", "const list; list = [];", "let count = 0; count = count + 1;", "let x = 1; let x = 2;"], "answer": 2, "why": "let สามารถกำหนดค่าใหม่ได้ ส่วน const เปลี่ยนค่าไม่ได้และต้องใส่ค่าเริ่มต้นทันที และห้ามประกาศ let ชื่อซ้ำในขอบเขตเดียวกัน"}, {"clo": "CLO03", "q": "จากโค้ด let a = 12; let b = 5; console.log(2 * (a - b)); ผลลัพธ์คือข้อใด", "choices": ["19", "14", "12", "7"], "answer": 1, "why": "คำนวณในวงเล็บก่อน: 12 - 5 ได้ 7 แล้วนำไปคูณ 2 ได้ผลลัพธ์ 14"}, {"clo": "CLO03", "q": "ข้อใดเลือก element เดียวกับ document.getElementById('status')", "choices": ["document.querySelector('.status')", "document.querySelector('status')", "document.getElementsByClassName('status')", "document.querySelector('#status')"], "answer": 3, "why": "querySelector ใช้ CSS Selector จึงต้องใส่เครื่องหมาย # นำหน้าชื่อ id ส่วนเครื่องหมาย . ใช้กับ class"}, {"clo": "CLO03", "q": "เมื่อผู้ใช้นำเมาส์ไปวางบนข้อความหรือกล่องบนหน้าเว็บ (โดยยังไม่ได้กดคลิก) จะเกิด Event ใด", "choices": ["onmouseover", "onmousedown", "onmouseup", "onclick"], "answer": 0, "why": "onmouseover เกิดขึ้นทันทีเมื่อนำเมาส์ไปวางบน element ก่อนที่จะกดคลิก (onmousedown) และปล่อยเมาส์ (onmouseup)"}, {"clo": "CLO04", "q": "ตามมาตรฐาน IEC 60204-1 ไฟแสดงสถานะสีใดหมายถึง \"ต้องให้ผู้ปฏิบัติงานดำเนินการ\"", "choices": ["เขียว", "เหลือง", "น้ำเงิน", "ขาว"], "answer": 2, "why": "ตามมาตรฐาน IEC 60204-1 สีน้ำเงินหมายถึงต้องให้ผู้ปฏิบัติงานดำเนินการ"}, {"clo": "CLO04", "q": "เมื่อพนักงานกดปุ่ม \"ส่งแจ้งเตือน\" หรือ \"ลบข้อมูล\" บนหน้าจอโรงงาน การออกแบบ UI ที่ดีเพื่อป้องกันความผิดพลาดควรทำอย่างไร", "choices": ["ซ่อนปุ่มให้เล็กที่สุดจะได้ไม่เผลอกด", "แสดงกล่องยืนยัน (Confirm) หรือแจ้งผลลัพธ์ชัดเจนและปิดปุ่มชั่วคราวกันกดซ้ำ", "ปล่อยให้กดซ้ำได้ไม่จำกัดโดยไม่ต้องแสดงข้อความใดๆ", "ให้ระบบลบข้อมูลทันทีโดยไม่ต้องตรวจเงื่อนไข"], "answer": 1, "why": "หลัก Error Prevention และ Feedback ต้องมีข้อความยืนยันหรือแจ้งสถานะให้ผู้ใช้เห็นชัดเจนและป้องกันการกดพลาดซ้ำ"}, {"clo": "CLO05", "q": "เมื่อต้องการ \"ส่งข้อมูลใหม่\" หรือส่งข้อความแจ้งเตือนไปยัง Webhook API ของ Server ควรใช้ HTTP Method ใด", "choices": ["GET", "POST", "DELETE", "HEAD"], "answer": 1, "why": "GET ใช้ดึง/อ่านข้อมูล ส่วน POST ใช้ส่งข้อมูลใหม่หรือส่งแจ้งเตือนไปยัง Server"}, {"clo": "CLO05", "q": "หากโรงงานต้องการให้ระบบส่งข้อความแจ้งเตือนทันทีที่เครื่องจักรหยุด โดยหน้าเว็บไม่ต้องคอยเรียก API ถามซ้ำ ๆ ทุก 5 วินาที ควรใช้กลไกใด", "choices": ["Webhook (Push Notification)", "HTML CSS Flexbox", "Local File เปิดผ่าน file://", "Manual Refresh กด F5 เอง"], "answer": 0, "why": "Webhook จะผลัก (Push) ข้อมูลมาทันทีเมื่อเกิดเหตุการณ์สำคัญ โดยไม่ต้องคอยดึงข้อมูลซ้ำ"}, {"clo": "CLO05", "q": "ข้อใดเรียงลำดับการดึงข้อมูลด้วย fetch แบบ async/await ได้ถูกต้อง", "choices": ["await res.json() › เรียก fetch › ตรวจ res.ok › แสดงผล", "เรียก fetch › ตรวจ res.ok › แปลงด้วย await res.json() › แสดงผล", "เรียก fetch › แสดงผล › ตรวจ res.ok", "ตรวจ res.ok › เรียก fetch › await res.json() › แสดงผล"], "answer": 1, "why": "ต้องเรียก fetch เพื่อรับ Response ก่อน จากนั้นเช็ก res.ok แล้วค่อย await res.json() แปลงเป็น Object ก่อนนำไปแสดงผล"}, {"clo": "CLO06", "q": "Test Case ใดเขียนผลลัพธ์ที่คาดหวัง (Expected Result) ได้ชัดเจนและตรวจวัดได้จริงที่สุด", "choices": ["ระบบทำงานถูกต้อง", "หน้าจอแสดงผลสวยงาม", "เมื่อแรงดันเป็น 245 V หน้าจอแสดงคำเตือน \"แรงดันเกิน 240 V\" และเปลี่ยนป้ายเป็นสีแดง", "ไม่พบข้อผิดพลาด"], "answer": 2, "why": "Expected Result ที่ดีต้องระบุผลลัพธ์ที่เห็นและตรวจวัดได้ชัดเจน เพื่อให้ผู้ทดสอบตัดสิน Pass/Fail ได้ตรงกัน"}, {"clo": "CLO06", "q": "จุดประสงค์หลักของการทำ UAT (User Acceptance Testing) คือข้อใด", "choices": ["ให้ผู้เขียนโปรแกรมตรวจ syntax ของโค้ด", "ให้ผู้ใช้งานจริงทดสอบระบบในสภาพเหมือนจริง เพื่อยืนยันว่าใช้งานได้ตรงความต้องการก่อน Go-Live", "ออกแบบสีของหน้าเว็บให้สวยงามก่อนเขียนโค้ด", "ติดตั้งฐานข้อมูลและ Server ใหม่"], "answer": 1, "why": "UAT คือการให้ผู้ใช้งานจริงทดสอบและลงชื่อยอมรับระบบก่อนนำไปใช้งานจริง"}], "part2": [{"auditCol": "I", "auditLabel": "สถาปัตยกรรมระบบ OT / IT และ Enterprise App", "clo": "CLO01", "points": 5, "q": "ในระบบตรวจวัดเครื่องจักร (Electrical Meter) ของห้องเรียน ผู้สอนรันโปรแกรม Python (API Server) บนเครื่องผู้สอน ส่วนผู้เรียนเปิดหน้าเว็บ index.html บนเบราว์เซอร์เครื่องตนเอง ข้อใดอธิบายบทบาทของทั้งสองฝั่งได้ถูกต้อง", "choices": ["เบราว์เซอร์ของผู้เรียนทำหน้าที่เป็น Server ส่วนโปรแกรม Python เป็น Client", "โปรแกรม Python ทำหน้าที่เป็น Server คอยจ่ายข้อมูล JSON ผ่าน API ส่วนเบราว์เซอร์ของผู้เรียนเป็น Client ที่ดึงข้อมูลมาคำนวณและแสดงผล", "ทั้งสองฝั่งทำงานในฐานข้อมูลเดียวกันโดยตรงโดยไม่ต้องผ่าน HTTP", "ระบบแบบนี้เป็นฝั่ง OT ทั้งหมดเพราะมีการวัดค่าแรงดันไฟฟ้า"], "answer": 1, "why": "API Server ของผู้สอนคือฝั่ง Server ที่ให้บริการข้อมูล JSON ส่วนหน้าเว็บ HTML/JS ในเบราว์เซอร์ของผู้เรียนคือ Client ที่เรียก fetch ไปดึงข้อมูลมาแสดงผล"}, {"auditCol": "J", "auditLabel": "โครงสร้างหน้าเว็บ HTML5 และการจัดวาง CSS Flexbox", "clo": "CLO03, CLO04", "points": 5, "q": "หน้าจอ Dashboard มีกล่องครอบการ์ด <section class=\"cards\"> ที่มีการ์ด 3 ใบ (Voltage, Current, Water Flow) ต้องการให้การ์ดเรียงเป็นแถวแนวนอน มีช่องว่าง 16px และปัดขึ้นแถวใหม่ได้เมื่อเปิดบนหน้าจอแคบ ควรใช้ CSS ใดกับ .cards", "choices": ["display: block; margin: 16px;", "position: fixed; width: 100%;", "display: flex; flex-wrap: wrap; gap: 16px;", "text-align: center; font-size: 16px;"], "answer": 2, "why": "display: flex จัดเรียงลูกในแนวนอน, flex-wrap: wrap ให้ขึ้นแถวใหม่เมื่อจอแคบ และ gap: 16px กำหนดระยะห่างระหว่างการ์ด"}, {"auditCol": "K", "auditLabel": "การเขียนโปรแกรม JavaScript ฟังก์ชัน และการจัดการ DOM", "clo": "CLO03", "points": 5, "q": "พิจารณาโค้ดต่อไปนี้:\nconst MAX_VOLT = 240;\nfunction checkVolt(v) {\n  if (v > MAX_VOLT) {\n    return 'อันตราย';\n  } else if (v >= 235) {\n    return 'เฝ้าระวัง';\n  } else {\n    return 'ปกติ';\n  }\n}\ndocument.getElementById('status').textContent = checkVolt(240);\nผลลัพธ์ที่แสดงใน #status คือข้อใด", "choices": ["อันตราย", "เฝ้าระวัง", "ปกติ", "เกิด Error"], "answer": 1, "why": "240 > 240 เป็นเท็จ จึงลงมาเช็กเงื่อนไข else if (240 >= 235) ซึ่งเป็นจริง และคืนค่า 'เฝ้าระวัง' ไปแสดงใน #status"}, {"auditCol": "L", "auditLabel": "โครงสร้างข้อมูล JSON และการสื่อสาร REST API", "clo": "CLO02, CLO05", "points": 5, "q": "API ตอบกลับ JSON ดังนี้:\n{ \"line\": \"A\", \"electric\": { \"voltage\": 248.5, \"current\": 16.2 }, \"water\": { \"flow\": 3.1 } }\nหลังแปลงเป็นตัวแปร data ด้วย const data = await res.json(); แล้ว หากต้องการอ่านค่าอัตราการไหลของน้ำ (3.1) ต้องเขียนอย่างไร", "choices": ["data.flow", "data.electric.flow", "data.water.flow", "data[0].water.flow"], "answer": 2, "why": "ไล่ตามโครงสร้าง Object ทีละชั้น: data -> water -> flow จึงเขียนเป็น data.water.flow"}, {"auditCol": "M", "auditLabel": "การรับ-ส่งข้อมูลและระบบแจ้งเตือน Webhook", "clo": "CLO05", "points": 5, "q": "เมื่อตรวจสอบพบว่าค่าแรงดันเกินเกณฑ์ ต้องการส่ง JSON { sender, title, message } ไปแจ้งเตือนที่ Webhook URL ของผู้สอนด้วย fetch ข้อใดตั้งค่าถูกต้องที่สุด", "choices": ["fetch(WEBHOOK_URL, { method: 'GET', body: { sender, title, message } })", "fetch(WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sender, title, message }) })", "fetch(WEBHOOK_URL, { method: 'POST', body: '{ sender, title, message }' })", "fetch(WEBHOOK_URL, { method: 'PUT', headers: { 'Content-Type': 'text/plain' } })"], "answer": 1, "why": "การส่งข้อมูลเข้า Webhook ต้องใช้ method: 'POST', ระบุ header 'Content-Type': 'application/json' และแปลง Object เป็นข้อความ JSON ด้วย JSON.stringify(...)"}, {"auditCol": "N", "auditLabel": "ความมั่นคงปลอดภัยไซเบอร์ (Security) และการทำ UAT", "clo": "CLO04, CLO06", "points": 5, "q": "ข้อใดปฏิบัติได้ถูกต้องตามหลักความปลอดภัย (ป้องกัน XSS) และการจัดทำ Test Case ก่อนส่งมอบระบบ", "choices": ["ใช้ .innerHTML แสดงข้อความที่ผู้ใช้กรอก เพราะทำงานเร็วกว่า .textContent", "ใช้ .textContent แสดงข้อความจากผู้ใช้ และเขียน Test Case ระบุข้อมูลทดสอบกับผลที่คาดหวัง (Expected Result) ให้ชัดเจน", "เก็บ User และ Password ไว้ในไฟล์ JavaScript ฝั่งหน้าเว็บเพื่อให้ผู้เรียนดูง่าย", "ข้ามขั้นตอน UAT ไปใช้งานจริงทันทีหากเขียนโค้ดเสร็จแล้ว"], "answer": 1, "why": "การแสดงข้อความจากผู้ใช้ต้องใช้ .textContent เพื่อป้องกันการฝังโค้ดอันตราย (XSS) และการทดสอบที่ดีต้องเขียน Test Case ที่มี Expected Result ชัดเจน"}]};
+const LETTERS = ['ก', 'ข', 'ค', 'ง'];
+let lastSubmission = null;
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderQuestions(list, containerId, prefix, isFinal) {
+  const box = document.getElementById(containerId);
+  box.innerHTML = list.map((q, idx) => {
+    const qNo = isFinal ? (21 + idx) : (1 + idx);
+    const pts = isFinal ? (q.points || 5) : 1;
+    const badgeText = isFinal
+      ? `<span class="tag final">Final หัวข้อ ${q.auditCol || (idx + 1)}: ${escapeHtml(q.auditLabel || q.clo)}</span>`
+      : `<span class="tag">${escapeHtml(q.clo)}</span>`;
+    const choicesHtml = q.choices.map((ch, cIdx) => `
+      <label class="choice-label">
+        <input type="radio" name="${prefix}_${idx}" value="${cIdx}" onchange="onPick('${prefix}_${idx}')">
+        <span><strong>${LETTERS[cIdx]}.</strong> ${escapeHtml(ch)}</span>
+      </label>
+    `).join('');
+    return `
+      <div class="q-card" id="card_${prefix}_${idx}">
+        <div class="q-meta">
+          ${badgeText}
+          <span>${pts} คะแนน</span>
+        </div>
+        <div class="q-title">${qNo}. ${escapeHtml(q.q)}</div>
+        <div>${choicesHtml}</div>
+        <div class="explain-box" id="exp_${prefix}_${idx}"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+function onPick(name) {
+  const card = document.getElementById('card_' + name);
+  if (card && !card.classList.contains('correct') && !card.classList.contains('wrong')) {
+    card.classList.add('answered');
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done = 0;
+  EXAM.part1.forEach((_, i) => {
+    if (document.querySelector(`input[name="p1_${i}"]:checked`)) done++;
+  });
+  EXAM.part2.forEach((_, i) => {
+    if (document.querySelector(`input[name="p2_${i}"]:checked`)) done++;
+  });
+  const total = EXAM.part1.length + EXAM.part2.length;
+  document.getElementById('progress-text').textContent = `ตอบแล้ว ${done} / ${total} ข้อ`;
+}
+
+function gradeSection(list, prefix, defaultPts) {
+  let sum = 0;
+  const details = [];
+  list.forEach((q, idx) => {
+    const pts = q.points || defaultPts;
+    const checked = document.querySelector(`input[name="${prefix}_${idx}"]:checked`);
+    const sel = checked ? Number(checked.value) : -1;
+    const ok = sel === q.answer;
+    const earned = ok ? pts : 0;
+    sum += earned;
+    details.push({ sel, ok, earned, label: q.auditLabel || q.clo });
+
+    const card = document.getElementById(`card_${prefix}_${idx}`);
+    card.classList.remove('answered', 'correct', 'wrong');
+    card.classList.add(ok ? 'correct' : 'wrong');
+
+    const exp = document.getElementById(`exp_${prefix}_${idx}`);
+    exp.style.display = 'block';
+    exp.innerHTML = ok
+      ? `<strong>✓ ถูกต้อง (+${pts} คะแนน)</strong> · เฉลย: ${LETTERS[q.answer]}. ${escapeHtml(q.choices[q.answer])}<br><span style="color:#475569">${escapeHtml(q.why || '')}</span>`
+      : `<strong>✗ ยังไม่ถูก (0 คะแนน)</strong> · คำตอบที่ถูกคือ <strong>${LETTERS[q.answer]}. ${escapeHtml(q.choices[q.answer])}</strong><br><span style="color:#475569">${escapeHtml(q.why || '')}</span>`;
+  });
+  return { sum, details };
+}
+
+function submitExam() {
+  const studentName = document.getElementById('studentName').value.trim();
+  const seatNo = document.getElementById('seatNo').value.trim();
+  if (!studentName) {
+    alert('กรุณากรอกชื่อ-นามสกุลก่อนส่งข้อสอบครับ');
+    document.getElementById('studentName').focus();
+    return;
+  }
+
+  const r1 = gradeSection(EXAM.part1, 'p1', 1);
+  const r2 = gradeSection(EXAM.part2, 'p2', 5);
+  const total50 = r1.sum + r2.sum;
+
+  document.getElementById('score-summary').textContent = `Post-Test: ${r1.sum} / 20  |  Final ทฤษฎี: ${r2.sum} / 30  (รวม ${total50} / 50)`;
+  document.getElementById('score-detail').innerHTML =
+    `ผู้เข้าสอบ: <strong>${escapeHtml(studentName)}</strong> (รุ่น: ${escapeHtml(document.getElementById('cohort').value.trim())}, เลขที่ ${escapeHtml(seatNo || '-')})`;
+
+  let tableRows = `
+    <tr><th>ช่องคะแนนในตาราง Audit</th><th style="width:120px;text-align:center;">คะแนนที่ได้</th></tr>
+    <tr><td>Post-Test (20)</td><td class="num">${r1.sum} / 20</td></tr>
+  `;
+  r2.details.forEach((d, i) => {
+    tableRows += `<tr><td>Final หัวข้อ ${i + 1}: ${escapeHtml(d.label)}</td><td class="num">${d.earned} / 5</td></tr>`;
+  });
+  tableRows += `<tr><th>รวมคะแนนสอบ Final (ภาคทฤษฎี)</th><th style="text-align:center;">${r2.sum} / 30</th></tr>`;
+  document.getElementById('audit-table').innerHTML = tableRows;
+
+  document.getElementById('result-banner').style.display = 'block';
+  lastSubmission = {
+    submittedAt: new Date().toISOString(),
+    cohort: document.getElementById('cohort').value.trim(),
+    seatNo: seatNo,
+    studentName: studentName,
+    department: document.getElementById('dept').value.trim(),
+    postTest20: r1.sum,
+    finalTopics: r2.details.map(d => d.earned),
+    final30: r2.sum,
+    total50: total50
+  };
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadResultJSON() {
+  if (!lastSubmission) return;
+  const safeName = (lastSubmission.studentName || 'student').replace(/[^a-zA-Z0-9ก-๙_-]/g, '_');
+  const seat = lastSubmission.seatNo ? String(lastSubmission.seatNo).padStart(2, '0') : '00';
+  const blob = new Blob([JSON.stringify(lastSubmission, null, 2)], { type: 'application/json;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ผลสอบรวม_${seat}_${safeName}.json`;
+  a.click();
+}
+
+function downloadSingleCSV() {
+  if (!lastSubmission) return;
+  const s = lastSubmission;
+  const header = 'รุ่น,เลขที่,ชื่อ-นามสกุล,สังกัด,Post-Test(20),หัวข้อ1(5),หัวข้อ2(5),หัวข้อ3(5),หัวข้อ4(5),หัวข้อ5(5),หัวข้อ6(5),Final(30)\n';
+  const row = `"${s.cohort}","${s.seatNo}","${s.studentName}","${s.department}",${s.postTest20},${s.finalTopics.join(',')},${s.final30}\n`;
+  const blob = new Blob(['\uFEFF' + header + row], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `คะแนนสอบ_${s.seatNo || '00'}_${s.studentName}.csv`;
+  a.click();
+}
+
+function toggleInstructorPanel() {
+  const p = document.getElementById('instructor-panel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+}
+
+async function mergeStudentFiles(event) {
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
+  const records = [];
+  for (const f of files) {
+    try { records.push(JSON.parse(await f.text())); }
+    catch (e) { console.error('อ่านไฟล์ไม่สำเร็จ:', f.name, e); }
+  }
+  records.sort((a, b) => Number(a.seatNo || 999) - Number(b.seatNo || 999));
+  let csv = 'รุ่น,เลขที่,ชื่อ-นามสกุล,สังกัด,Post-Test(20),หัวข้อ1(5),หัวข้อ2(5),หัวข้อ3(5),หัวข้อ4(5),หัวข้อ5(5),หัวข้อ6(5),Final(30)\n';
+  records.forEach(r => {
+    const t = r.finalTopics || [0,0,0,0,0,0];
+    csv += `"${r.cohort || ''}","${r.seatNo || ''}","${r.studentName || ''}","${r.department || ''}",${r.postTest20},${t.join(',')},${r.final30}\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  document.getElementById('batch-output').innerHTML =
+    `<p>รวมผลสอบสำเร็จ <strong>${records.length} คน</strong></p>` +
+    `<a class="btn btn-primary" style="display:inline-block;text-decoration:none;" href="${url}" download="สรุปคะแนน_PostTest_และ_Final_ทั้งห้อง.csv">⬇️ ดาวน์โหลด CSV กรอกลง Audit ทั้งห้อง</a>`;
+}
+
+renderQuestions(EXAM.part1, 'part1-container', 'p1', false);
+renderQuestions(EXAM.part2, 'part2-container', 'p2', true);
+</script>
+</body>
+</html>

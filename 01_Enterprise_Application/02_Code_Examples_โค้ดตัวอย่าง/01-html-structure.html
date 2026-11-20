@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<!-- โครงสร้าง HTML และ Semantic HTML · สไลด์ 25–27 · เปิดไฟล์นี้ในเบราว์เซอร์ได้เลย -->
+<html lang="th">
+
+<!-- head: ข้อมูลเกี่ยวกับหน้า ไม่แสดงบนหน้าเว็บ -->
+<head>
+  <meta charset="UTF-8">                                                  <!-- ให้แสดงภาษาไทยได้ -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <!-- ให้แสดงผลดีบนมือถือ -->
+  <title>Electrical Meter</title>                                         <!-- ชื่อบนแท็บเบราว์เซอร์ -->
+</head>
+
+<!-- body: ทุกอย่างที่ผู้ใช้มองเห็น -->
+<body>
+
+  <!-- Semantic HTML: ใช้แท็กที่บอกความหมาย แทนการใช้ div ทั้งหมด -->
+  <header>
+    <h1>Electrical Meter</h1>                <!-- h1 หัวข้อหลัก ควรมีหน้าละ 1 ตัว -->
+    <nav>
+      <a href="#meter">มิเตอร์</a> |
+      <a href="#history">ประวัติ</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="meter">
+      <h2>ค่าปัจจุบัน</h2>                     <!-- h2–h6 หัวข้อย่อยตามลำดับ -->
+      <p>แรงดัน <strong>230</strong> V</p>   <!-- strong = ข้อความสำคัญ (มีความหมาย ไม่ใช่แค่ตัวหนา) -->
+      <p>กระแส <strong>15.8</strong> A</p>
+    </section>
+
+    <section id="history">
+      <h2>ประวัติ 3 ครั้งล่าสุด</h2>
+
+      <!-- ตาราง: table > thead/tbody > tr (แถว) > th (หัว) / td (ข้อมูล) -->
+      <table border="1">
+        <thead>
+          <tr><th>เวลา</th><th>แรงดัน (V)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>09:00</td><td>229</td></tr>
+          <tr><td>09:05</td><td>231</td></tr>
+          <tr><td>09:10</td><td>230</td></tr>
+        </tbody>
+      </table>
+
+      <!-- รายการ: ul ไม่มีลำดับ / ol มีลำดับ -->
+      <ul>
+        <li>ข้อมูลจากเครื่อง M-01</li>
+        <li>อัปเดตทุก 5 นาที</li>
+      </ul>
+    </section>
+
+    <!-- ฟอร์ม: label คู่กับ input ผ่าน for และ id -->
+    <section>
+      <h2>บันทึกค่า</h2>
+      <form>
+        <label for="volt">แรงดัน (V)</label>
+        <input id="volt" type="number" min="0" max="500" required>
+        <button type="submit">บันทึก</button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>© SNC · Line A</p>
+  </footer>
+
+  <!--
+    เทียบกัน: แบบ div ทั้งหมด (ไม่มีความหมาย)        แบบ Semantic
+    <div class="header">                         <header>
+    <div class="menu">                           <nav>
+    <div class="content">                        <main> / <section> / <article>
+    <div class="footer">                         <footer>
+
+    id ต้องไม่ซ้ำในหน้า (ใช้ให้ JavaScript หา) · class ใช้ซ้ำได้ (ใช้แต่งด้วย CSS)
+    แท็กส่วนใหญ่ต้องปิด เช่น <p>...</p> ยกเว้น <meta> <input> <img> <br>
+  -->
+</body>
+</html>

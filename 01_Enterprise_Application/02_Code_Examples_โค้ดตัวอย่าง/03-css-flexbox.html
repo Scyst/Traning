@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!-- Flexbox: จัดการ์ดให้เรียงเป็นแถว (ใช้ใน Workshop 1) · สไลด์ 34 -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electrical Meter · Flexbox</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Tahoma, sans-serif;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    h1 { text-align: center; margin: 0; }
+    .sub { text-align: center; color: #9ca3af; margin: 4px 0 24px; }
+
+    /* ใส่ display: flex ที่ "กล่องแม่" ลูกข้างในจะเรียงเป็นแถว */
+    .cards {
+      display: flex;
+      gap: 16px;               /* ระยะห่างระหว่างการ์ด */
+      flex-wrap: wrap;         /* จอแคบให้ตัดลงบรรทัดใหม่ */
+      justify-content: center; /* จัดตามแนวนอน: flex-start | center | space-between */
+      align-items: stretch;    /* จัดตามแนวตั้ง: การ์ดสูงเท่ากัน */
+    }
+
+    .card {
+      flex: 1 1 240px;         /* ขยายเท่ากัน แต่ไม่แคบกว่า 240px */
+      max-width: 420px;
+      padding: 20px;
+      border-radius: 10px;
+      background: #0b1220;
+      text-align: center;
+    }
+
+    .label { margin: 0; font-weight: bold; }
+    .value { margin: 12px 0 0; font-size: 40px; font-weight: bold; }
+    .unit { font-size: 16px; color: #9ca3af; }
+    .voltage { color: #38bdf8; }
+    .current { color: #22c55e; }
+
+    /* ทางเลือก: Grid เหมาะกับตารางหลายแถวหลายคอลัมน์
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    */
+  </style>
+</head>
+<body>
+  <h1>Electrical Meter</h1>
+  <p class="sub">Real-time Voltage &amp; Current</p>
+
+  <section class="cards">
+    <article class="card">
+      <p class="label">Voltage</p>
+      <p class="value voltage">230 <span class="unit">V</span></p>
+    </article>
+    <article class="card">
+      <p class="label">Current</p>
+      <p class="value current">15.8 <span class="unit">A</span></p>
+    </article>
+  </section>
+
+  <!--
+    กับดักที่เจอบ่อย: ใส่ display: flex ที่ .card แทน .cards การ์ดจะไม่เรียงข้างกัน
+    ลองย่อหน้าต่างเบราว์เซอร์ให้แคบ การ์ดจะตัดลงบรรทัดเพราะ flex-wrap: wrap
+  -->
+</body>
+</html>

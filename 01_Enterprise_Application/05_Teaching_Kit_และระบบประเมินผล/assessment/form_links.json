@@ -1,0 +1,22 @@
+{
+  "subject": "App (Application Development & IoT)",
+  "updatedAt": "2026-11-18",
+  "forms": [
+    {
+      "key": "pre_test",
+      "title": "Pre-Test (ก่อนเรียน)",
+      "when": "วันที่ 1 · 09:15",
+      "note": "20 ข้อ (20 คะแนน) ประมาณ 15 นาที",
+      "url": "https://docs.google.com/forms/d/e/1FAIpQLSfQjQDY_RsHZrYz7Vnk82Ozzx7QoBnibBXAiJLFCCduEbEldA/viewform",
+      "editUrl": "https://docs.google.com/forms/d/18MWtB_h_audbcEfSzTkwziC-bH10OsDwFsxWDqdcXRc/edit"
+    },
+    {
+      "key": "post_final",
+      "title": "Post-Test + Final ทฤษฎี (ฉบับรวม)",
+      "when": "วันที่ 4 · ช่วงสอบทฤษฎี",
+      "note": "26 ข้อ (ตอน 1: 20 คะแนน + ตอน 2: 30 คะแนน) ประมาณ 35–40 นาที",
+      "url": "https://docs.google.com/forms/d/e/1FAIpQLSdTMA748IzgZ-znxQc8uNzg0zyV1A0vFYdtbK5Yzqy84l4OBw/viewform",
+      "editUrl": "https://docs.google.com/forms/d/1suWxlgckR76KMSikQ7TSIBF-T2B04kZGbly-GS321UU/edit"
+    }
+  ]
+}

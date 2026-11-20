@@ -1,0 +1,12 @@
+/* T1: จัดหน้าจอ Dashboard ที่นี่
+   - การ์ด 4 ใบเรียงเป็นแถวด้วย Flexbox และตัดลงบรรทัดเมื่อจอแคบ
+   - ตัวเลขในการ์ด (.value) ต้องเด่น อ่านได้ภายใน 5 วินาที
+   - สถานะ (#status) ใช้ class ok / warn / bad / off ตามมาตรฐานสี Industrial UI */
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: "Leelawadee UI", Tahoma, sans-serif;
+}

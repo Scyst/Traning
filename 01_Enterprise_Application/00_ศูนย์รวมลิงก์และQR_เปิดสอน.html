@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ศูนย์รวมลิงก์ &amp; QR เปิดสอน (Enterprise Application · BOI)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: "Sarabun", "Leelawadee UI", Tahoma, sans-serif;
+    background: #f1f5f9; color: #0f172a;
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, #0e5930, #147a42);
+    color: #fff; padding: 20px 26px; border-radius: 14px; margin-bottom: 20px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  header h1 { margin: 0; font-size: 1.45rem; }
+  header p { margin: 4px 0 0; opacity: 0.9; font-size: 0.95rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .card {
+    background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 18px 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 { margin: 0 0 6px; font-size: 1.12rem; color: #0e5930; }
+  .when { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; }
+  input[type="text"] {
+    width: 100%; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 8px;
+    font: inherit; font-size: 0.9rem; margin-bottom: 10px;
+  }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .btn {
+    display: inline-block; padding: 8px 14px; border-radius: 8px; border: 1px solid #cbd5e1;
+    background: #f8fafc; color: #0f172a; text-decoration: none; font-weight: 700; font-size: 0.88rem; cursor: pointer;
+  }
+  .btn.primary { background: #147a42; color: #fff; border-color: #147a42; }
+  .btn.blue { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  .qr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(175px, 1fr)); gap: 14px; }
+  .qr-item {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; text-align: center;
+  }
+  .qr-item img { max-width: 140px; height: auto; border-radius: 6px; }
+  .qr-item div { font-size: 0.85rem; font-weight: 700; margin-top: 8px; word-break: break-word; }
+  .shortcut-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; }
+  .shortcut {
+    display: block; padding: 12px 14px; background: #f8fafc; border: 1px solid #cbd5e1;
+    border-radius: 10px; text-decoration: none; color: #0f172a; font-weight: 700;
+  }
+  .shortcut:hover { background: #ecfdf5; border-color: #10b981; }
+  .shortcut small { display: block; font-weight: 400; color: #64748b; margin-top: 3px; }
+  .toast { color: #047857; font-weight: 700; font-size: 0.9rem; margin-left: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>🚀 ศูนย์รวมลิงก์ &amp; QR เปิดสอนวิชา Enterprise Application (BOI)</h1>
+      <p>รวมลิงก์ Pre-Test, Post-Test + Final และเครื่องมือสอนทั้งหมดไว้ในหน้าเดียวสำหรับทุกรุ่น (แบบประเมินใช้ระบบกลางของ HR)</p>
+    </div>
+    <button class="btn" onclick="exportLinksJson()" style="background:#fff;color:#0e5930;">💾 บันทึกเป็น form_links.json</button>
+  </header>
+
+  <section class="card" style="margin-bottom:18px;">
+    <h2>1. ลิงก์แบบทดสอบ (แก้/อัปเดตได้หลังรันสคริปต์ <code>create_boi_forms.gs</code>)</h2>
+    <p style="margin:0 0 12px;color:#475569;font-size:0.92rem;">
+      เมื่อรัน <code>createAllBOIForms()</code> ใน Google Sheet 1 ครั้ง ให้วางลิงก์ใหม่ลงในช่องด้านล่าง แล้วกด <strong>บันทึกเป็น form_links.json</strong> เพื่อเก็บทับไฟล์ใน <code>05_Teaching_Kit_และระบบประเมินผล/assessment/form_links.json</code> (ใช้ได้ตลอดทั้ง 19 รุ่น ไม่ต้องหาใหม่อีก)
+    </p>
+    <div class="grid" id="forms-grid"></div>
+  </section>
+
+  <section class="card" style="margin-bottom:18px;">
+    <h2>2. ทางลัดไฟล์สอนและสอบที่ใช้ทุกวัน (เปิดจากในโปรเจ็คได้ทันที)</h2>
+    <div class="shortcut-list">
+      <a class="shortcut" href="02_Code_Examples_โค้ดตัวอย่าง/00-html-css-visual-lab.html" target="_blank">
+        🎨 Visual Lab: HTML &amp; CSS
+        <small>02_Code_Examples_โค้ดตัวอย่าง/00-html-css-visual-lab.html</small>
+      </a>
+      <a class="shortcut" href="02_Code_Examples_โค้ดตัวอย่าง/00-dom-js-visual-lab.html" target="_blank">
+        ⚡ Visual Lab: DOM &amp; JS Event
+        <small>02_Code_Examples_โค้ดตัวอย่าง/00-dom-js-visual-lab.html</small>
+      </a>
+      <a class="shortcut" href="04_Exam_ข้อสอบและเกณฑ์วัดผล/ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html" target="_blank">
+        📝 ข้อสอบรวมออนไลน์ (Post-Test + Final 26 ข้อ)
+        <small>ใช้สอบบนเว็บได้ทันที (แยกคะแนนตรงตาราง Audit)</small>
+      </a>
+      <a class="shortcut" href="04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/โจทย์สอบปฏิบัติ_แสดงบนจอ.html" target="_blank">
+        🖥️ จอโจทย์สอบปฏิบัติ (Electrical Meter Alert)
+        <small>เปิดขึ้นโปรเจคเตอร์คู่กับ python exam_server.py</small>
+      </a>
+      <a class="shortcut" href="05_Teaching_Kit_และระบบประเมินผล/teaching-kit/index.html" target="_blank">
+        📖 Teaching Kit (Speaker Notes &amp; Quiz)
+        <small>05_Teaching_Kit_และระบบประเมินผล/teaching-kit/index.html</small>
+      </a>
+      <a class="shortcut" href="../03_Audit_สรุปคะแนนการสอบ/สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_1-8_พร้อมพิมพ์_PDF.html" target="_blank">
+        📊 ตัวช่วยพิมพ์สรุปคะแนน Audit PDF
+        <small>และไฟล์ Excel แยกรายรุ่นใน 03_Audit_สรุปคะแนนการสอบ/</small>
+      </a>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>3. รูป QR Code ที่บันทึกไว้ในโปรเจ็ค (<code>00_BOI_Template_และตารางฝึกอบรม/QR_Codes/</code>)</h2>
+    <div class="qr-grid">
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/BOI.png" alt="BOI"><div>BOI.png</div></div>
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/Regis_Snc3.png" alt="Regis_Snc3"><div>Regis_Snc3.png</div></div>
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/Post_Test_APP.png" alt="Post_Test_APP"><div>Post_Test_APP.png</div></div>
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/qrcode_docs.google.com.png" alt="QR 1"><div>qrcode_docs.google.com.png</div></div>
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/qrcode_docs.google.com (1).png" alt="QR 2"><div>qrcode_docs.google.com (1).png</div></div>
+      <div class="qr-item"><img src="../00_BOI_Template_และตารางฝึกอบรม/QR_Codes/qrcode_docs.google.com (2).png" alt="QR 3"><div>qrcode_docs.google.com (2).png</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const DEFAULT_LINKS = {
+  subject: "App (Application Development & IoT)",
+  updatedAt: "2026-11-18",
+  forms: [
+    {
+      key: "pre_test",
+      title: "Pre-Test (ก่อนเรียน)",
+      when: "วันที่ 1 · 09:15",
+      note: "20 ข้อ (20 คะแนน) ประมาณ 15 นาที",
+      url: "https://docs.google.com/forms/d/e/1FAIpQLSfQjQDY_RsHZrYz7Vnk82Ozzx7QoBnibBXAiJLFCCduEbEldA/viewform",
+      editUrl: "https://docs.google.com/forms/d/18MWtB_h_audbcEfSzTkwziC-bH10OsDwFsxWDqdcXRc/edit"
+    },
+    {
+      key: "post_final",
+      title: "Post-Test + Final ทฤษฎี (ฉบับรวม)",
+      when: "วันที่ 4 · ช่วงสอบทฤษฎี",
+      note: "26 ข้อ (ตอน 1: 20 คะแนน + ตอน 2: 30 คะแนน) ประมาณ 35–40 นาที",
+      url: "https://docs.google.com/forms/d/e/1FAIpQLSdTMA748IzgZ-znxQc8uNzg0zyV1A0vFYdtbK5Yzqy84l4OBw/viewform",
+      editUrl: "https://docs.google.com/forms/d/1suWxlgckR76KMSikQ7TSIBF-T2B04kZGbly-GS321UU/edit"
+    }
+  ]
+};
+
+let currentData = JSON.parse(JSON.stringify(DEFAULT_LINKS));
+
+async function init() {
+  try {
+    const res = await fetch('05_Teaching_Kit_และระบบประเมินผล/assessment/form_links.json', { cache: 'no-store' });
+    if (res.ok) {
+      const json = await res.json();
+      if (json && Array.isArray(json.forms)) {
+        const filtered = json.forms.filter(f => f.key !== 'satisfaction' && !(f.title || '').includes('ความพึงพอใจ'));
+        if (filtered.length > 0) currentData = { ...json, forms: filtered };
+      }
+    }
+  } catch (e) {}
+  renderForms();
+}
+
+function renderForms() {
+  const grid = document.getElementById('forms-grid');
+  grid.innerHTML = currentData.forms.map((f, idx) => `
+    <div class="card" style="margin:0;">
+      <h2>${f.title}</h2>
+      <div class="when">${f.when || ''} · ${f.note || ''}</div>
+      <input type="text" id="url_${idx}" value="${f.url || ''}" oninput="currentData.forms[${idx}].url = this.value.trim()">
+      <div class="btn-row">
+        <a class="btn primary" href="${f.url || '#'}" target="_blank" onclick="this.href=document.getElementById('url_${idx}').value || '#'">🔗 เปิดฟอร์มผู้สอบ</a>
+        <button class="btn" onclick="copyUrl(${idx})">📋 คัดลอกลิงก์</button>
+        ${f.editUrl ? `<a class="btn blue" href="${f.editUrl}" target="_blank">✏️ แก้ไข / ตั้งค่าประกาศคะแนน</a>` : ''}
+        <span class="toast" id="msg_${idx}"></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function copyUrl(idx) {
+  const val = document.getElementById('url_' + idx).value.trim();
+  navigator.clipboard?.writeText(val);
+  const el = document.getElementById('msg_' + idx);
+  el.textContent = 'คัดลอกแล้ว!';
+  setTimeout(() => { el.textContent = ''; }, 1500);
+}
+
+function exportLinksJson() {
+  const blob = new Blob([JSON.stringify(currentData, null, 2)], { type: 'application/json;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'form_links.json';
+  a.click();
+}
+
+init();
+</script>
+</body>
+</html>

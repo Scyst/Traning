@@ -1,0 +1,118 @@
+{
+  "subject": "การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร",
+  "intro": "Workshop ทั้ง 4 ข้อต่อยอดเป็นงานชิ้นเดียว: หน้า Electrical Meter ที่ค่อย ๆ โต้ตอบได้ ดึงข้อมูลจริง และส่งแจ้งเตือนได้ เก็บงานของตัวเองไว้ทุกวัน ถ้าทำข้อก่อนหน้าไม่เสร็จ ขอโฟลเดอร์ starter ของข้อถัดไปจากผู้สอนเพื่อเริ่มต่อได้ทันที",
+  "workshops": [
+    {
+      "id": "Workshop 1", "title": "Electrical Meter", "when": "วันที่ 1 · 14:00–15:45", "slides": "สไลด์ 25–35",
+      "folder": "w1/starter", "files": "index.html, style.css",
+      "goal": "สร้างหน้า Electrical Meter ให้เหมือนภาพในสไลด์ 35 ด้วย HTML และ CSS",
+      "steps": [
+        "เปิดโฟลเดอร์ w1/starter ใน VS Code แล้วเปิด index.html ด้วย Live Server",
+        "ใน <body> สร้าง <header> ที่มี <h1> \"Electrical Meter\" และ <p class=\"sub\"> \"Real-time Voltage & Current\"",
+        "สร้าง <main> และ <section class=\"cards\"> ข้างในมีการ์ด <article class=\"card\"> 2 ใบ: Voltage 230 V และ Current 15.8 A",
+        "ใส่ตัวเลขใน <span id=\"voltage\"> และ <span id=\"current\"> (Workshop 2–4 ใช้ id นี้)",
+        "ใน style.css ตั้งสีตามตาราง จัดหัวข้อกึ่งกลาง และใส่ display: flex ที่ .cards",
+        "ย่อหน้าต่างเบราว์เซอร์ให้แคบ แล้วตรวจว่าการ์ดตัดลงบรรทัด"
+      ],
+      "spec": [["ส่วน", "สี / ขนาด"], ["พื้นหลังหน้า", "#111827"], ["พื้นหลังการ์ด", "#0b1220 มุมโค้ง 10px"], ["ตัวอักษรหลัก / รอง", "#e5e7eb / #9ca3af"], ["ตัวเลข Voltage", "#38bdf8 ขนาดประมาณ 40px ตัวหนา"], ["ตัวเลข Current", "#22c55e ขนาดประมาณ 40px ตัวหนา"]],
+      "done": [
+        "ใช้แท็ก header, main, section และ article",
+        "เชื่อม CSS ด้วย <link> ไปที่ style.css ไม่เขียน style ไว้ในแท็ก",
+        "การ์ด 2 ใบอยู่แถวเดียวกันบนจอกว้าง และตัดลงบรรทัดเมื่อจอแคบ",
+        "ตัวเลขอยู่ใน id=\"voltage\" และ id=\"current\"",
+        "สีและขนาดใกล้เคียงภาพตัวอย่าง อ่านค่าได้ภายใน 5 วินาที",
+        "คลิกขวา › Inspect แล้วโครงหน้าไม่เพี้ยน (ไม่มีแท็กที่ลืมปิด)"
+      ],
+      "stretch": ["เพิ่มการ์ด Power แสดง 3.6 kW", "ทำให้การ์ดสว่างขึ้นเล็กน้อยเมื่อเอาเมาส์ชี้ (:hover)"],
+      "hints": [
+        "CSS ไม่ทำงานทั้งหน้า: ตรวจ href ใน <link> และชื่อไฟล์ style.css",
+        "การ์ดไม่เรียงข้างกัน: display: flex ต้องอยู่ที่ .cards (กล่องแม่) ไม่ใช่ .card",
+        "ภาษาไทยเป็นตัวแปลก: ต้องมี <meta charset=\"UTF-8\"> ใน <head>"
+      ]
+    },
+    {
+      "id": "Workshop 2", "title": "Start / Stop และ Simple Meter", "when": "วันที่ 2 · 14:30–16:00", "slides": "สไลด์ 58–71",
+      "folder": "w2/starter", "files": "script.js (HTML และ CSS เตรียมไว้ให้แล้ว)",
+      "goal": "ทำให้หน้า Electrical Meter โต้ตอบได้ด้วย JavaScript: ปุ่มเปลี่ยนสถานะเครื่อง และคำเตือนเมื่อแรงดันเกิน",
+      "steps": [
+        "เปิดโฟลเดอร์ w2/starter (หรือใช้งาน Workshop 1 ของตัวเองแล้วคัดลอกส่วนควบคุมจาก starter มาเพิ่ม)",
+        "2.1 เขียน setStatus(isRunning): true แสดง RUNNING พร้อม class \"badge run\" ส่วน false แสดง STOP พร้อม class \"badge stop\"",
+        "2.1 ผูก click ที่ #start-btn และ #stop-btn ด้วย addEventListener",
+        "2.2 เขียน checkVoltage(v): เกิน 240 คืน \"Warning: แรงดันเกิน 240 V\" ไม่เกินคืนข้อความว่าง",
+        "2.2 ผูก input ที่ #volt-input แปลงค่าด้วย Number() ถ้าช่องว่างให้ล้างคำเตือน แล้วแสดงผลใน #warning"
+      ],
+      "spec": [["id", "ใช้ทำอะไร"], ["#status", "ป้ายสถานะเครื่อง (class: badge, badge run, badge stop)"], ["#start-btn / #stop-btn", "ปุ่ม Start และ Stop"], ["#volt-input", "ช่องกรอกแรงดันทดสอบ"], ["#warning", "ข้อความคำเตือน"]],
+      "done": [
+        "กด Start ขึ้น RUNNING สีเขียว กด Stop ขึ้น STOP สีแดง สลับไปมาได้",
+        "พิมพ์ 245 คำเตือนขึ้นทันทีโดยไม่ต้องกดปุ่ม",
+        "พิมพ์ 240 ไม่มีคำเตือน (240 ยังไม่เกิน) แต่ 240.1 มีคำเตือน",
+        "ลบค่าจนช่องว่าง คำเตือนหายไป",
+        "ใช้ addEventListener และเปลี่ยนสีด้วย class ไม่แก้ style ตรง ๆ",
+        "Console (F12) ไม่มี error สีแดง"
+      ],
+      "stretch": ["ปุ่ม Start กดไม่ได้ขณะ RUNNING และปุ่ม Stop กดไม่ได้ขณะ STOP", "ให้ค่าที่พิมพ์ไปแสดงในการ์ด Voltage ด้วย"],
+      "hints": [
+        "Cannot set properties of null: id สะกดไม่ตรง หรือ script ทำงานก่อน HTML (ต้องมี defer)",
+        "เทียบตัวเลขแล้วผิด: ค่าจาก input เป็น String ต้องแปลงด้วย Number() ก่อน",
+        "ช่องว่างแล้วไม่ขึ้นคำเตือนแต่ค่าเป็น 0: Number('') ได้ 0 ให้เช็ก value === '' แยก"
+      ]
+    },
+    {
+      "id": "Workshop 3", "title": "ดึงค่าน้ำ-ไฟจาก API", "when": "วันที่ 3 · 11:00–12:00 และ 13:00–13:45", "slides": "สไลด์ 73–85",
+      "folder": "w3/starter", "files": "script.js (มีโค้ด Workshop 2 และการ์ด Water Flow ให้แล้ว)",
+      "goal": "เชื่อม Dashboard กับ API ให้แสดงค่าแรงดัน กระแส และอัตราการไหลของน้ำจริง แล้วอัปเดตเองทุก 5 วินาที",
+      "data": "{\n  \"line\": \"A\",\n  \"electric\": { \"voltage\": 231.4, \"current\": 15.6 },\n  \"water\": { \"flow\": 3.2 },\n  \"updatedAt\": \"2026-11-04T11:05:00+07:00\"\n}",
+      "steps": [
+        "ตั้ง API_URL ตามที่ผู้สอนแจ้ง ถ้ายังไม่มีให้ใช้ data/meter.json ในโฟลเดอร์ไปก่อน (ค่าไม่เปลี่ยน)",
+        "ส่วนที่ 1 (ก่อนพักเที่ยง): เขียน loadMeter() ใช้ fetch แบบ async/await ตรวจ res.ok แล้วแปลงด้วย await res.json()",
+        "ส่วนที่ 1: แสดง electric.voltage, electric.current และ water.flow เป็นทศนิยม 1 ตำแหน่งใน #voltage, #current, #water",
+        "ส่วนที่ 1: ถ้าเกิด error แสดง \"โหลดข้อมูลไม่สำเร็จ\" ใน #updated และเพิ่ม class error",
+        "ส่วนที่ 2 (หลังพักเที่ยง): เรียก loadMeter ทุก 5 วินาทีด้วย setInterval และแสดง \"อัปเดตล่าสุด\" กับเวลาใน #updated",
+        "ส่วนที่ 2: ส่งแรงดันจาก API เข้า checkVoltage แล้วแสดงคำเตือนใน #warning"
+      ],
+      "done": [
+        "ค่าทั้ง 3 ช่องมาจาก API ไม่ใช่ตัวเลขที่พิมพ์ไว้ใน HTML",
+        "ตัวเลขแสดงทศนิยม 1 ตำแหน่ง",
+        "ลองเปลี่ยน API_URL เป็นไฟล์ที่ไม่มีอยู่ หน้าจอขึ้น \"โหลดข้อมูลไม่สำเร็จ\" และค่าเดิมยังอยู่",
+        "ใช้ API สำรองของผู้สอน: ค่าเปลี่ยนเองทุก 5 วินาที และเวลาอัปเดตเปลี่ยนตาม",
+        "เมื่อแรงดันจาก API เกิน 240 คำเตือนขึ้นเอง (API สำรองจะเกินช่วงวินาทีที่ 0–9 ของทุกนาที)",
+        "แท็บ Network มี request ทุก 5 วินาที รอบละครั้ง ไม่ซ้อนกัน"
+      ],
+      "stretch": ["คำนวณกำลังไฟฟ้า (kW) = แรงดัน × กระแส ÷ 1000 แล้วแสดงในการ์ด Power", "แสดงจุดสีเขียวเมื่อโหลดสำเร็จ และสีแดงเมื่อโหลดไม่สำเร็จ"],
+      "hints": [
+        "Failed to fetch หรือ CORS: เปิดหน้าเว็บผ่าน Live Server และตรวจ URL ว่าพิมพ์ถูก",
+        "is not valid JSON: URL ผิดแล้วได้หน้า HTML (เช่น 404) กลับมา เปิดแท็บ Network ดู Response",
+        "หน้าจอแสดง [object Promise]: ลืม await หน้า res.json()",
+        "ได้ undefined: path ผิด ข้อมูลอยู่ที่ data.electric.voltage ไม่ใช่ data.voltage"
+      ]
+    },
+    {
+      "id": "Workshop 4", "title": "แจ้งเตือนผ่าน Webhook เมื่อกด Start", "when": "วันที่ 3 · 14:15–15:00", "slides": "สไลด์ 86–90",
+      "folder": "w4/starter", "files": "script.js (มีโค้ด Workshop 2–3 ให้แล้ว)",
+      "goal": "เมื่อกด Start บน Dashboard ให้ส่งแจ้งเตือนผ่าน Webhook ทันที (Trigger-based Notification)",
+      "data": "{\n  \"title\": \"Machine started\",\n  \"message\": \"Line A · เครื่องเริ่มทำงานเวลา 14:20:05\"\n}",
+      "steps": [
+        "ตั้ง API_URL เหมือน Workshop 3 และตั้ง WEBHOOK_URL ตามที่ผู้สอนแจ้ง",
+        "เขียน notify(title, message): fetch แบบ POST พร้อม headers Content-Type: application/json และ body ด้วย JSON.stringify ถ้า res.ok เป็น false ให้ throw",
+        "ทดลองเรียก notify ใน Console ก่อน แล้วดูข้อความในช่องแจ้งเตือน",
+        "แก้ปุ่ม Start: ถ้ากำลัง RUNNING อยู่แล้วให้หยุด ไม่อย่างนั้นเปลี่ยนสถานะ ปิดปุ่ม แสดง \"กำลังส่งแจ้งเตือน…\" แล้วเรียก notify",
+        "แสดง \"ส่งแจ้งเตือนแล้ว\" หรือ \"ส่งแจ้งเตือนไม่สำเร็จ\" ใน #notify-result และเปิดปุ่มกลับใน finally"
+      ],
+      "done": [
+        "กด Start แล้วแท็บ Network มี POST ไปที่ WEBHOOK_URL พร้อม Content-Type: application/json",
+        "body มี title และ message และ message บอกไลน์กับเวลา",
+        "ข้อความขึ้นในช่องแจ้งเตือน (หรือบนหน้าจอผู้สอนเมื่อใช้ API สำรอง)",
+        "หน้าเว็บแสดงผลส่งสำเร็จหรือไม่สำเร็จ",
+        "กด Start ซ้ำขณะ RUNNING หรือกดรัว ๆ ระหว่างส่ง ไม่ส่งซ้ำ",
+        "กด Stop ไม่ส่งแจ้งเตือน"
+      ],
+      "stretch": ["ส่งแจ้งเตือนอัตโนมัติเมื่อแรงดันจาก API เกิน 240 แต่ส่งครั้งเดียวต่อเหตุการณ์ ไม่ส่งทุก 5 วินาที"],
+      "hints": [
+        "ปลายทางได้ข้อความ [object Object]: ลืม JSON.stringify",
+        "เห็น request OPTIONS แล้วล้ม (CORS): ปลายทางไม่รองรับ preflight ให้ใช้ API สำรองของผู้สอน",
+        "กดแล้วไม่เกิดอะไร: WEBHOOK_URL ยังว่าง หรือดู error สีแดงใน Console",
+        "ระบบจริงไม่ควรให้หน้าเว็บยิง Webhook ตรง เพราะใครก็เปิด DevTools เห็น URL และ token ได้ ควรส่งผ่าน Backend"
+      ]
+    }
+  ]
+}
