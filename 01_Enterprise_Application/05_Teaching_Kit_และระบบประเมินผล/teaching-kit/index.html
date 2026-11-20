@@ -1,0 +1,1478 @@
+<title>ชุดสอน Enterprise Application</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=Sarabun:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: SNC-red ribbon + header, sticky tab bar, one 1080px column; instruments in the lab use HMI status colours */
+:root {
+  --bg: #f3f5f7;
+  --surface: #ffffff;
+  --sunk: #e9edf1;
+  --ink: #17212b;
+  --muted: #5a6773;
+  --line: #d7dde3;
+  --accent: #c8102e;
+  --accent-ink: #ffffff;
+  --navy: #1b4f6e;
+  --code-bg: #f6f8fa;
+  --ok: #18884a;
+  --ok-bg: #e2f4ea;
+  --warn: #9a6b00;
+  --warn-bg: #fdf1cf;
+  --bad: #c62f2f;
+  --bad-bg: #fbe3e3;
+  --info: #23679f;
+  --info-bg: #e1eefa;
+  --off: #66727e;
+  --off-bg: #e8ecef;
+  --hit: #fff3b8;
+  --f-display: "Bai Jamjuree", "Sarabun", "Leelawadee UI", "Tahoma", sans-serif;
+  --f-body: "Sarabun", "Leelawadee UI", "Tahoma", sans-serif;
+  --f-mono: "IBM Plex Mono", "Consolas", "Menlo", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f151b; --surface: #17202a; --sunk: #111a22; --ink: #e6ebf0; --muted: #9ca8b4; --line: #2b3642;
+    --accent: #ff5266; --accent-ink: #1a0b0e; --navy: #79b9de; --code-bg: #121b24;
+    --ok: #4fd18a; --ok-bg: #12301f; --warn: #f2c94c; --warn-bg: #352a0c; --bad: #ff7373; --bad-bg: #3a1717;
+    --info: #6cb1f2; --info-bg: #13283c; --off: #9aa5b0; --off-bg: #222c36; --hit: #3c3512;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f151b; --surface: #17202a; --sunk: #111a22; --ink: #e6ebf0; --muted: #9ca8b4; --line: #2b3642;
+  --accent: #ff5266; --accent-ink: #1a0b0e; --navy: #79b9de; --code-bg: #121b24;
+  --ok: #4fd18a; --ok-bg: #12301f; --warn: #f2c94c; --warn-bg: #352a0c; --bad: #ff7373; --bad-bg: #3a1717;
+  --info: #6cb1f2; --info-bg: #13283c; --off: #9aa5b0; --off-bg: #222c36; --hit: #3c3512;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 16px; line-height: 1.65; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+h1, h2, h3, h4 { font-family: var(--f-display); line-height: 1.25; text-wrap: balance; margin: 0; }
+p { margin: 0; }
+code, pre, kbd { font-family: var(--f-mono); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--info); outline-offset: 2px; }
+
+.wrap { max-width: 1080px; margin-inline: auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.ribbon { height: 8px; background: var(--accent); }
+
+header.top { background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { padding-block: 28px 22px; display: grid; gap: 10px; }
+.eyebrow { font-family: var(--f-display); font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+header.top h1 { font-size: clamp(26px, 4.4vw, 38px); font-weight: 700; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 15px; }
+.meta b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+nav.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+nav.tabs .wrap { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+nav.tabs button { flex: none; background: none; border: 0; border-bottom: 3px solid transparent; padding: 12px 14px 10px; font-family: var(--f-display); font-weight: 600; font-size: 15px; color: var(--muted); cursor: pointer; }
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:hover { color: var(--ink); }
+
+main.wrap { padding-block: 28px 64px; }
+.panel { display: grid; gap: 28px; }
+.panel-head { display: grid; gap: 6px; }
+.panel-head h2 { font-size: 24px; }
+.lead { color: var(--muted); max-width: 68ch; }
+.block { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+.block > h3 { font-size: 18px; }
+.sub { font-size: 14px; color: var(--muted); }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 2px 10px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.info { color: var(--info); background: var(--info-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+.pill.bad { color: var(--bad); background: var(--bad-bg); }
+.pill.off { color: var(--off); background: var(--off-bg); }
+
+/* kit list */
+.kit { display: grid; gap: 0; }
+.kit-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line); align-items: start; }
+.kit-row:first-child { border-top: 0; padding-top: 0; }
+.kit-row h4 { font-family: var(--f-body); font-size: 16px; font-weight: 600; }
+.kit-row p { color: var(--muted); font-size: 15px; grid-column: 1; }
+.kit-row .pill { grid-column: 2; grid-row: 1; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 14px; color: var(--muted); }
+
+/* checklist */
+.checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.checks section { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.checks h4 { font-size: 15px; color: var(--navy); }
+.check { display: grid; grid-template-columns: 22px 1fr; gap: 8px; align-items: start; font-size: 15px; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ok); }
+.check:has(input:checked) span { color: var(--muted); text-decoration: line-through; }
+.row-end { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 14px; cursor: pointer; font-weight: 600; font-size: 15px; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn.small { padding: 4px 10px; font-size: 14px; }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 4px; }
+kbd { background: var(--sunk); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; font-size: 13px; }
+
+/* script tab */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 14px; cursor: pointer; font-weight: 500; }
+.chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: var(--surface); }
+.search { flex: 1 1 200px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; }
+.count { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.notes { display: grid; gap: 12px; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 10px; min-width: 0; }
+.note-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.slide-no { font-family: var(--f-mono); font-size: 13px; font-weight: 500; color: var(--accent); min-width: 5.2em; }
+.note-head h3 { font-size: 17px; font-weight: 600; flex: 1 1 260px; min-width: 0; }
+.time { font-family: var(--f-mono); font-size: 13px; color: var(--navy); background: var(--sunk); border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
+.say { max-width: 75ch; }
+.callout { border-left: 3px solid var(--info); background: var(--info-bg); padding: 8px 12px; border-radius: 0 8px 8px 0; font-size: 15px; display: grid; gap: 2px; }
+.callout.tip { border-left-color: var(--warn); background: var(--warn-bg); }
+.callout b { font-family: var(--f-display); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--info); }
+.callout.tip b { color: var(--warn); }
+.focus .note { padding: 26px 28px; gap: 14px; }
+.focus .note-head h3 { font-size: 24px; }
+.focus .say { font-size: 20px; line-height: 1.7; }
+.focus .callout { font-size: 17px; }
+.focus-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.empty { color: var(--muted); padding: 24px; text-align: center; border: 1px dashed var(--line); border-radius: 10px; }
+
+/* quiz */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--surface); padding: 7px 14px; cursor: pointer; font-weight: 600; font-size: 15px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--navy); color: var(--surface); }
+.quiz-form { display: grid; gap: 14px; }
+fieldset.q { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 14px 18px 16px; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; min-inline-size: 0; overflow-wrap: anywhere; }
+fieldset.q legend { padding: 0; display: contents; }
+.q-title { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-weight: 600; }
+.q-title > span:nth-child(2) { flex: 1 1 200px; min-width: 0; }
+.q-title .n { font-family: var(--f-mono); color: var(--muted); font-weight: 500; min-width: 2ch; }
+.q-title .clo { margin-left: auto; font-family: var(--f-mono); font-size: 12px; color: var(--navy); white-space: nowrap; }
+.choice { display: grid; grid-template-columns: 26px 1fr; gap: 6px; align-items: start; padding: 6px 10px; border-radius: 8px; border: 1px solid transparent; cursor: pointer; }
+.choice:hover { background: var(--sunk); }
+.choice input { margin: 5px 0 0; accent-color: var(--navy); }
+.choice .letter { font-weight: 600; margin-right: 6px; }
+.choice.right { border-color: var(--ok); background: var(--ok-bg); }
+.choice.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.why { font-size: 15px; color: var(--muted); padding-left: 10px; }
+.why b { color: var(--ink); }
+.quiz-bar { position: sticky; bottom: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.progress { flex: 1 1 160px; height: 8px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
+.progress i { display: block; height: 100%; width: 0; background: var(--navy); transition: width .2s; }
+.notice { font-size: 14px; color: var(--warn); flex-basis: 100%; }
+.result { display: grid; grid-template-columns: auto 1fr; gap: 18px 28px; align-items: center; }
+.score { font-family: var(--f-display); font-size: 56px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.score small { font-size: 22px; color: var(--muted); font-weight: 600; }
+.clo-bars { display: grid; gap: 6px; min-width: 0; }
+.clo-bar { display: grid; grid-template-columns: 4.5em 1fr 3em; gap: 10px; align-items: center; font-size: 14px; font-variant-numeric: tabular-nums; }
+.clo-bar .track { height: 10px; background: var(--sunk); border-radius: 99px; overflow: hidden; }
+.clo-bar .track i { display: block; height: 100%; background: var(--ok); }
+.clo-bar .track i.low { background: var(--warn); }
+.table-scroll { overflow-x: auto; }
+table.key { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.key th, table.key td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.key th { font-family: var(--f-display); font-size: 13px; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+table.key td.num, table.key td.mono { font-family: var(--f-mono); font-size: 14px; white-space: nowrap; }
+table.key td.ans { font-weight: 600; }
+
+/* lab */
+.lab-grid { display: grid; gap: 20px; }
+.demo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.demo-head { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; justify-content: space-between; }
+.demo-head h3 { font-size: 20px; }
+.demo-head .ref { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.demo .lead { font-size: 15px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.cols > * { min-width: 0; }
+.label { font-family: var(--f-display); font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+pre.code { margin: 0; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font-size: 13.5px; line-height: 1.6; }
+
+/* demo: API */
+.methods { display: flex; flex-wrap: wrap; gap: 6px; }
+.method { font-family: var(--f-mono); font-weight: 500; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+.method[aria-pressed="true"] { border-color: var(--navy); background: var(--navy); color: var(--surface); }
+.api-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.api-controls select { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 8px; }
+.flow { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 18px 0 8px; }
+.flow::before { content: ""; position: absolute; left: 16%; right: 16%; top: 46px; border-top: 2px dashed var(--line); }
+.node { position: relative; z-index: 1; display: grid; justify-items: center; gap: 4px; text-align: center; }
+.node .box { width: 58px; height: 58px; border-radius: 12px; background: var(--sunk); border: 2px solid var(--line); display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; color: var(--navy); font-size: 13px; transition: border-color .2s, background .2s; }
+.node.active .box { border-color: var(--accent); background: var(--surface); }
+.node b { font-size: 14px; }
+.node span { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.packet { position: absolute; z-index: 2; top: 38px; left: 16.6%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--info); box-shadow: 0 0 0 4px var(--info-bg); opacity: 0; transition: left .45s ease-in-out, background .2s; }
+.packet.on { opacity: 1; }
+.packet.back { background: var(--ok); box-shadow: 0 0 0 4px var(--ok-bg); }
+.packet.err { background: var(--bad); box-shadow: 0 0 0 4px var(--bad-bg); }
+.stage { min-height: 1.6em; font-size: 15px; color: var(--navy); font-weight: 500; text-align: center; }
+.http-status { font-family: var(--f-mono); font-weight: 500; }
+table.mini { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.mini td, table.mini th { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+table.mini th { font-size: 12px; color: var(--muted); font-weight: 600; }
+table.mini td:first-child { font-family: var(--f-mono); }
+
+/* demo: JSON */
+pre.json .jv, pre.json .jk { font: inherit; background: none; border: 0; padding: 0 1px; border-radius: 3px; cursor: pointer; }
+pre.json .jk { color: var(--navy); }
+pre.json .jv.t-string { color: var(--ok); }
+pre.json .jv.t-number { color: var(--info); }
+pre.json .jv.t-boolean, pre.json .jv.t-null { color: var(--accent); }
+pre.json .jv:hover, pre.json .jk:hover { background: var(--hit); }
+pre.json .sel { background: var(--hit); outline: 1px solid var(--warn); }
+.path-out { display: grid; gap: 6px; }
+.path-expr { font-family: var(--f-mono); font-size: 16px; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: nowrap; }
+.path-val { font-family: var(--f-mono); font-size: 14px; }
+.path-try { display: flex; gap: 8px; flex-wrap: wrap; }
+.path-try input { flex: 1 1 200px; min-width: 0; font-family: var(--f-mono); border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 10px; }
+.err-msg { color: var(--bad); font-size: 14px; }
+
+/* demo: DOM */
+.hmi { background: var(--sunk); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
+.hmi-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.badge { font-family: var(--f-display); font-weight: 700; letter-spacing: .06em; padding: 6px 18px; border-radius: 8px; font-size: 18px; color: var(--surface); background: var(--off); transition: background .2s; }
+.badge.run { background: var(--ok); color: var(--surface); }
+.badge.stop { background: var(--bad); color: var(--surface); }
+.hmi-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.hmi input { width: 7em; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 6px 8px; font-family: var(--f-mono); }
+.warn-text { color: var(--bad); font-weight: 600; min-height: 1.6em; }
+pre.lines { padding: 8px 0; }
+pre.lines .ln { display: block; padding: 0 14px 0 0; transition: background .25s; }
+pre.lines .ln i { display: inline-block; width: 2.6em; padding-right: 10px; text-align: right; color: var(--muted); font-style: normal; user-select: none; }
+pre.lines .ln.hit { background: var(--hit); }
+.log { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
+.log li { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.log li:first-child { color: var(--ink); }
+
+/* demo: pull vs push */
+.sim-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.clock { font-family: var(--f-mono); font-size: 15px; background: var(--sunk); border-radius: 6px; padding: 4px 10px; font-variant-numeric: tabular-nums; }
+.lanes { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.lane { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.lane h4 { font-size: 16px; }
+.wire { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; font-size: 14px; }
+.wire .end { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: var(--sunk); font-weight: 600; }
+.wire .arrow { position: relative; height: 2px; background: var(--line); }
+.wire .arrow::after { content: ""; position: absolute; top: -5px; border: 6px solid transparent; }
+.wire .arrow.to-right::after { right: -2px; border-left-color: var(--line); border-right: 0; }
+.wire .arrow.to-left::after { left: -2px; border-right-color: var(--line); border-left: 0; }
+.wire .arrow.pulse { background: var(--info); }
+.wire .arrow.pulse.to-right::after { border-left-color: var(--info); }
+.wire .arrow.pulse.to-left::after { border-right-color: var(--info); }
+.wire .arrow.hot { background: var(--accent); }
+.wire .arrow.hot.to-left::after { border-right-color: var(--accent); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--sunk); border-radius: 8px; padding: 8px 10px; display: grid; gap: 2px; }
+.stat b { font-family: var(--f-display); font-size: 22px; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.lane-msg { font-size: 14px; min-height: 1.5em; }
+
+/* review */
+.rv-toc { display: flex; flex-wrap: wrap; gap: 6px; }
+.rv-toc a { text-decoration: none; color: var(--ink); border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 14px; }
+.rv-toc a:hover { border-color: var(--muted); }
+.rv-list { display: grid; gap: 18px; }
+.rv { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; display: grid; gap: 14px; min-width: 0; scroll-margin-top: 64px; }
+.rv-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.rv-head h3 { font-size: 20px; flex: 1 1 260px; min-width: 0; }
+.rv-head .ref { font-family: var(--f-mono); font-size: 13px; color: var(--muted); }
+.tag { font-family: var(--f-display); font-size: 12px; font-weight: 600; letter-spacing: .05em; border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
+.tag.fe { color: var(--info); background: var(--info-bg); }
+.tag.be { color: var(--ok); background: var(--ok-bg); }
+.tag.gen { color: var(--off); background: var(--off-bg); }
+.rv ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; max-width: 80ch; }
+.rv li code, .rv p code, .callout code, table.key code { font-size: .88em; background: var(--sunk); border-radius: 4px; padding: 0 4px; }
+details.faq { border-top: 1px solid var(--line); padding-top: 10px; }
+details.faq + details.faq { padding-top: 8px; }
+details.faq summary { cursor: pointer; font-weight: 600; }
+details.faq summary::marker { color: var(--accent); }
+details.faq p { margin-top: 6px; color: var(--muted); max-width: 80ch; }
+.flowline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 14px; }
+.flowline span { background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; }
+.flowline span.here { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.flowline i { font-style: normal; color: var(--muted); }
+
+@media (max-width: 560px) {
+  .result { grid-template-columns: 1fr; }
+  .kit-row { grid-template-columns: 1fr; }
+  .kit-row .pill { grid-column: 1; grid-row: auto; justify-self: start; }
+  .stats { grid-template-columns: 1fr 1fr 1fr; }
+  .focus .say { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+</style>
+
+<div class="ribbon" aria-hidden="true"></div>
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">ชุดสอนวิชา App · SNC / 99 Industrial Solutions</div>
+    <h1>การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร</h1>
+    <div class="meta">
+      <span>หลักสูตร <b>4 วัน</b> · จันทร์–พฤหัส <b>09:00–16:00</b></span>
+      <span>ทฤษฎี <b>12</b> · ปฏิบัติ <b>6</b> · สอบ <b>6</b> ชั่วโมง</span>
+      <span><b>19</b> รุ่น · 2 พ.ย. 69 – 1 เม.ย. 70</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="ส่วนของชุดสอน">
+  <div class="wrap" role="tablist">
+    <button role="tab" data-tab="prep" aria-selected="true">เตรียมสอน</button>
+    <button role="tab" data-tab="script" aria-selected="false">บทพูดรายสไลด์</button>
+    <button role="tab" data-tab="test" aria-selected="false">Pre/Post-test</button>
+    <button role="tab" data-tab="lab" aria-selected="false">สื่อเข้าใจง่าย</button>
+    <button role="tab" data-tab="review" aria-selected="false">ทบทวนผู้สอน</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ============ PREP ============ -->
+  <section id="prep" class="panel" role="tabpanel">
+    <div class="panel-head">
+      <h2>สิ่งที่ผู้สอนควรมีก่อนเปิดแต่ละรุ่น</h2>
+      <p class="lead">รายการนี้รวมทุกอย่างที่ทำให้ 4 วันเดินตามแผน แยกสถานะว่าอะไรพร้อมแล้ว อะไรอยู่ในชุดนี้ และอะไรที่ยังต้องเตรียมเพิ่ม</p>
+    </div>
+
+    <div class="block">
+      <div class="row-end">
+        <h3>ชุดสื่อการสอน</h3>
+        <div class="legend">
+          <span class="pill ok">พร้อมใช้</span>
+          <span class="pill info">มีในชุดนี้</span>
+          <span class="pill warn">ยังต้องเตรียม</span>
+        </div>
+      </div>
+      <div class="kit">
+        <div class="kit-row"><h4>สไลด์ 102 หน้า พร้อมกำหนดการ 4 วัน</h4><span class="pill ok">พร้อมใช้</span><p>สไลด์ 4–6 ตรงกับตารางเวลาในหน้านี้ ส่วน React ย้ายไปท้าย deck เป็นหัวข้อต่อยอด มีสไลด์ Flexbox (34) และ async/await (84)</p></div>
+        <div class="kit-row"><h4>บทพูดรายสไลด์</h4><span class="pill info">มีในชุดนี้</span><p>อยู่ในแท็บ "บทพูดรายสไลด์" และใน Speaker Notes ของไฟล์ PowerPoint ทุกหน้า มีเวลา บทพูด คำถามชวนคิด และหมายเหตุผู้สอน</p></div>
+        <div class="kit-row"><h4>Pre-test / Post-test ชุดละ 20 ข้อ พร้อมเฉลย</h4><span class="pill info">มีในชุดนี้</span><p>สองชุดวัด CLO เดียวกันข้อต่อข้อ Post-test พลิกโจทย์และซับซ้อนขึ้นเล็กน้อย ผู้เรียนจึงจำคำตอบจาก Pre-test มาใช้ไม่ได้ ใช้เป็นหลักฐานพัฒนาการตามแผนปรับปรุงหลักสูตร</p></div>
+        <div class="kit-row"><h4>สื่อเข้าใจง่าย 4 ชิ้นสำหรับเปิดบนจอ</h4><span class="pill info">มีในชุดนี้</span><p>API แบบพนักงานเสิร์ฟ, อ่าน JSON, DOM กับ Event และ Polling เทียบ Webhook ใช้ประกอบสไลด์ที่ผู้เรียนมักงง</p></div>
+        <div class="kit-row"><h4>สรุปทบทวนสำหรับผู้สอน</h4><span class="pill info">มีในชุดนี้</span><p>แท็บ "ทบทวนผู้สอน" รวมเรื่องหน้าบ้านและหลังบ้านที่ต้องอธิบายได้ กับดักที่ผู้เรียนเจอ วิธีไล่ปัญหาด้วย DevTools และคำถามเช็กตัวเอง</p></div>
+        <div class="kit-row"><h4>โจทย์และ Starter code ของ Workshop 1–4</h4><span class="pill ok">พร้อมใช้</span><p>อยู่ในโฟลเดอร์ workshops: โจทย์ 1 หน้าต่อ Workshop พร้อมเช็กลิสต์ "ทำเสร็จเมื่อ" และ starter ของแต่ละข้อต่อจากเฉลยข้อก่อน คนที่ตามไม่ทันเริ่มต่อได้ทันที</p></div>
+        <div class="kit-row"><h4>เฉลย Workshop 1–4</h4><span class="pill ok">พร้อมใช้</span><p>โฟลเดอร์ solution ของแต่ละข้อ ทดสอบในเบราว์เซอร์แล้ว ให้ผู้ช่วยสอนใช้ไล่ปัญหา ห้ามคัดลอกลงเครื่องผู้เรียน</p></div>
+        <div class="kit-row"><h4>ข้อสอบทฤษฎี 1 ชม. และโจทย์ The Performance Update</h4><span class="pill ok">พร้อมใช้</span><p>อยู่ในโฟลเดอร์ exam: ข้อสอบทฤษฎี 50 คะแนนพร้อมเฉลย โจทย์สอบปฏิบัติ 100 คะแนนพร้อม Rubric ใบให้คะแนน starter code และเฉลยโค้ด</p></div>
+        <div class="kit-row"><h4>แบบฟอร์ม Test Report และ UAT</h4><span class="pill ok">พร้อมใช้</span><p>อยู่ใน workshops/templates เป็นภาษาไทย ดัดแปลงจากเทมเพลตใน repo ทีมให้ตรงกับ Electrical Meter Dashboard มี PDF สำหรับพิมพ์ ไฟล์ Markdown และตัวอย่าง System Test อัตโนมัติ</p></div>
+        <div class="kit-row"><h4>API สำรองสำหรับ Workshop 3–4</h4><span class="pill ok">พร้อมใช้</span><p>รัน workshops/mock-api/mock_api.py บนเครื่องผู้สอน ได้ค่าน้ำ-ไฟที่เปลี่ยนเอง และรับแจ้งเตือนขึ้นจอผู้สอน ถ้าเครือข่ายล่ม ผู้เรียนใช้ data/meter.json ใน starter แทนได้</p></div>
+        <div class="kit-row"><h4>ช่องแจ้งเตือนสำหรับห้องเรียน</h4><span class="pill warn">ยังต้องเตรียม</span><p>แยกจากช่องแจ้งเตือนจริงของโรงงาน เพราะผู้เรียนทุกคนจะยิง Webhook ใน Workshop 4</p></div>
+        <div class="kit-row"><h4>แบบประเมินความพึงพอใจ</h4><span class="pill ok">พร้อมใช้</span><p>เป็น Google Form ในระบบประเมิน ลิงก์และ QR code อยู่ในโฟลเดอร์ assessment</p></div>
+        <div class="kit-row"><h4>ใบลงชื่อเข้าเรียน</h4><span class="pill ok">พร้อมใช้</span><p>assessment/ใบลงชื่อเข้าเรียน.pdf แนวนอน 2 หน้า 40 คน ช่องลงชื่อเช้า-บ่าย 4 วัน นับรวมช่วงที่มา (เต็ม 8) แล้วกรอกในคอลัมน์ เข้าเรียน (ช่วง) ของชีตผู้เรียน</p></div>
+        <div class="kit-row"><h4>Rubric นำเสนอและ UAT Showcase</h4><span class="pill ok">พร้อมใช้</span><p>exam/Rubric นำเสนอและ UAT.pdf ลำดับกิจกรรมบ่ายวันที่ 4 เกณฑ์ 6 ข้อรวม 100 คะแนน และใบให้คะแนนทั้งห้อง กรอกผลรวมในคอลัมน์ นำเสนอ/UAT (%) ได้ทันที</p></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="row-end">
+        <h3>เช็กลิสต์ต่อรุ่น</h3>
+        <button class="btn small" id="checks-reset" type="button">ล้างเช็กลิสต์สำหรับรุ่นใหม่</button>
+      </div>
+      <p class="sub">ติ๊กได้เลย ระบบจำไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>
+      <div class="checks" id="checks">
+        <section>
+          <h4>1 สัปดาห์ก่อนเริ่มรุ่น</h4>
+          <label class="check"><input type="checkbox" id="c-roster"><span>ยืนยันรายชื่อ และถามพื้นฐานการเขียนโปรแกรมของแต่ละคน</span></label>
+          <label class="check"><input type="checkbox" id="c-api"><span>ทดสอบ API ค่าน้ำ-ไฟ และ Webhook จากเครือข่ายห้องอบรมจริง</span></label>
+          <label class="check"><input type="checkbox" id="c-pcs"><span>ติดตั้ง VS Code และเบราว์เซอร์ทุกเครื่อง เข้า CodePen ได้</span></label>
+          <label class="check"><input type="checkbox" id="c-print"><span>พิมพ์ใบลงชื่อ แบบฟอร์ม Test Case/UAT และแบบประเมิน</span></label>
+        </section>
+        <section>
+          <h4>เช้าวันแรก</h4>
+          <label class="check"><input type="checkbox" id="c-proj"><span>ทดสอบโปรเจกเตอร์ เปิดสไลด์แบบ Presenter View</span></label>
+          <label class="check"><input type="checkbox" id="c-wifi"><span>แจ้งรหัส Wi-Fi และลิงก์ที่ต้องใช้ทั้งหมดไว้บนกระดาน</span></label>
+          <label class="check"><input type="checkbox" id="c-pre"><span>เตรียม Pre-test ให้พร้อมแจกตอน 09:15</span></label>
+        </section>
+        <section>
+          <h4>ระหว่าง 4 วัน</h4>
+          <label class="check"><input type="checkbox" id="c-review"><span>เปิดวันใหม่ด้วยการทบทวน 3 นาที (มีคำถามในบทพูด)</span></label>
+          <label class="check"><input type="checkbox" id="c-files"><span>ย้ำให้ผู้เรียนเก็บไฟล์ Workshop ทุกเย็น เพราะงานต่อกันทุกวัน</span></label>
+          <label class="check"><input type="checkbox" id="c-tc"><span>เก็บ Test Case ที่ผู้เรียนเขียนในวันที่ 3 ไว้ใช้ UAT</span></label>
+        </section>
+        <section>
+          <h4>วันสุดท้ายและหลังจบรุ่น</h4>
+          <label class="check"><input type="checkbox" id="c-post"><span>บันทึกคะแนน Pre/Post-test คู่กันรายคน</span></label>
+          <label class="check"><input type="checkbox" id="c-eval"><span>สรุปแบบประเมินความพึงพอใจ</span></label>
+          <label class="check"><input type="checkbox" id="c-fix"><span>วันศุกร์: จดสิ่งที่ต้องปรับ และรีเซ็ตเครื่องก่อนรุ่นถัดไป</span></label>
+        </section>
+      </div>
+    </div>
+
+    <div class="block">
+      <h3>เปิดบทพูดตอนสอนจริง</h3>
+      <ol class="steps">
+        <li>เปิดไฟล์สไลด์ใน PowerPoint แล้วไปที่ Slide Show › Use Presenter View</li>
+        <li>บทพูดของแต่ละหน้าจะแสดงบนจอผู้สอนเท่านั้น ผู้เรียนเห็นแค่สไลด์</li>
+        <li>ถ้าสอนจากแท็บเล็ตหรือโน้ตบุ๊กเครื่องที่สอง ใช้แท็บ "บทพูดรายสไลด์" › โหมดสอนทีละหน้า แล้วกด <kbd>←</kbd> <kbd>→</kbd> เปลี่ยนหน้า</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SCRIPT ============ -->
+  <section id="script" class="panel" role="tabpanel" hidden>
+    <div class="panel-head">
+      <h2>บทพูดรายสไลด์</h2>
+      <p class="lead">เลขสไลด์ตรงกับไฟล์ PowerPoint ฉบับปัจจุบัน เวลาที่กำกับคือเวลาที่ควรเริ่มหัวข้อนั้นตามกำหนดการ</p>
+    </div>
+    <div class="toolbar">
+      <div class="chips" id="day-chips">
+        <button class="chip" type="button" data-day="all" aria-pressed="true">ทั้งหมด</button>
+        <button class="chip" type="button" data-day="1" aria-pressed="false">วันที่ 1</button>
+        <button class="chip" type="button" data-day="2" aria-pressed="false">วันที่ 2</button>
+        <button class="chip" type="button" data-day="3" aria-pressed="false">วันที่ 3</button>
+        <button class="chip" type="button" data-day="4" aria-pressed="false">วันที่ 4</button>
+      </div>
+      <input class="search" id="note-search" type="search" placeholder="ค้นหา เช่น Workshop, JSON, 34">
+      <button class="btn" id="focus-toggle" type="button" aria-pressed="false">โหมดสอนทีละหน้า</button>
+    </div>
+    <p class="count" id="notes-count">กำลังโหลดบทพูด…</p>
+    <div id="notes-list" class="notes"></div>
+  </section>
+
+  <!-- ============ TEST ============ -->
+  <section id="test" class="panel" role="tabpanel" hidden>
+    <div class="panel-head">
+      <h2>Pre-test / Post-test</h2>
+      <p class="lead">ชุดละ 20 ข้อ 15 นาที Pre-test ใช้ตอนเริ่ม (วันที่ 1 เวลา 09:15) Post-test ใช้ตอนจบ (วันที่ 4 เวลา 15:00) ทั้งสองชุดวัด CLO เดียวกันข้อต่อข้อ แต่ Post-test พลิกโจทย์และซับซ้อนขึ้น เลือกชุดด้วยปุ่มด้านล่าง คะแนนในหน้านี้ไม่ถูกส่งไปที่ใด</p>
+    </div>
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="โหมด">
+        <button type="button" data-qmode="take" aria-pressed="true">ทำแบบทดสอบ</button>
+        <button type="button" data-qmode="key" aria-pressed="false">เฉลยสำหรับผู้สอน</button>
+      </div>
+      <div class="seg" role="group" aria-label="รอบ" id="round-seg">
+        <button type="button" data-round="Pre-test" aria-pressed="true">Pre-test</button>
+        <button type="button" data-round="Post-test" aria-pressed="false">Post-test</button>
+      </div>
+    </div>
+
+    <div id="quiz-take" class="panel">
+      <div id="quiz-result" class="block" hidden></div>
+      <form id="quiz-form" class="quiz-form" novalidate></form>
+      <div class="quiz-bar" id="quiz-bar">
+        <span class="count" id="quiz-progress-text">ตอบแล้ว 0/20</span>
+        <div class="progress" aria-hidden="true"><i id="quiz-progress"></i></div>
+        <button class="btn primary" id="quiz-submit" type="button">ส่งคำตอบ</button>
+        <button class="btn" id="quiz-reset" type="button" hidden>ทำใหม่</button>
+        <p class="notice" id="quiz-notice" hidden></p>
+      </div>
+    </div>
+
+    <div id="quiz-key" class="panel" hidden>
+      <div class="block">
+        <h3>เฉลยและ CLO ที่วัด</h3>
+        <p class="sub">CLO07 (สร้างต้นแบบ) และ CLO08 (นำเสนอ) วัดจากสอบปฏิบัติและ Final Presentation ในวันที่ 4</p>
+        <div id="key-tables"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LAB ============ -->
+  <section id="lab" class="panel" role="tabpanel" hidden>
+    <div class="panel-head">
+      <h2>สื่อเข้าใจง่าย</h2>
+      <p class="lead">เปิดขึ้นจอตอนสอนสไลด์ที่ระบุ แล้วให้ผู้เรียนลองกดเอง ทุกอย่างจำลองอยู่ในหน้านี้ ไม่ได้ต่อระบบจริง</p>
+    </div>
+    <div class="lab-grid">
+
+      <!-- API -->
+      <article class="demo" id="demo-api">
+        <div class="demo-head"><h3>API คือพนักงานเสิร์ฟ</h3><span class="ref">ใช้กับสไลด์ 75–77</span></div>
+        <p class="lead">เลือก HTTP Method แล้วกดส่ง ดูว่า Request เดินทางจากหน้าเว็บผ่าน API ไปถึง Server แล้ว Response กลับมาอย่างไร ข้อมูลเครื่องจักรด้านล่างเปลี่ยนตามจริง</p>
+        <div class="api-controls">
+          <div class="methods" id="api-methods">
+            <button class="method" type="button" data-m="GET" aria-pressed="true">GET</button>
+            <button class="method" type="button" data-m="POST" aria-pressed="false">POST</button>
+            <button class="method" type="button" data-m="PUT" aria-pressed="false">PUT</button>
+            <button class="method" type="button" data-m="DELETE" aria-pressed="false">DELETE</button>
+          </div>
+          <label id="api-target-wrap" hidden>เครื่อง <select id="api-target"></select></label>
+          <button class="btn primary" id="api-send" type="button">ส่ง Request</button>
+          <button class="btn small" id="api-reset" type="button">รีเซ็ตข้อมูล</button>
+        </div>
+        <div class="flow" aria-hidden="true">
+          <div class="node" id="n-client"><div class="box">WEB</div><b>หน้าเว็บ (Client)</b><span>ลูกค้าสั่งอาหาร</span></div>
+          <div class="node" id="n-api"><div class="box">API</div><b>API</b><span>พนักงานเสิร์ฟ</span></div>
+          <div class="node" id="n-server"><div class="box">DB</div><b>Server</b><span>ครัว + ฐานข้อมูล</span></div>
+          <div class="packet" id="packet"></div>
+        </div>
+        <p class="stage" id="api-stage" aria-live="polite">กด "ส่ง Request" เพื่อเริ่ม</p>
+        <div class="cols">
+          <div><div class="label">Request</div><pre class="code" id="api-req"></pre></div>
+          <div><div class="label">Response <span class="http-status" id="api-code"></span></div><pre class="code" id="api-res">ยังไม่มี Response</pre></div>
+        </div>
+        <div><div class="label">ข้อมูลใน Server ตอนนี้</div><div class="table-scroll"><table class="mini" id="api-table"></table></div></div>
+      </article>
+
+      <!-- JSON -->
+      <article class="demo" id="demo-json">
+        <div class="demo-head"><h3>อ่าน JSON ให้เป็น</h3><span class="ref">ใช้กับสไลด์ 73–74 และ Workshop 3</span></div>
+        <p class="lead">คลิกค่าใดก็ได้ใน JSON เพื่อดูว่าต้องเขียนโค้ดอย่างไรถึงอ่านค่านั้นได้ หรือพิมพ์ path เองในช่องด้านล่าง</p>
+        <div class="cols">
+          <div><div class="label">Response จาก API ของไลน์ผลิต (ตัวแปร data)</div><pre class="code json" id="json-view"></pre></div>
+          <div class="path-out">
+            <div class="label">โค้ดที่ใช้อ่านค่า</div>
+            <div class="path-expr" id="path-expr">data.machines[0].temp</div>
+            <div class="path-val" id="path-val"></div>
+            <div class="label" style="margin-top:10px">ลองพิมพ์เอง</div>
+            <form class="path-try" id="path-form">
+              <input id="path-input" value="data.power.voltage" aria-label="path ที่ต้องการอ่าน" autocomplete="off" spellcheck="false">
+              <button class="btn" type="submit">อ่านค่า</button>
+            </form>
+            <p class="err-msg" id="path-err" aria-live="polite"></p>
+            <p class="sub">ข้อควรจำ: Object ใช้ <code>.ชื่อkey</code> ส่วน Array ใช้ <code>[ตัวเลข]</code> และ index เริ่มที่ 0</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- DOM -->
+      <article class="demo" id="demo-dom">
+        <div class="demo-head"><h3>DOM กับ Event: โค้ดบรรทัดไหนทำงาน</h3><span class="ref">ใช้กับสไลด์ 58–71 ก่อน Workshop 2</span></div>
+        <p class="lead">กดปุ่มหรือพิมพ์ค่าแรงดันบนหน้าจอเครื่องจักร บรรทัดโค้ดที่ทำงานจะถูกไฮไลต์ทางขวา</p>
+        <div class="cols">
+          <div class="hmi">
+            <div class="hmi-status"><span class="label">สถานะเครื่อง</span><span class="badge" id="d-badge">IDLE</span></div>
+            <div class="hmi-row">
+              <button class="btn" type="button" id="d-start">Start</button>
+              <button class="btn" type="button" id="d-stop">Stop</button>
+            </div>
+            <div class="hmi-row">
+              <label for="d-volt">แรงดัน (V)</label>
+              <input id="d-volt" type="number" inputmode="decimal" value="230">
+              <span class="sub">เตือนเมื่อเกิน 240 V</span>
+            </div>
+            <div class="warn-text" id="d-warn" aria-live="polite"></div>
+            <div><div class="label">Event ที่เกิดขึ้น</div><ul class="log" id="d-log"><li>ยังไม่มี Event</li></ul></div>
+          </div>
+          <div><div class="label">script.js</div><pre class="code lines" id="d-code"></pre></div>
+        </div>
+      </article>
+
+      <!-- PULL vs PUSH -->
+      <article class="demo" id="demo-push">
+        <div class="demo-head"><h3>Polling เทียบ Webhook</h3><span class="ref">ใช้กับสไลด์ 86–90</span></div>
+        <p class="lead">กด "เริ่มเวลา" แล้วกด "เครื่องหยุด!" เมื่อไรก็ได้ ฝั่ง Polling ต้องรอรอบถามถัดไปถึงจะรู้ ส่วน Webhook รู้ทันที เทียบจำนวน Request ที่ใช้ด้วย</p>
+        <div class="sim-controls">
+          <button class="btn" type="button" id="s-run">เริ่มเวลา</button>
+          <button class="btn primary" type="button" id="s-event">เครื่องหยุด!</button>
+          <label>Polling ทุก <select id="s-interval"><option value="5">5 วินาที</option><option value="10" selected>10 วินาที</option><option value="30">30 วินาที</option></select></label>
+          <button class="btn small" type="button" id="s-reset">เริ่มใหม่</button>
+          <span class="clock" id="s-clock">เวลาจำลอง 00:00</span>
+        </div>
+        <div class="lanes">
+          <div class="lane">
+            <h4>Polling: Dashboard ถาม Server เป็นรอบ</h4>
+            <div class="wire"><span class="end">Dashboard</span><span class="arrow to-right" id="p-arrow"></span><span class="end">Server</span></div>
+            <div class="stats">
+              <div class="stat"><b id="p-req">0</b><span>Request ที่ส่ง</span></div>
+              <div class="stat"><b id="p-seen">0</b><span>เหตุการณ์ที่รู้แล้ว</span></div>
+              <div class="stat"><b id="p-delay">–</b><span>รู้ช้ากว่าเหตุการณ์ (วินาที)</span></div>
+            </div>
+            <p class="lane-msg" id="p-msg">รอเริ่มเวลา</p>
+          </div>
+          <div class="lane">
+            <h4>Webhook: Server ส่งมาเองเมื่อมีเหตุการณ์</h4>
+            <div class="wire"><span class="end">Dashboard</span><span class="arrow to-left" id="w-arrow"></span><span class="end">Server</span></div>
+            <div class="stats">
+              <div class="stat"><b id="w-req">0</b><span>Request ที่ส่ง</span></div>
+              <div class="stat"><b id="w-seen">0</b><span>เหตุการณ์ที่รู้แล้ว</span></div>
+              <div class="stat"><b id="w-delay">–</b><span>รู้ช้ากว่าเหตุการณ์ (วินาที)</span></div>
+            </div>
+            <p class="lane-msg" id="w-msg">รอเหตุการณ์</p>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ REVIEW ============ -->
+  <section id="review" class="panel" role="tabpanel" hidden>
+    <div class="panel-head">
+      <h2>ทบทวนก่อนสอน: หน้าบ้านและหลังบ้าน</h2>
+      <p class="lead">ระดับที่ผู้สอนต้องถึงคือ อธิบายเรื่องในสไลด์ได้ด้วยคำพูดตัวเอง และไล่ปัญหาของผู้เรียนระหว่าง Workshop ได้ ไม่จำเป็นต้องเชี่ยวชาญทุกเรื่อง อ่านจบรอบเดียวประมาณ 45 นาที แต่ละหัวข้อบอกเลขสไลด์ที่เกี่ยวข้องไว้</p>
+    </div>
+    <nav class="rv-toc" aria-label="หัวข้อทบทวน">
+      <a href="#rv-arch">ภาพรวมระบบ</a>
+      <a href="#rv-html">HTML</a>
+      <a href="#rv-css">CSS และ Flexbox</a>
+      <a href="#rv-js">JavaScript กับดักชนิดข้อมูล</a>
+      <a href="#rv-data">Array, Object, Function</a>
+      <a href="#rv-dom">DOM และ Event</a>
+      <a href="#rv-http">HTTP และ REST</a>
+      <a href="#rv-json">JSON</a>
+      <a href="#rv-fetch">fetch และ async</a>
+      <a href="#rv-cors">CORS</a>
+      <a href="#rv-hook">Webhook และความปลอดภัย</a>
+      <a href="#rv-test">Testing</a>
+      <a href="#rv-debug">ไล่ปัญหาด้วย DevTools</a>
+      <a href="#rv-quiz">เช็กตัวเอง</a>
+    </nav>
+    <div class="legend"><span class="tag fe">หน้าบ้าน</span><span class="tag be">หลังบ้าน / เชื่อมต่อ</span><span class="tag gen">ทั่วไป</span></div>
+
+    <div class="rv-list">
+
+      <article class="rv" id="rv-arch">
+        <div class="rv-head"><span class="tag gen">ทั่วไป</span><h3>ภาพรวม: โค้ดแต่ละส่วนรันที่ไหน</h3><span class="ref">สไลด์ 13–17</span></div>
+        <ul>
+          <li>HTML, CSS และ JavaScript ที่ผู้เรียนเขียน รันใน<strong>เบราว์เซอร์ของผู้ใช้</strong>ทั้งหมด ส่วน API และฐานข้อมูลอยู่บน <strong>Server</strong></li>
+          <li>เบราว์เซอร์ไม่ควรต่อฐานข้อมูลหรือ PLC ตรง ๆ เพราะต้องฝังรหัสผ่านไว้ในโค้ดที่ใครก็เปิดดูได้ จึงต้องมี API คั่นกลางเสมอ</li>
+          <li>ระดับระบบในโรงงานตามมาตรฐาน ISA-95: ระดับ 0 เซนเซอร์ · 1 PLC · 2 SCADA/HMI · 3 MES · 4 ERP</li>
+        </ul>
+        <div class="flowline" aria-label="เส้นทางข้อมูลจากเครื่องจักรถึง Dashboard">
+          <span>เซนเซอร์</span><i>→</i><span>PLC</span><i>→ Modbus / OPC UA →</i><span>Gateway</span><i>→ MQTT / HTTP →</i><span>Server + DB</span><i>→</i><span>REST API</span><i>→</i><span class="here">Dashboard ของคอร์สนี้</span>
+        </div>
+        <details class="faq"><summary>ผู้เรียนถาม: เขียนหน้าเว็บสั่ง PLC ตรง ๆ ได้ไหม</summary><p>ไม่ควร หน้าเว็บส่งคำสั่งไปที่ Backend แล้ว Backend ตรวจสิทธิ์ก่อนส่งต่อผ่าน Gateway เพราะฝั่ง OT ให้ความปลอดภัยของเครื่องจักรมาก่อน ในคอร์สนี้เราอ่านข้อมูลอย่างเดียว</p></details>
+        <details class="faq"><summary>ผู้เรียนถาม: MQTT คืออะไร ต่างจาก API ยังไง</summary><p>MQTT เป็นการส่งข้อความแบบ publish/subscribe ผ่านตัวกลางที่เรียกว่า Broker เหมาะกับเซนเซอร์จำนวนมากที่ส่งค่าถี่ ๆ ส่วน REST API เป็นแบบถามแล้วตอบ เหมาะกับหน้าเว็บที่ขอข้อมูลเป็นครั้ง ๆ ในโรงงานมักใช้ทั้งสองอย่าง</p></details>
+        <details class="faq"><summary>ผู้เรียนถาม: Python ทำเว็บได้ไหม</summary><p>ได้ในฝั่ง Server เช่น Flask หรือ FastAPI ใช้เขียน API แต่หน้าเว็บที่รันในเบราว์เซอร์ต้องใช้ JavaScript</p></details>
+      </article>
+
+      <article class="rv" id="rv-html">
+        <div class="rv-head"><span class="tag fe">หน้าบ้าน</span><h3>HTML: โครงสร้างและ Semantic</h3><span class="ref">สไลด์ 25–27 · Workshop 1</span></div>
+        <ul>
+          <li><strong>Semantic tag</strong> บอกความหมายของเนื้อหา: <code>header</code> <code>nav</code> <code>main</code> <code>section</code> <code>article</code> <code>aside</code> <code>footer</code> ส่วน <code>div</code> และ <code>span</code> เป็นกล่องเปล่า</li>
+          <li><code>&lt;b&gt;</code> แค่ทำตัวหนา ถ้าต้องการบอกว่าสำคัญให้ใช้ <code>&lt;strong&gt;</code></li>
+          <li><strong>Block</strong> (<code>div</code> <code>p</code> <code>h1</code>) ขึ้นบรรทัดใหม่และกว้างเต็มแถว · <strong>Inline</strong> (<code>span</code> <code>a</code> <code>strong</code>) อยู่ในบรรทัดเดียวกับข้อความ</li>
+          <li><code>id</code> ต้องไม่ซ้ำในหน้า ใช้ให้ JavaScript หา · <code>class</code> ซ้ำได้ ใช้แต่งด้วย CSS</li>
+        </ul>
+<pre class="code">&lt;header&gt;
+  &lt;h1&gt;Electrical Meter&lt;/h1&gt;
+&lt;/header&gt;
+&lt;main&gt;
+  &lt;section class="cards"&gt;
+    &lt;div class="card"&gt;
+      &lt;p class="label"&gt;Voltage&lt;/p&gt;
+      &lt;p class="value" id="volt"&gt;230 V&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;script src="script.js" defer&gt;&lt;/script&gt;</pre>
+        <div class="callout tip"><b>กับดักใน Workshop 1</b><span>ลืมปิดแท็ก, ลืม <code>&lt;link rel="stylesheet" href="style.css"&gt;</code> ใน head หรือพิมพ์ path ไฟล์ผิด ทำให้ CSS ไม่ทำงานทั้งหน้า</span></div>
+      </article>
+
+      <article class="rv" id="rv-css">
+        <div class="rv-head"><span class="tag fe">หน้าบ้าน</span><h3>CSS: Selector, Box model และ Flexbox</h3><span class="ref">สไลด์ 28–35 · Workshop 1</span></div>
+        <ul>
+          <li>Selector ที่ใช้บ่อย: <code>.card</code> (class) · <code>#volt</code> (id) · <code>.card p</code> (p ที่อยู่ใน .card)</li>
+          <li>ถ้ากฎชนกัน ตัวที่เจาะจงกว่าชนะ: style ในแท็ก &gt; id &gt; class &gt; ชื่อแท็ก ถ้าเท่ากัน ตัวที่เขียนทีหลังชนะ</li>
+          <li><strong>Box model:</strong> เนื้อหา → <code>padding</code> → <code>border</code> → <code>margin</code> ใส่ <code>box-sizing: border-box</code> แล้วความกว้างจะรวม padding กับ border ไว้ด้วย คำนวณง่ายกว่า</li>
+          <li><strong>Flexbox:</strong> <code>justify-content</code> จัดตามแนวแถว (ซ้าย-ขวา) · <code>align-items</code> จัดตามแนวตั้งฉาก (บน-ล่าง)</li>
+        </ul>
+<pre class="code">* { box-sizing: border-box; }
+
+.cards {
+  display: flex;      /* วางการ์ดเรียงเป็นแถว */
+  flex-wrap: wrap;    /* จอแคบให้ตัดลงบรรทัดใหม่ */
+  gap: 16px;          /* ระยะห่างระหว่างการ์ด */
+}
+.card {
+  flex: 1 1 240px;    /* กว้างเท่ากัน แต่ไม่แคบกว่า 240px */
+  padding: 20px;
+  border-radius: 8px;
+}</pre>
+        <div class="callout tip"><b>กับดัก</b><span>ใส่ <code>display: flex</code> ที่ตัวการ์ดแทนที่จะใส่ที่กล่องแม่ การ์ดเลยไม่เรียงข้างกัน ให้จำว่า flex ใส่ที่<strong>กล่องที่ครอบ</strong>ของที่ต้องการจัดเรียง</span></div>
+        <details class="faq"><summary>ผู้เรียนถาม: Flexbox กับ Grid ใช้ต่างกันยังไง</summary><p>Flexbox เหมาะกับการเรียงของในแถวเดียวหรือคอลัมน์เดียว Grid เหมาะกับตารางสองมิติ เช่น Dashboard ที่มีหลายแถวหลายคอลัมน์ (<code>grid-template-columns: repeat(2, 1fr)</code>)</p></details>
+      </article>
+
+      <article class="rv" id="rv-js">
+        <div class="rv-head"><span class="tag fe">หน้าบ้าน</span><h3>JavaScript: ชนิดข้อมูลและกับดัก</h3><span class="ref">สไลด์ 37–46 · Workshop 2</span></div>
+        <ul>
+          <li>JavaScript แปลงชนิดข้อมูลให้เองแบบเงียบ ๆ ถ้ามี String อยู่ฝั่งใดฝั่งหนึ่งของ <code>+</code> จะกลายเป็นการต่อข้อความ แต่เครื่องหมาย <code>-</code> <code>*</code> <code>/</code> จะแปลงเป็นตัวเลขให้</li>
+          <li>ใช้ <code>===</code> เสมอ เพราะ <code>==</code> แปลงชนิดก่อนเทียบ ผลลัพธ์จึงคาดเดายาก</li>
+          <li><code>const</code> ห้ามกำหนดค่าใหม่ทั้งก้อน แต่ยังแก้ข้างใน Array หรือ Object ได้</li>
+          <li>ค่าที่นับเป็นเท็จ (falsy) มี 6 ตัว: <code>false</code> <code>0</code> <code>''</code> <code>null</code> <code>undefined</code> <code>NaN</code> ที่เหลือเป็นจริงทั้งหมด รวมถึง <code>'0'</code> และ <code>[]</code></li>
+        </ul>
+<pre class="code">'10' + 5            // '105'  ต่อข้อความ
+'10' - 5            // 5      แปลงเป็นตัวเลข
+Number('230')       // 230
+Number('')          // 0      ← ช่องว่างกลายเป็น 0
+Number('12V')       // NaN
+parseFloat('12V')   // 12
+'5' == 5            // true   (แปลงชนิดก่อนเทียบ)
+'5' === 5           // false  (ใช้แบบนี้)
+typeof null         // 'object'  (ข้อผิดพลาดเก่าของภาษา)
+0.1 + 0.2           // 0.30000000000000004
+(15.8 * 230).toFixed(1)  // '3634.0'</pre>
+        <div class="callout tip"><b>กับดักใน Workshop 2</b><span>ค่าจาก <code>input.value</code> เป็น String เสมอ ต้องแปลงด้วย <code>Number()</code> ก่อนเทียบกับ 240 และช่องว่างจะได้ 0 ไม่ใช่ค่าว่าง ต้องเช็ก <code>input.value === ''</code> แยก</span></div>
+      </article>
+
+      <article class="rv" id="rv-data">
+        <div class="rv-head"><span class="tag gen">ทั่วไป</span><h3>Array, Object และ Function</h3><span class="ref">สไลด์ 47–57</span></div>
+        <ul>
+          <li>Array เริ่มที่ index 0 ตัวสุดท้ายคือ <code>length - 1</code> อ่านเกินจะได้ <code>undefined</code> ไม่ error</li>
+          <li>Object อ่านด้วย <code>obj.key</code> หรือ <code>obj['key']</code> ถ้า key ไม่มีจะได้ <code>undefined</code> แต่ถ้าอ่านต่อจาก <code>undefined</code> อีกชั้นจะ error</li>
+          <li>Arrow function <code>(a, b) =&gt; a * b</code> เท่ากับ function ปกติในงานของคอร์สนี้</li>
+          <li>Template literal ใช้ backtick ต่อข้อความกับตัวแปรได้ง่ายกว่าใช้ <code>+</code></li>
+        </ul>
+<pre class="code">const temps = [70.5, 72.1, 80.3];
+temps.push(75);                    // const แต่ push ได้
+temps.length                       // 4
+temps.filter(t =&gt; t &gt; 75)          // [80.3]
+temps.map(t =&gt; Math.round(t))      // [71, 72, 80, 75]
+
+const machine = { id: 'M-01', status: 'RUNNING', temp: 72.5 };
+machine.status                     // 'RUNNING'
+machine.speed                      // undefined
+machine.speed.max                  // TypeError: Cannot read properties of undefined
+
+const power = (v, a) =&gt; v * a;
+`เครื่อง ${machine.id}: ${machine.temp} °C`</pre>
+      </article>
+
+      <article class="rv" id="rv-dom">
+        <div class="rv-head"><span class="tag fe">หน้าบ้าน</span><h3>DOM และ Event</h3><span class="ref">สไลด์ 58–71 · Workshop 2</span></div>
+        <ul>
+          <li>DOM คือหน้าเว็บในรูปแบบ Object ที่ JavaScript อ่านและแก้ได้ ใช้ <code>querySelector</code> เป็นหลัก เพราะเลือกแบบเดียวกับ CSS</li>
+          <li>Script ต้องทำงาน<strong>หลัง</strong> HTML สร้างเสร็จ ใส่ <code>defer</code> หรือวาง <code>&lt;script&gt;</code> ไว้ท้าย body ไม่อย่างนั้นจะหา element ไม่เจอ</li>
+          <li><code>textContent</code> สำหรับข้อความ · <code>innerHTML</code> ใส่แท็กได้ แต่ห้ามใช้กับข้อความที่ผู้ใช้พิมพ์ เพราะเปิดช่อง XSS</li>
+          <li>เปลี่ยนสีด้วย <code>classList.add()</code> แล้วกำหนดสีใน CSS ดูแลง่ายกว่าแก้ <code>style</code> ตรง ๆ</li>
+          <li><code>addEventListener</code> ดีกว่า <code>onclick="..."</code> ในแท็ก เพราะแยก HTML กับ JavaScript ออกจากกัน (สไลด์สอนแบบ onclick ทั้งสองแบบใช้ได้)</li>
+        </ul>
+<pre class="code">const badge = document.querySelector('#status');
+const input = document.querySelector('#volt-input');
+const warn  = document.querySelector('#warn');
+
+document.querySelector('#start').addEventListener('click', () =&gt; {
+  badge.textContent = 'RUNNING';
+  badge.classList.add('run');
+});
+
+input.addEventListener('input', (event) =&gt; {
+  if (input.value === '') { warn.textContent = ''; return; }
+  const v = Number(event.target.value);
+  warn.textContent = v &gt; 240 ? 'Warning: แรงดันเกิน' : '';
+});</pre>
+        <div class="callout tip"><b>Error ที่เจอบ่อยที่สุด</b><span><code>Cannot set properties of null (setting 'textContent')</code> แปลว่าหา element ไม่เจอ สาเหตุคือ id สะกดไม่ตรง หรือ script โหลดก่อน HTML</span></div>
+      </article>
+
+      <article class="rv" id="rv-http">
+        <div class="rv-head"><span class="tag be">หลังบ้าน</span><h3>HTTP และ REST API</h3><span class="ref">สไลด์ 75–80</span></div>
+        <ul>
+          <li>Request มี 4 ส่วน: Method, URL, Headers และ Body (มีเฉพาะ POST/PUT/PATCH) · Response มี Status code, Headers และ Body</li>
+          <li>REST ตั้งชื่อ URL เป็นคำนาม (<code>/machines</code>, <code>/machines/M-01</code>) แล้วใช้ Method บอกว่าจะทำอะไร</li>
+          <li>PUT แทนที่ทั้งก้อน · PATCH แก้บางฟิลด์ · GET, PUT, DELETE เรียกซ้ำกี่ครั้งผลก็เหมือนเดิม (idempotent) แต่ POST เรียกซ้ำจะสร้างข้อมูลซ้ำ</li>
+          <li>ข้อมูลที่ใช้ค้นหาหรือกรองใส่ใน query string: <code>/machines?status=STOP</code></li>
+        </ul>
+<pre class="code">POST /api/machines HTTP/1.1
+Host: factory.local
+Content-Type: application/json
+Authorization: Bearer &lt;token&gt;
+
+{"name": "Press C", "status": "STOP"}
+
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{"id": "M-04", "name": "Press C", "status": "STOP"}</pre>
+        <div class="table-scroll">
+          <table class="key">
+            <thead><tr><th>Code</th><th>ความหมาย</th><th>เจอเมื่อไร</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">200</td><td>OK</td><td>GET หรือ PUT สำเร็จ</td></tr>
+              <tr><td class="mono">201</td><td>Created</td><td>POST สร้างข้อมูลใหม่สำเร็จ</td></tr>
+              <tr><td class="mono">204</td><td>No Content</td><td>สำเร็จแต่ไม่มี Body เช่น DELETE</td></tr>
+              <tr><td class="mono">400</td><td>Bad Request</td><td>ส่ง JSON ผิดรูปแบบ หรือขาดฟิลด์ที่ต้องมี</td></tr>
+              <tr><td class="mono">401</td><td>Unauthorized</td><td>ไม่ได้ส่ง token หรือ token ผิด (ยังไม่รู้ว่าเป็นใคร)</td></tr>
+              <tr><td class="mono">403</td><td>Forbidden</td><td>รู้ว่าเป็นใคร แต่ไม่มีสิทธิ์</td></tr>
+              <tr><td class="mono">404</td><td>Not Found</td><td>URL ผิด หรือไม่มีข้อมูลนั้น</td></tr>
+              <tr><td class="mono">429</td><td>Too Many Requests</td><td>เรียกถี่เกินไป เช่น ทั้งห้องตั้ง setInterval ทุก 1 วินาที</td></tr>
+              <tr><td class="mono">500</td><td>Internal Server Error</td><td>Server พังเอง ไม่ใช่ความผิดของหน้าเว็บ</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="rv" id="rv-json">
+        <div class="rv-head"><span class="tag be">หลังบ้าน</span><h3>JSON</h3><span class="ref">สไลด์ 73–74, 78</span></div>
+        <ul>
+          <li>กฎของ JSON: key และข้อความใช้เครื่องหมายคำพูดคู่เท่านั้น · ห้ามมี comma ตัวสุดท้าย · ห้ามมี comment · ไม่มี <code>undefined</code> หรือ function</li>
+          <li><code>JSON.parse(text)</code> แปลงข้อความเป็น Object · <code>JSON.stringify(obj)</code> แปลง Object เป็นข้อความก่อนส่ง</li>
+          <li><code>response.json()</code> ใน fetch ทำหน้าที่เดียวกับ <code>JSON.parse</code></li>
+        </ul>
+        <div class="callout tip"><b>Error ที่บอกใบ้ได้</b><span><code>Unexpected token '&lt;' ... is not valid JSON</code> แปลว่าได้ HTML กลับมาแทน JSON ส่วนใหญ่เพราะ URL ผิดแล้วได้หน้า 404 ให้เปิดแท็บ Network ดู Response จริง</span></div>
+      </article>
+
+      <article class="rv" id="rv-fetch">
+        <div class="rv-head"><span class="tag be">เชื่อมต่อ</span><h3>fetch และการทำงานแบบ async</h3><span class="ref">สไลด์ 81–85 · Workshop 3–4</span></div>
+        <ul>
+          <li><code>fetch</code> คืนค่าเป็น Promise คือสัญญาว่าจะมีผลลัพธ์ภายหลัง หน้าเว็บไม่ค้างระหว่างรอ</li>
+          <li><code>.then()</code> กับ <code>async/await</code> ให้ผลเหมือนกัน แบบ await อ่านง่ายกว่าเพราะเขียนเรียงบนลงล่าง</li>
+          <li><strong>fetch ไม่ throw เมื่อได้ 404 หรือ 500</strong> จะเข้า catch เฉพาะตอนต่อเครือข่ายไม่ได้ ต้องเช็ก <code>res.ok</code> เอง</li>
+          <li>Polling ทุก 5 วินาทีขึ้นไปพอสำหรับห้องเรียน ถ้า API ตอบช้ากว่ารอบ setInterval จะยิงซ้อนกัน ใช้ setTimeout เรียกต่อหลังได้คำตอบจะปลอดภัยกว่า</li>
+        </ul>
+<pre class="code">async function loadMeter() {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    volt.textContent = data.voltage;
+    statusText.textContent = 'อัปเดตล่าสุด ' + new Date().toLocaleTimeString('th-TH');
+  } catch (err) {
+    statusText.textContent = 'โหลดข้อมูลไม่สำเร็จ';
+    console.error(err);
+  }
+}
+loadMeter();
+setInterval(loadMeter, 5000);
+
+// ส่งข้อมูลแบบ POST (Workshop 4)
+await fetch(WEBHOOK_URL, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ title: 'Machine started', message: 'M-01 RUNNING' })
+});</pre>
+        <div class="callout tip"><b>กับดัก</b><span>ลืม <code>await</code> หน้า <code>res.json()</code> จะได้ Promise แทนข้อมูล แสดงผลออกมาเป็น <code>[object Promise]</code> และลืม <code>JSON.stringify</code> ตอน POST ทำให้ Server ได้ข้อความ <code>[object Object]</code></span></div>
+      </article>
+
+      <article class="rv" id="rv-cors">
+        <div class="rv-head"><span class="tag be">หลังบ้าน</span><h3>CORS: ทำไมเรียก API แล้วโดนบล็อก</h3><span class="ref">Workshop 3–4</span></div>
+        <ul>
+          <li>เบราว์เซอร์บล็อกการเรียก API ข้ามโดเมน เว้นแต่ Server จะตอบ header <code>Access-Control-Allow-Origin</code> อนุญาตไว้</li>
+          <li><strong>แก้ที่ Server เท่านั้น</strong> แก้จากโค้ดหน้าเว็บไม่ได้ ถ้าเจอในห้องเรียน ให้แจ้งคนดูแล API หรือเปลี่ยนไปใช้ API สำรอง</li>
+          <li>POST ที่ส่ง <code>Content-Type: application/json</code> เบราว์เซอร์จะส่ง request <code>OPTIONS</code> ไปถามก่อน (preflight) ถ้า Server ไม่รองรับ OPTIONS จะโดนบล็อก ทั้งที่ GET ใช้ได้ปกติ</li>
+          <li>Postman หรือ curl ไม่โดน CORS เพราะไม่ใช่เบราว์เซอร์ จึงเห็นว่า API ใช้ได้ทั้งที่หน้าเว็บเรียกไม่ได้</li>
+          <li>เปิดไฟล์ HTML ด้วยการดับเบิลคลิก (<code>file://</code>) บาง API จะปฏิเสธ ให้เปิดผ่าน Live Server ใน VS Code แทน</li>
+        </ul>
+      </article>
+
+      <article class="rv" id="rv-hook">
+        <div class="rv-head"><span class="tag be">หลังบ้าน</span><h3>Webhook และความปลอดภัย</h3><span class="ref">สไลด์ 86–90 · Workshop 4</span></div>
+        <ul>
+          <li>Webhook คือ URL ที่รอรับ POST เมื่อมีเหตุการณ์ ระบบต้นทางส่งมาเอง (Push) ไม่ต้องคอยถาม (Pull)</li>
+          <li>ฝั่งที่รับ Webhook ควรตอบ 2xx ให้เร็ว และกันข้อมูลซ้ำ เพราะต้นทางมักส่งซ้ำเมื่อไม่ได้คำตอบ</li>
+          <li>ยืนยันว่าเป็นผู้ส่งจริงด้วย secret หรือลายเซ็น (signature) ใน header และใช้ HTTPS เสมอ</li>
+          <li><strong>ใน Workshop 4 หน้าเว็บยิง Webhook ตรง ซึ่งใช้ได้ในห้องเรียน</strong> แต่ระบบจริงควรส่งผ่าน Backend เพราะใครก็เปิด DevTools เห็น URL และ token ได้ บอกผู้เรียนตรงนี้ด้วย</li>
+          <li>หลักทั่วไป: ห้ามเก็บรหัสผ่านหรือ API key ไว้ในโค้ดหน้าเว็บ · ตรวจข้อมูลที่ Server ซ้ำเสมอ แม้หน้าเว็บตรวจแล้ว · ข้อมูลส่วนบุคคลอยู่ภายใต้ PDPA</li>
+        </ul>
+        <details class="faq"><summary>ผู้เรียนถาม: ทำไมไม่ใช้ Webhook ส่งค่าทุกวินาทีแทน Polling</summary><p>Webhook เหมาะกับเหตุการณ์ที่เกิดไม่บ่อยแต่ต้องรู้ทันที เช่น เครื่องหยุด ถ้าเป็นค่าที่เปลี่ยนตลอดเวลาแบบกราฟ Real-time จะใช้ WebSocket หรือ MQTT ซึ่งเปิดช่องเชื่อมต่อค้างไว้</p></details>
+      </article>
+
+      <article class="rv" id="rv-test">
+        <div class="rv-head"><span class="tag gen">ทั่วไป</span><h3>Software Testing</h3><span class="ref">สไลด์ 91–97</span></div>
+        <ul>
+          <li>Test Case ที่ดีครอบคลุม 3 แบบ: กรณีปกติ · กรณีผิดปกติ (กรอกตัวอักษร, API ล่ม) · ค่าขอบ (boundary)</li>
+          <li>ตัวอย่างค่าขอบใน Workshop 2: 240 V ต้องไม่เตือน · 240.1 V ต้องเตือน · ช่องว่างต้องไม่เตือน</li>
+          <li>Expected Result ต้องเขียนให้วัดได้ เช่น "แสดงข้อความ Warning สีแดงภายใน 1 วินาที" ไม่ใช่ "ระบบทำงานถูกต้อง"</li>
+          <li>UAT ให้ผู้ใช้จริงทดสอบตามงานจริง แล้วลงชื่อยอมรับ ในวันที่ 4 ให้เพื่อนเป็นผู้ใช้</li>
+        </ul>
+        <div class="table-scroll">
+          <table class="key">
+            <thead><tr><th>ID</th><th>ขั้นตอน</th><th>ข้อมูล</th><th>ผลที่คาดหวัง</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">TC-01</td><td>พิมพ์ค่าในช่องแรงดัน</td><td class="mono">240</td><td>ไม่แสดง Warning</td></tr>
+              <tr><td class="mono">TC-02</td><td>พิมพ์ค่าในช่องแรงดัน</td><td class="mono">240.1</td><td>แสดง Warning สีแดง</td></tr>
+              <tr><td class="mono">TC-03</td><td>ปิดอินเทอร์เน็ตแล้วรอรอบอัปเดต</td><td>–</td><td>แสดง "โหลดข้อมูลไม่สำเร็จ" และค่าเดิมยังอยู่</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="rv" id="rv-debug">
+        <div class="rv-head"><span class="tag gen">เครื่องมือ</span><h3>ไล่ปัญหาผู้เรียนด้วย DevTools</h3><span class="ref">กด F12 · ใช้ทุก Workshop</span></div>
+        <ul>
+          <li><strong>Console:</strong> ดูข้อความสีแดงก่อนเสมอ คลิกชื่อไฟล์ท้ายบรรทัดจะพาไปบรรทัดที่พัง</li>
+          <li><strong>Elements:</strong> คลิกขวาที่ของบนหน้าจอ › Inspect ดูว่า CSS ตัวไหนมีผล ตัวไหนถูกขีดฆ่า และแก้ค่าลองได้สด ๆ</li>
+          <li><strong>Network:</strong> ดูว่า request ออกไปจริงไหม ได้ Status อะไร และ Response จริงหน้าตาเป็นอย่างไร</li>
+          <li>ลำดับไล่ปัญหาใน 1 นาที: Console มี error ไหม › Network มี request ไหม ได้ status อะไร › <code>console.log</code> ค่ากลางทาง</li>
+        </ul>
+        <div class="table-scroll">
+          <table class="key">
+            <thead><tr><th>ข้อความ Error</th><th>สาเหตุที่พบบ่อย</th></tr></thead>
+            <tbody>
+              <tr><td><code>Cannot set properties of null</code></td><td>id ไม่ตรงกับ HTML หรือ script ทำงานก่อน HTML สร้างเสร็จ</td></tr>
+              <tr><td><code>Unexpected token</code> / <code>missing )</code></td><td>พิมพ์วงเล็บหรือเครื่องหมายคำพูดไม่ครบคู่</td></tr>
+              <tr><td><code>... is not defined</code></td><td>สะกดชื่อตัวแปรหรือฟังก์ชันผิด หรือตัวพิมพ์เล็ก-ใหญ่ไม่ตรง</td></tr>
+              <tr><td><code>... is not a function</code></td><td>สะกดชื่อคำสั่งผิด เช่น <code>getElementByClassName</code> ขาด s</td></tr>
+              <tr><td><code>blocked by CORS policy</code></td><td>Server ไม่อนุญาตโดเมนนี้ แก้ที่ Server</td></tr>
+              <tr><td><code>Failed to fetch</code></td><td>URL ผิด เน็ตหลุด หรือโดน CORS</td></tr>
+              <tr><td><code>is not valid JSON</code></td><td>ได้ HTML กลับมา มักเป็นหน้า 404</td></tr>
+              <tr><td>แสดง <code>[object Promise]</code></td><td>ลืม <code>await</code></td></tr>
+              <tr><td>แสดง <code>NaN</code></td><td>คำนวณกับข้อความที่แปลงเป็นตัวเลขไม่ได้</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="rv" id="rv-quiz">
+        <div class="rv-head"><span class="tag gen">เช็กตัวเอง</span><h3>10 คำถามที่ยากกว่า Pre-test</h3><span class="ref">ตอบในใจแล้วกดดูเฉลย</span></div>
+        <details class="faq"><summary>1. <code>Number('')</code> ได้อะไร และทำไมสำคัญกับ Workshop 2</summary><p>ได้ 0 ถ้าผู้เรียนลบค่าในช่องจนว่าง โปรแกรมจะคิดว่าแรงดันเป็น 0 ต้องเช็ก <code>input.value === ''</code> แยกก่อน</p></details>
+        <details class="faq"><summary>2. fetch ได้ status 404 จะเข้า <code>catch</code> ไหม</summary><p>ไม่เข้า fetch ถือว่าสำเร็จเพราะได้คำตอบกลับมา ต้องเช็ก <code>res.ok</code> แล้ว throw เอง</p></details>
+        <details class="faq"><summary>3. GET ใช้ได้ แต่ POST JSON ไป API เดียวกันโดน CORS ได้อย่างไร</summary><p>POST ที่มี <code>Content-Type: application/json</code> ทำให้เบราว์เซอร์ส่ง preflight <code>OPTIONS</code> ก่อน ถ้า Server ไม่ตอบ OPTIONS ให้ถูกต้องจะโดนบล็อก</p></details>
+        <details class="faq"><summary>4. 401 กับ 403 ต่างกันอย่างไร</summary><p>401 คือยังยืนยันตัวตนไม่ได้ (ไม่มี token หรือ token ผิด) 403 คือรู้ว่าเป็นใครแต่ไม่มีสิทธิ์ทำสิ่งนั้น</p></details>
+        <details class="faq"><summary>5. <code>const list = []; list.push(1);</code> error ไหม</summary><p>ไม่ error const ห้ามกำหนดค่าใหม่ทั้งตัวแปร (<code>list = [2]</code>) แต่แก้ข้างใน Array ได้</p></details>
+        <details class="faq"><summary>6. ทำไม token ใน Workshop 4 ไม่ควรอยู่ในโค้ดหน้าเว็บของระบบจริง</summary><p>โค้ดหน้าเว็บส่งไปถึงเครื่องผู้ใช้ทั้งหมด ใครก็เปิด DevTools อ่านได้ ระบบจริงต้องให้ Backend เป็นคนเก็บ token และยิง Webhook</p></details>
+        <details class="faq"><summary>7. <code>justify-content</code> กับ <code>align-items</code> ต่างกันอย่างไรใน flex แบบแถว</summary><p><code>justify-content</code> จัดตามแนวนอน (แกนหลัก) <code>align-items</code> จัดตามแนวตั้ง (แกนตั้งฉาก) ถ้าเปลี่ยนเป็น <code>flex-direction: column</code> สองตัวนี้จะสลับแกนกัน</p></details>
+        <details class="faq"><summary>8. PUT กับ PATCH ต่างกันอย่างไร</summary><p>PUT ส่งข้อมูลทั้งก้อนไปแทนที่ของเดิม PATCH ส่งเฉพาะฟิลด์ที่จะแก้</p></details>
+        <details class="faq"><summary>9. ทำไมไม่ควรใช้ <code>innerHTML</code> แสดงข้อความที่ผู้ใช้พิมพ์</summary><p>ถ้าผู้ใช้พิมพ์แท็ก เช่น <code>&lt;img src=x onerror=...&gt;</code> เบราว์เซอร์จะรันโค้ดนั้น (XSS) ใช้ <code>textContent</code> แทน</p></details>
+        <details class="faq"><summary>10. API ทำงานใน Postman แต่หน้าเว็บเรียกไม่ได้ ควรสงสัยอะไรก่อน</summary><p>CORS เพราะ Postman ไม่ใช่เบราว์เซอร์ จึงไม่ถูกตรวจ ดูข้อความใน Console ว่ามีคำว่า CORS policy ไหม</p></details>
+      </article>
+
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("ea-kit:" + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("ea-kit:" + k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  };
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sleep = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  /* ---------- tabs ---------- */
+  const TABS = ["prep", "script", "test", "lab", "review"];
+  function showTab(id) {
+    if (!TABS.includes(id)) id = "prep";
+    TABS.forEach(t => {
+      $("#" + t).hidden = t !== id;
+      $('[data-tab="' + t + '"]').setAttribute("aria-selected", String(t === id));
+    });
+    store.set("tab", id);
+  }
+  $$("[data-tab]").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
+  const hash = location.hash.slice(1);
+  showTab(TABS.includes(hash) ? hash : store.get("tab", "prep"));
+
+  /* ---------- checklist ---------- */
+  const checks = store.get("checks", {});
+  $$("#checks input").forEach(i => {
+    i.checked = !!checks[i.id];
+    i.addEventListener("change", () => { checks[i.id] = i.checked; store.set("checks", checks); });
+  });
+  $("#checks-reset").addEventListener("click", () => {
+    $$("#checks input").forEach(i => { i.checked = false; checks[i.id] = false; });
+    store.set("checks", checks);
+  });
+
+  /* ---------- speaker notes ---------- */
+  let NOTES = [];
+  let day = "all", query = "", focusMode = false, focusIdx = 0;
+  const dayOf = n => n <= 35 ? 1 : n <= 71 ? 2 : n <= 97 ? 3 : 4;
+
+  function noteCard(n) {
+    const a = el("article", "note");
+    const head = el("div", "note-head");
+    head.append(el("span", "slide-no", "สไลด์ " + n.n), el("h3", null, n.title));
+    if (n.time) head.append(el("span", "time", n.time));
+    a.append(head, el("p", "say", n.say));
+    if (n.ask) { const c = el("div", "callout"); c.append(el("b", null, "ถามผู้เรียน"), el("span", null, n.ask)); a.append(c); }
+    if (n.tip) { const c = el("div", "callout tip"); c.append(el("b", null, "หมายเหตุผู้สอน"), el("span", null, n.tip)); a.append(c); }
+    return a;
+  }
+  function filtered() {
+    const q = query.trim().toLowerCase();
+    return NOTES.filter(n => (day === "all" || dayOf(n.n) === +day) &&
+      (!q || String(n.n) === q || (n.title + " " + n.say + " " + n.ask + " " + n.tip).toLowerCase().includes(q)));
+  }
+  function renderNotes() {
+    const list = $("#notes-list");
+    const items = filtered();
+    list.replaceChildren();
+    list.classList.toggle("focus", focusMode);
+    if (!items.length) {
+      list.append(el("div", "empty", "ไม่พบสไลด์ที่ตรงกับคำค้น"));
+    } else if (focusMode) {
+      focusIdx = Math.max(0, Math.min(focusIdx, items.length - 1));
+      const nav = el("div", "focus-nav");
+      const prev = el("button", "btn", "← ก่อนหน้า"); prev.type = "button"; prev.disabled = focusIdx === 0;
+      const next = el("button", "btn", "ถัดไป →"); next.type = "button"; next.disabled = focusIdx === items.length - 1;
+      prev.addEventListener("click", () => step(-1));
+      next.addEventListener("click", () => step(1));
+      nav.append(prev, el("span", "count", (focusIdx + 1) + " / " + items.length), next);
+      list.append(noteCard(items[focusIdx]), nav);
+    } else {
+      items.forEach(n => list.append(noteCard(n)));
+    }
+    $("#notes-count").textContent = focusMode
+      ? "โหมดสอนทีละหน้า · กด ← → เพื่อเปลี่ยนหน้า"
+      : items.length + " สไลด์";
+  }
+  function step(d) { focusIdx += d; renderNotes(); }
+  $$("#day-chips .chip").forEach(c => c.addEventListener("click", () => {
+    day = c.dataset.day; focusIdx = 0;
+    $$("#day-chips .chip").forEach(x => x.setAttribute("aria-pressed", String(x === c)));
+    renderNotes();
+  }));
+  $("#note-search").addEventListener("input", e => { query = e.target.value; focusIdx = 0; renderNotes(); });
+  $("#focus-toggle").addEventListener("click", e => {
+    focusMode = !focusMode;
+    e.currentTarget.setAttribute("aria-pressed", String(focusMode));
+    e.currentTarget.textContent = focusMode ? "แสดงทุกหน้า" : "โหมดสอนทีละหน้า";
+    renderNotes();
+  });
+  document.addEventListener("keydown", e => {
+    if (!focusMode || $("#script").hidden) return;
+    if (e.target.matches("input, select, textarea")) return;
+    const n = filtered().length;
+    if (e.key === "ArrowRight" && focusIdx < n - 1) step(1);
+    if (e.key === "ArrowLeft" && focusIdx > 0) step(-1);
+  });
+
+  /* ---------- quiz ---------- */
+  let QUIZ = [];
+  const QUIZ_SETS = {};
+  const LET = ["ก", "ข", "ค", "ง"];
+  let answers = {}, submitted = false, warned = false, round = "Pre-test";
+
+  function renderQuiz() {
+    const f = $("#quiz-form");
+    f.replaceChildren();
+    QUIZ.forEach((item, i) => {
+      const fs = el("fieldset", "q");
+      const lg = el("legend");
+      const t = el("div", "q-title");
+      t.append(el("span", "n", (i + 1) + "."), el("span", null, item.q), el("span", "clo", item.clo));
+      lg.append(t);
+      fs.append(lg);
+      item.choices.forEach((c, j) => {
+        const lab = el("label", "choice");
+        const inp = el("input");
+        inp.type = "radio"; inp.name = "q" + i; inp.id = "q" + i + "c" + j; inp.value = j;
+        inp.checked = answers[i] === j;
+        inp.disabled = submitted;
+        inp.addEventListener("change", () => { answers[i] = j; warned = false; $("#quiz-notice").hidden = true; updateProgress(); });
+        const txt = el("span");
+        txt.append(el("span", "letter", LET[j] + "."), document.createTextNode(c));
+        lab.append(inp, txt);
+        if (submitted) {
+          if (j === item.answer) lab.classList.add("right");
+          else if (answers[i] === j) lab.classList.add("wrong");
+        }
+        fs.append(lab);
+      });
+      if (submitted) {
+        const w = el("p", "why");
+        const ok = answers[i] === item.answer;
+        w.append(el("b", null, ok ? "ถูกต้อง · " : "เฉลย " + LET[item.answer] + " · "), document.createTextNode(item.why));
+        fs.append(w);
+      }
+      f.append(fs);
+    });
+    updateProgress();
+  }
+  function updateProgress() {
+    const done = Object.keys(answers).length, total = QUIZ.length || 20;
+    $("#quiz-progress-text").textContent = submitted ? "ส่งคำตอบแล้ว" : "ตอบแล้ว " + done + "/" + total;
+    $("#quiz-progress").style.width = (done / total * 100) + "%";
+  }
+  function submitQuiz() {
+    const missing = QUIZ.map((_, i) => i).filter(i => answers[i] === undefined);
+    if (missing.length && !warned) {
+      warned = true;
+      const n = $("#quiz-notice");
+      n.textContent = "ยังไม่ได้ตอบ " + missing.length + " ข้อ (ข้อ " + missing.map(i => i + 1).join(", ") + ") กดส่งคำตอบอีกครั้งถ้าต้องการส่งเลย ข้อที่ไม่ตอบนับเป็นผิด";
+      n.hidden = false;
+      return;
+    }
+    submitted = true;
+    $("#quiz-notice").hidden = true;
+    $("#quiz-submit").hidden = true;
+    $("#quiz-reset").hidden = false;
+    const score = QUIZ.filter((q, i) => answers[i] === q.answer).length;
+    const byClo = {};
+    QUIZ.forEach((q, i) => {
+      byClo[q.clo] = byClo[q.clo] || { ok: 0, all: 0 };
+      byClo[q.clo].all++;
+      if (answers[i] === q.answer) byClo[q.clo].ok++;
+    });
+    const r = $("#quiz-result");
+    r.replaceChildren();
+    const head = el("div", "row-end");
+    head.append(el("h3", null, "ผล " + round), el("span", "sub", "แจ้งคะแนนนี้กับผู้สอน"));
+    const body = el("div", "result");
+    const sc = el("div", "score", String(score));
+    sc.append(el("small", null, " / " + QUIZ.length));
+    const bars = el("div", "clo-bars");
+    Object.keys(byClo).sort().forEach(k => {
+      const v = byClo[k], pct = v.ok / v.all * 100;
+      const row = el("div", "clo-bar");
+      const tr = el("div", "track"); const fill = el("i", pct < 60 ? "low" : ""); fill.style.width = pct + "%"; tr.append(fill);
+      row.append(el("span", null, k), tr, el("span", null, v.ok + "/" + v.all));
+      bars.append(row);
+    });
+    body.append(sc, bars);
+    r.append(head, body);
+    r.hidden = false;
+    renderQuiz();
+    r.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  }
+  function resetQuiz() {
+    answers = {}; submitted = false; warned = false;
+    $("#quiz-result").hidden = true;
+    $("#quiz-submit").hidden = false;
+    $("#quiz-reset").hidden = true;
+    renderQuiz();
+    $("#test").scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+  }
+  function renderKey() {
+    const box = $("#key-tables");
+    box.replaceChildren();
+    Object.keys(QUIZ_SETS).forEach(name => {
+      const t = el("table", "key");
+      const hr = el("tr");
+      ["ข้อ", "CLO", "คำตอบ", "คำถาม"].forEach(h => hr.append(el("th", null, h)));
+      const thead = el("thead"); thead.append(hr);
+      const tb = el("tbody");
+      QUIZ_SETS[name].forEach((q, i) => {
+        const tr = el("tr");
+        tr.append(el("td", "num", String(i + 1)), el("td", "mono", q.clo),
+          el("td", "ans", LET[q.answer] + ". " + q.choices[q.answer]), el("td", null, q.q));
+        tb.append(tr);
+      });
+      t.append(thead, tb);
+      const wrap = el("div", "table-scroll"); wrap.append(t);
+      box.append(el("h4", null, name), wrap);
+    });
+  }
+  $("#quiz-submit").addEventListener("click", submitQuiz);
+  $("#quiz-reset").addEventListener("click", resetQuiz);
+  $$("[data-qmode]").forEach(b => b.addEventListener("click", () => {
+    const key = b.dataset.qmode === "key";
+    $$("[data-qmode]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $("#quiz-take").hidden = key;
+    $("#quiz-key").hidden = !key;
+    $("#round-seg").hidden = key;
+  }));
+  $$("[data-round]").forEach(b => b.addEventListener("click", () => {
+    if (round === b.dataset.round) return;
+    round = b.dataset.round;
+    $$("[data-round]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    QUIZ = QUIZ_SETS[round] || [];   // each round has its own questions, so start over
+    answers = {}; submitted = false; warned = false;
+    $("#quiz-result").hidden = true;
+    $("#quiz-notice").hidden = true;
+    $("#quiz-submit").hidden = false;
+    $("#quiz-reset").hidden = true;
+    renderQuiz();
+  }));
+
+  const getJson = url => fetch(url).then(r => { if (!r.ok) throw r.status; return r.json(); });
+  Promise.all([getJson("speaker_notes.json"), getJson("quiz.json"), getJson("quiz_post.json")])
+  .then(([notes, pre, post]) => {
+    NOTES = notes;
+    QUIZ_SETS["Pre-test"] = pre;
+    QUIZ_SETS["Post-test"] = post;
+    QUIZ = QUIZ_SETS[round];
+    renderNotes(); renderQuiz(); renderKey();
+  }).catch(() => {
+    const msg = "โหลดข้อมูลไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้ง";
+    $("#notes-count").textContent = msg;
+    $("#quiz-form").replaceChildren(el("div", "empty", msg));
+  });
+
+  /* ---------- demo: API ---------- */
+  const SEED = [
+    { id: "M-01", name: "Press A", status: "RUNNING" },
+    { id: "M-02", name: "Press B", status: "STOP" },
+    { id: "M-03", name: "CNC 1", status: "ALARM" }
+  ];
+  let machines = SEED.map(m => ({ ...m })), seq = 4, method = "GET", busy = false;
+  const STATUS_PILL = { RUNNING: "ok", STOP: "bad", ALARM: "warn" };
+
+  function targetId() { return $("#api-target").value; }
+  function buildReq() {
+    const t = targetId();
+    if (method === "GET") return { url: "/api/machines", body: null };
+    if (method === "POST") return { url: "/api/machines", body: { name: "Machine " + seq, status: "STOP" } };
+    const m = machines.find(x => x.id === t);
+    if (method === "PUT") return { url: "/api/machines/" + (t || "?"), body: { status: m && m.status === "RUNNING" ? "STOP" : "RUNNING" } };
+    return { url: "/api/machines/" + (t || "?"), body: null };
+  }
+  function showReq() {
+    const r = buildReq();
+    let s = method + " " + r.url + "\nHost: factory.local";
+    if (r.body) s += "\nContent-Type: application/json\n\n" + JSON.stringify(r.body, null, 2);
+    $("#api-req").textContent = s;
+    $("#api-target-wrap").hidden = method === "GET" || method === "POST";
+  }
+  function renderTargets() {
+    const sel = $("#api-target"), cur = sel.value;
+    sel.replaceChildren();
+    machines.forEach(m => { const o = el("option", null, m.id); o.value = m.id; sel.append(o); });
+    if (!machines.length) { const o = el("option", null, "(ไม่มีเครื่อง)"); o.value = ""; sel.append(o); }
+    if (machines.some(m => m.id === cur)) sel.value = cur;
+  }
+  function renderTable() {
+    const t = $("#api-table");
+    t.replaceChildren();
+    const hr = el("tr"); ["id", "name", "status"].forEach(h => hr.append(el("th", null, h)));
+    t.append(hr);
+    if (!machines.length) { const tr = el("tr"); const td = el("td", null, "ไม่มีข้อมูล"); td.colSpan = 3; tr.append(td); t.append(tr); }
+    machines.forEach(m => {
+      const tr = el("tr");
+      const st = el("td"); st.append(el("span", "pill " + STATUS_PILL[m.status], m.status));
+      tr.append(el("td", null, m.id), el("td", null, m.name), st);
+      t.append(tr);
+    });
+  }
+  function handle(req) {
+    const t = targetId();
+    if (method === "GET") return [200, "OK", machines];
+    if (method === "POST") {
+      const m = { id: "M-" + String(seq++).padStart(2, "0"), name: req.body.name, status: req.body.status };
+      machines.push(m);
+      return [201, "Created", m];
+    }
+    const m = machines.find(x => x.id === t);
+    if (!m) return [404, "Not Found", { error: "ไม่พบเครื่องที่ระบุ" }];
+    if (method === "PUT") { m.status = req.body.status; return [200, "OK", m]; }
+    machines = machines.filter(x => x !== m);
+    return [200, "OK", { deleted: m.id }];
+  }
+  function setActive(id) { ["n-client", "n-api", "n-server"].forEach(n => $("#" + n).classList.toggle("active", n === id)); }
+  async function send() {
+    if (busy) return;
+    busy = true; $("#api-send").disabled = true;
+    const p = $("#packet"), stage = $("#api-stage");
+    const req = buildReq();
+    p.className = "packet on"; p.style.left = "16.6%";
+    $("#api-code").textContent = ""; $("#api-res").textContent = "รอ Response…";
+    setActive("n-client"); stage.textContent = "1. หน้าเว็บส่ง Request: " + method + " " + req.url;
+    await sleep(500);
+    p.style.left = "50%"; setActive("n-api");
+    await sleep(500);
+    stage.textContent = "2. API ตรวจคำขอ แล้วส่งต่อให้ Server";
+    await sleep(500);
+    p.style.left = "83.4%"; setActive("n-server");
+    await sleep(500);
+    const [code, text, body] = handle(req);
+    stage.textContent = "3. Server ประมวลผล และ" + (code < 400 ? "เตรียมข้อมูลตอบกลับ" : "ตอบว่าหาไม่พบ");
+    renderTable(); renderTargets();
+    await sleep(600);
+    p.classList.add(code < 400 ? "back" : "err");
+    p.style.left = "50%"; setActive("n-api");
+    await sleep(500);
+    p.style.left = "16.6%"; setActive("n-client");
+    await sleep(500);
+    stage.textContent = "4. หน้าเว็บได้ Response " + code + " " + text + " นำ JSON ไปแสดงผล";
+    $("#api-code").textContent = code + " " + text;
+    $("#api-res").textContent = JSON.stringify(body, null, 2);
+    p.className = "packet";
+    setActive("");
+    showReq();
+    busy = false; $("#api-send").disabled = false;
+  }
+  $$("#api-methods .method").forEach(b => b.addEventListener("click", () => {
+    method = b.dataset.m;
+    $$("#api-methods .method").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    showReq();
+  }));
+  $("#api-target").addEventListener("change", showReq);
+  $("#api-send").addEventListener("click", send);
+  $("#api-reset").addEventListener("click", () => {
+    if (busy) return;
+    machines = SEED.map(m => ({ ...m })); seq = 4;
+    renderTable(); renderTargets(); showReq();
+    $("#api-code").textContent = ""; $("#api-res").textContent = "ยังไม่มี Response";
+    $("#api-stage").textContent = "กด \"ส่ง Request\" เพื่อเริ่ม";
+  });
+  renderTable(); renderTargets(); showReq();
+
+  /* ---------- demo: JSON ---------- */
+  const DATA = {
+    line: "A",
+    shift: "Day",
+    updatedAt: "2026-11-02T09:15:00",
+    machines: [
+      { id: "M-01", status: "RUNNING", temp: 72.5, alarm: null },
+      { id: "M-02", status: "STOP", temp: 40.1, alarm: "Door open" }
+    ],
+    power: { voltage: 230, current: 15.8, online: true }
+  };
+  const typeName = v => v === null ? "null" : Array.isArray(v) ? "array" : typeof v;
+  function jsonNode(v, path, depth) {
+    const frag = document.createDocumentFragment();
+    const pad = d => "  ".repeat(d);
+    const isArr = Array.isArray(v);
+    if (v !== null && typeof v === "object") {
+      frag.append(isArr ? "[\n" : "{\n");
+      const keys = isArr ? v.map((_, i) => i) : Object.keys(v);
+      keys.forEach((k, i) => {
+        frag.append(pad(depth + 1));
+        const childPath = isArr ? path + "[" + k + "]" : path + "." + k;
+        if (!isArr) {
+          const kb = el("button", "jk", '"' + k + '"'); kb.type = "button"; kb.dataset.path = childPath;
+          frag.append(kb, ": ");
+        }
+        frag.append(jsonNode(v[k], childPath, depth + 1));
+        if (i < keys.length - 1) frag.append(",");
+        frag.append("\n");
+      });
+      frag.append(pad(depth) + (isArr ? "]" : "}"));
+    } else {
+      const b = el("button", "jv t-" + typeName(v), JSON.stringify(v));
+      b.type = "button"; b.dataset.path = path;
+      frag.append(b);
+    }
+    return frag;
+  }
+  function resolvePath(str) {
+    str = str.trim();
+    if (!str.startsWith("data")) throw "ต้องขึ้นต้นด้วย data";
+    let rest = str.slice(4), cur = DATA, at = "data";
+    const re = /^(?:\.([A-Za-z_$][\w$]*)|\[(\d+)\]|\[["']([^"']+)["']\])/;
+    while (rest.length) {
+      const m = rest.match(re);
+      if (!m) throw "อ่านไม่ออกตรง \"" + rest + "\" ใช้ .ชื่อkey หรือ [ตัวเลข]";
+      if (m[2] !== undefined) {
+        if (!Array.isArray(cur)) throw at + " ไม่ใช่ Array จึงใช้ [" + m[2] + "] ไม่ได้";
+        const i = +m[2];
+        if (i >= cur.length) throw at + " มี " + cur.length + " ตัว ใช้ index 0–" + (cur.length - 1) + " ได้";
+        cur = cur[i]; at += "[" + i + "]";
+      } else {
+        const k = m[1] !== undefined ? m[1] : m[3];
+        if (cur === null || typeof cur !== "object" || Array.isArray(cur)) throw at + " ไม่ใช่ Object จึงอ่าน ." + k + " ไม่ได้";
+        if (!(k in cur)) throw "ไม่พบ key \"" + k + "\" ใน " + at + " (มี " + Object.keys(cur).join(", ") + ")";
+        cur = cur[k]; at += m[1] !== undefined ? "." + k : '["' + k + '"]';
+      }
+      rest = rest.slice(m[0].length);
+    }
+    return cur;
+  }
+  function showPath(path) {
+    $("#path-err").textContent = "";
+    $$("#json-view .sel").forEach(x => x.classList.remove("sel"));
+    $$("#json-view [data-path]").filter(x => x.dataset.path === path).forEach(x => x.classList.add("sel"));
+    const v = resolvePath(path);
+    $("#path-expr").textContent = path;
+    $("#path-val").textContent = "ได้ค่า: " + JSON.stringify(v) + "   (ชนิด " + typeName(v) + ")";
+  }
+  $("#json-view").append(jsonNode(DATA, "data", 0));
+  $("#json-view").addEventListener("click", e => {
+    const b = e.target.closest("[data-path]");
+    if (!b) return;
+    showPath(b.dataset.path);
+    $("#path-input").value = b.dataset.path;
+  });
+  $("#path-form").addEventListener("submit", e => {
+    e.preventDefault();
+    try { showPath($("#path-input").value); }
+    catch (err) { $("#path-err").textContent = String(err); }
+  });
+  showPath("data.machines[0].temp");
+
+  /* ---------- demo: DOM ---------- */
+  const CODE = [
+    "const badge = document.getElementById('status');",
+    "const warn = document.getElementById('warn');",
+    "",
+    "function startMachine() {",
+    "  badge.textContent = 'RUNNING';",
+    "  badge.style.background = 'green';",
+    "}",
+    "",
+    "function stopMachine() {",
+    "  badge.textContent = 'STOP';",
+    "  badge.style.background = 'red';",
+    "}",
+    "",
+    "function checkVoltage(event) {",
+    "  const v = Number(event.target.value);",
+    "  if (v > 240) {",
+    "    warn.textContent = 'Warning: แรงดันเกิน';",
+    "  } else {",
+    "    warn.textContent = '';",
+    "  }",
+    "}"
+  ];
+  const codeBox = $("#d-code");
+  CODE.forEach((line, i) => {
+    const s = el("span", "ln");
+    s.append(el("i", null, String(i + 1)), document.createTextNode(line || " "));
+    codeBox.append(s);
+  });
+  const lines = $$(".ln", codeBox);
+  function hit(nums) { lines.forEach((l, i) => l.classList.toggle("hit", nums.includes(i + 1))); }
+  function log(msg) {
+    const ul = $("#d-log");
+    if (ul.children.length === 1 && ul.firstElementChild.textContent === "ยังไม่มี Event") ul.replaceChildren();
+    ul.prepend(el("li", null, msg));
+    while (ul.children.length > 5) ul.lastElementChild.remove();
+  }
+  $("#d-start").addEventListener("click", () => {
+    const b = $("#d-badge"); b.textContent = "RUNNING"; b.className = "badge run";
+    hit([4, 5, 6, 7]); log("click ที่ปุ่ม Start → startMachine()");
+  });
+  $("#d-stop").addEventListener("click", () => {
+    const b = $("#d-badge"); b.textContent = "STOP"; b.className = "badge stop";
+    hit([9, 10, 11, 12]); log("click ที่ปุ่ม Stop → stopMachine()");
+  });
+  $("#d-volt").addEventListener("input", e => {
+    const v = Number(e.target.value);
+    const over = v > 240;
+    $("#d-warn").textContent = over ? "Warning: แรงดันเกิน" : "";
+    hit(over ? [14, 15, 16, 17] : [14, 15, 16, 18, 19, 20]);
+    log("input ที่ช่องแรงดัน = " + e.target.value + " → checkVoltage(event)");
+  });
+
+  /* ---------- demo: polling vs webhook ---------- */
+  const sim = { t: 0, timer: null, pending: null, pReq: 0, pSeen: 0, wReq: 0, wSeen: 0 };
+  const pad2 = n => String(n).padStart(2, "0");
+  function flash(id, cls) {
+    const a = $("#" + id);
+    a.classList.add(cls);
+    setTimeout(() => a.classList.remove(cls), reduced ? 150 : 350);
+  }
+  function simRender() {
+    $("#s-clock").textContent = "เวลาจำลอง " + pad2(Math.floor(sim.t / 60)) + ":" + pad2(sim.t % 60);
+    $("#p-req").textContent = sim.pReq; $("#p-seen").textContent = sim.pSeen;
+    $("#w-req").textContent = sim.wReq; $("#w-seen").textContent = sim.wSeen;
+  }
+  function tick() {
+    sim.t++;
+    const every = +$("#s-interval").value;
+    if (sim.t % every === 0) {
+      sim.pReq++; flash("p-arrow", "pulse");
+      if (sim.pending !== null) {
+        const d = sim.t - sim.pending;
+        sim.pSeen++; sim.pending = null;
+        $("#p-delay").textContent = d;
+        $("#p-msg").textContent = "รอบที่ " + sim.pReq + ": ถามแล้วเพิ่งรู้ว่าเครื่องหยุด ช้าไป " + d + " วินาที";
+      } else {
+        $("#p-msg").textContent = "รอบที่ " + sim.pReq + ": ถามว่ามีอะไรใหม่ไหม? ไม่มี";
+      }
+    }
+    simRender();
+  }
+  function setRun(on) {
+    clearInterval(sim.timer); sim.timer = null;
+    if (on) sim.timer = setInterval(tick, 250);
+    $("#s-run").textContent = on ? "หยุดเวลา" : "เริ่มเวลา";
+    if (on && sim.pReq === 0) $("#p-msg").textContent = "กำลังถาม Server ทุก " + $("#s-interval").value + " วินาที";
+  }
+  $("#s-run").addEventListener("click", () => setRun(!sim.timer));
+  $("#s-event").addEventListener("click", () => {
+    if (!sim.timer) setRun(true);
+    if (sim.pending === null) sim.pending = sim.t;
+    sim.wReq++; sim.wSeen++;
+    flash("w-arrow", "hot");
+    $("#w-delay").textContent = "0";
+    $("#w-msg").textContent = "เวลา " + pad2(Math.floor(sim.t / 60)) + ":" + pad2(sim.t % 60) + " Server ส่งแจ้งเตือนมาทันที";
+    $("#p-msg").textContent = "เครื่องหยุดแล้ว แต่ Dashboard ยังไม่รู้ ต้องรอรอบถามถัดไป";
+    simRender();
+  });
+  $("#s-reset").addEventListener("click", () => {
+    setRun(false);
+    Object.assign(sim, { t: 0, pending: null, pReq: 0, pSeen: 0, wReq: 0, wSeen: 0 });
+    $("#p-delay").textContent = "–"; $("#w-delay").textContent = "–";
+    $("#p-msg").textContent = "รอเริ่มเวลา"; $("#w-msg").textContent = "รอเหตุการณ์";
+    simRender();
+  });
+  simRender();
+})();
+</script>

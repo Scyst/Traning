@@ -1,0 +1,19 @@
+{
+  "title": "สอบปฏิบัติ: Electrical Meter Alert (ต่อยอด Workshop 4)",
+  "minutes": 90,
+  "scenario": "ให้ต่อยอดหน้าจอ Electrical Meter จาก Workshop 4 เพื่อดึงค่าจาก API ของผู้สอน ตรวจสอบเงื่อนไขความผิดปกติ 3 กรณี และส่งแจ้งเตือนกลับมาแสดงบนกระดานผู้สอนพร้อมชื่อผู้แจ้ง (ห้ามส่งเมื่อสถานะปกติ)",
+  "apiPayload": "{\n  \"line\": \"A\",\n  \"electric\": { \"voltage\": 231.4, \"current\": 15.6 },\n  \"water\": { \"flow\": 3.2 },\n  \"scenario\": \"normal\",\n  \"updatedAt\": \"2026-11-18T16:00:00+07:00\"\n}",
+  "rules": [
+    { "case": "normal", "condition": "voltage <= 240 และ current <= 20 และ flow >= 1.5", "action": "แสดงป้ายสีเขียว (ปกติ) และห้ามส่งแจ้งเตือน" },
+    { "case": "over_volt", "condition": "voltage > 240", "action": "แสดงป้ายสีแดง และส่งแจ้งเตือนไปที่ WEBHOOK_URL" },
+    { "case": "over_curr", "condition": "current > 20", "action": "แสดงป้ายสีเหลือง และส่งแจ้งเตือนไปที่ WEBHOOK_URL" },
+    { "case": "low_water", "condition": "water.flow < 1.5", "action": "แสดงป้ายสีฟ้า และส่งแจ้งเตือนไปที่ WEBHOOK_URL" }
+  ],
+  "rubric": [
+    { "id": 1, "auditCol": "P", "topic": "เชื่อมต่อ URL และตั้งค่าข้อมูลผู้เรียน (TODO 1)", "points": 10 },
+    { "id": 2, "auditCol": "Q", "topic": "ดึงข้อมูล JSON จาก API_URL และแสดงค่าผ่าน DOM (TODO 2)", "points": 10 },
+    { "id": 3, "auditCol": "R", "topic": "คำนวณค่ากำลังไฟฟ้า (TODO 3)", "points": 10 },
+    { "id": 4, "auditCol": "S", "topic": "เขียนเงื่อนไข if / else if / else แยก 3 เคส + ปกติ (TODO 4)", "points": 10 },
+    { "id": 5, "auditCol": "T", "topic": "ส่ง POST JSON พร้อม sender และป้องกันส่งซ้ำ (TODO 5)", "points": 10 }
+  ]
+}

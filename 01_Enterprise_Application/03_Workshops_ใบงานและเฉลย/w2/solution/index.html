@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electrical Meter</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Electrical Meter</h1>
+    <p class="sub">Real-time Voltage &amp; Current</p>
+  </header>
+
+  <main>
+    <section class="cards">
+      <article class="card">
+        <p class="label">Voltage</p>
+        <p class="value voltage"><span id="voltage">230</span> <span class="unit">V</span></p>
+      </article>
+      <article class="card">
+        <p class="label">Current</p>
+        <p class="value current"><span id="current">15.8</span> <span class="unit">A</span></p>
+      </article>
+    </section>
+
+    <!-- Workshop 2 -->
+    <section class="panel">
+      <div class="status-row">
+        <span class="label">Machine</span>
+        <span id="status" class="badge">IDLE</span>
+      </div>
+      <div class="buttons">
+        <button id="start-btn" type="button">Start</button>
+        <button id="stop-btn" type="button">Stop</button>
+      </div>
+      <div class="meter-input">
+        <label for="volt-input">ทดสอบแรงดัน (V)</label>
+        <input id="volt-input" type="number" inputmode="decimal" placeholder="เช่น 245">
+      </div>
+      <p id="warning" class="warning"></p>
+    </section>
+
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>

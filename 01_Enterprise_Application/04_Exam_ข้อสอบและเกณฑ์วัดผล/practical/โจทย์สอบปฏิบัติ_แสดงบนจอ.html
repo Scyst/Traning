@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โจทย์สอบปฏิบัติ · Electrical Meter Alert</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 20px 28px;
+    background: #0b1220; color: #f1f5f9;
+    font-family: "Sarabun", "Leelawadee UI", Tahoma, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  header {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+    border-bottom: 2px solid #26365a; padding-bottom: 12px; margin-bottom: 18px;
+  }
+  h1 { margin: 0; font-size: 28px; color: #38bdf8; }
+  .pill { background: #fde047; color: #0f172a; padding: 4px 14px; border-radius: 99px; font-weight: 800; }
+  .grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: #121c33; border: 1px solid #26365a; border-radius: 12px; padding: 16px 20px;
+  }
+  .card h2 { margin: 0 0 10px; font-size: 19px; color: #93c5fd; }
+  pre {
+    background: #0b1220; border: 1px solid #26365a; border-radius: 8px; padding: 12px;
+    color: #86efac; font-family: Consolas, monospace; font-size: 14px; overflow-x: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { border: 1px solid #26365a; padding: 8px 10px; text-align: left; }
+  th { background: #18243f; color: #cbd5e1; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 99px; font-weight: 700; font-size: 13px; }
+  .ok { background: #22c55e; color: #052e16; }
+  .bad { background: #ef4444; color: #fff; }
+  .warn { background: #eab308; color: #422006; }
+  .blue { background: #38bdf8; color: #082f49; }
+  ol { margin: 0; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+  code { background: #0b1220; border: 1px solid #26365a; padding: 1px 6px; border-radius: 5px; color: #fde047; font-family: Consolas, monospace; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>สอบปฏิบัติ: Electrical Meter Alert</h1>
+        <div style="color:#9fb0cc;">แก้ไขเฉพาะส่วน <code>TODO 1</code> ถึง <code>TODO 5</code> ในไฟล์ <code>exam_starter.html</code></div>
+      </div>
+      <div class="pill">50 คะแนน (5 ข้อ × 10 คะแนน)</div>
+    </header>
+
+    <div class="grid">
+      <div class="card">
+        <h2>รายการที่ต้องเขียนเพิ่มเติม (TODO 1 - TODO 5)</h2>
+        <ol>
+          <li><strong>TODO 1 (10 คะแนน):</strong> ใส่ <code>API_URL</code>, <code>WEBHOOK_URL</code> และชื่อผู้สอบ (เช่น <code>01-สมชาย</code>)</li>
+          <li><strong>TODO 2 (10 คะแนน):</strong> แสดงค่า <code>voltage</code>, <code>current</code> และ <code>water.flow</code> ลงใน <code>#voltage</code>, <code>#current</code>, <code>#water</code></li>
+          <li><strong>TODO 3 (10 คะแนน):</strong> คำนวณกำลังไฟฟ้า (V × A) ในฟังก์ชัน <code>calcPower()</code></li>
+          <li><strong>TODO 4 (10 คะแนน):</strong> เขียนเงื่อนไขใน <code>checkCondition()</code> เพื่อแยกสถานะทั้ง 4 กรณีตามตาราง</li>
+          <li><strong>TODO 5 (10 คะแนน):</strong> ส่งแจ้งเตือนแบบ <code>POST</code> ไปยัง <code>WEBHOOK_URL</code> เมื่อพบค่าผิดปกติ (ห้ามส่งเมื่อปกติ และไม่ส่งซ้ำในสถานะเดิม)</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h2>ตัวอย่างข้อมูล JSON จาก API</h2>
+<pre>{
+  "line": "A",
+  "electric": {
+    "voltage": 231.4,
+    "current": 15.6
+  },
+  "water": {
+    "flow": 3.2
+  }
+}</pre>
+        <h2 style="margin-top:14px;">เกณฑ์เงื่อนไขและการแจ้งเตือน</h2>
+        <table>
+          <thead>
+            <tr><th>เงื่อนไข</th><th>ค่าที่คืน</th><th>การแจ้งเตือน</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>voltage &gt; 240</code></td><td><span class="badge bad">'over_volt'</span></td><td>ส่งแจ้งเตือน</td></tr>
+            <tr><td><code>current &gt; 20</code></td><td><span class="badge warn">'over_curr'</span></td><td>ส่งแจ้งเตือน</td></tr>
+            <tr><td><code>water &lt; 1.5</code></td><td><span class="badge blue">'low_water'</span></td><td>ส่งแจ้งเตือน</td></tr>
+            <tr><td>อยู่ในเกณฑ์ทั้งหมด</td><td><span class="badge ok">'normal'</span></td><td>ห้ามส่งแจ้งเตือน</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

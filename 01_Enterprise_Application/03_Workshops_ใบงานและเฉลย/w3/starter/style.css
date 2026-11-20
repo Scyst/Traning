@@ -1,0 +1,99 @@
+/* สไตล์จาก Workshop 1 */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: Tahoma, sans-serif;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+header { text-align: center; margin-bottom: 24px; }
+h1 { margin: 0; }
+.sub { margin: 4px 0 0; color: #9ca3af; }
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.card {
+  flex: 1 1 240px;
+  max-width: 420px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #0b1220;
+  text-align: center;
+}
+
+.label { margin: 0; font-weight: bold; }
+.value { margin: 12px 0 0; font-size: 40px; font-weight: bold; }
+.unit { font-size: 16px; color: #9ca3af; }
+.voltage { color: #38bdf8; }
+.current { color: #22c55e; }
+.water { color: #a78bfa; }
+
+/* ส่วนควบคุมเครื่อง (เตรียมไว้ให้แล้วใน Workshop 2 ไม่ต้องแก้) */
+.panel {
+  max-width: 860px;
+  margin: 24px auto 0;
+  padding: 20px;
+  border-radius: 10px;
+  background: #0b1220;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.status-row { display: flex; align-items: center; gap: 12px; }
+
+/* มาตรฐานสี Industrial UI: เขียว ทำงาน / แดง หยุด / เทา ยังไม่เริ่ม */
+.badge {
+  display: inline-block;
+  min-width: 110px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  background: #6b7280;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+}
+.badge.run { background: #22c55e; color: #052e16; }
+.badge.stop { background: #ef4444; }
+
+.buttons { display: flex; gap: 8px; }
+
+button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px 20px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+#start-btn { background: #22c55e; color: #052e16; }
+#stop-btn { background: #ef4444; color: #ffffff; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.meter-input { display: flex; align-items: center; gap: 8px; }
+.meter-input input {
+  width: 110px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  background: #111827;
+  color: #e5e7eb;
+  font: inherit;
+}
+
+.warning { flex-basis: 100%; margin: 0; min-height: 1.5em; color: #f87171; font-weight: bold; }
+
+.note { text-align: center; color: #9ca3af; font-size: 14px; margin: 16px 0 0; }
+.note.error { color: #f87171; }

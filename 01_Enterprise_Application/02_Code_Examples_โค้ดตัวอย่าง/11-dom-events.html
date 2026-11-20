@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!-- Event: click, input/change, keydown, mouse และ event.target · สไลด์ 63–66, 70, Workshop 2 -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Events</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 24px; }
+    .badge { display: inline-block; padding: 6px 16px; border-radius: 6px; color: #fff; background: gray; font-weight: bold; }
+    .run { background: green; }
+    .stop { background: red; }
+    .warn { color: red; font-weight: bold; }
+    #hover-box { margin-top: 16px; padding: 16px; border: 1px dashed #999; width: 260px; }
+    button { min-width: 44px; min-height: 44px; }
+  </style>
+</head>
+<body>
+  <h2>สถานะเครื่อง: <span id="status" class="badge">IDLE</span></h2>
+
+  <!-- แบบที่ 1: onclick ใน HTML (แบบในสไลด์) -->
+  <button onclick="startMachine()">Start</button>
+
+  <!-- แบบที่ 2: addEventListener ใน JavaScript (แยก HTML กับ JS ออกจากกัน แนะนำ) -->
+  <button id="stop-btn">Stop</button>
+
+  <p>
+    แรงดัน (V): <input id="volt" type="number" value="230">
+    <span id="warn" class="warn"></span>
+  </p>
+
+  <p>พิมพ์ชื่อแล้วกด Enter: <input id="name" type="text"></p>
+  <p id="greeting"></p>
+
+  <p>ปุ่มเดียวกันหลายตัว ใช้ฟังก์ชันเดียว:</p>
+  <button class="line-btn">Line A</button>
+  <button class="line-btn">Line B</button>
+  <button class="line-btn">Line C</button>
+  <p id="line-result"></p>
+
+  <div id="hover-box">เอาเมาส์มาวางตรงนี้</div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+
+    // ---------------------------------------------- click แบบที่ 1 (เรียกจาก onclick ใน HTML)
+    function startMachine() {
+      statusEl.textContent = 'RUNNING';
+      statusEl.className = 'badge run';      // เปลี่ยนสีด้วย class ดีกว่าแก้ style ตรง ๆ
+    }
+
+    // ---------------------------------------------- click แบบที่ 2 (addEventListener)
+    document.getElementById('stop-btn').addEventListener('click', () => {
+      statusEl.textContent = 'STOP';
+      statusEl.className = 'badge stop';
+    });
+
+    // ---------------------------------------------- input: ทำงานทุกครั้งที่ค่าเปลี่ยน
+    // 'change' จะทำงานตอนออกจากช่อง (blur) หรือกด Enter แทน
+    document.getElementById('volt').addEventListener('input', (event) => {
+      const raw = event.target.value;        // เป็น String เสมอ
+      const v = Number(raw);
+      const warn = document.getElementById('warn');
+      if (raw === '') {
+        warn.textContent = '';               // ช่องว่าง Number('') ได้ 0 จึงต้องเช็กแยก
+      } else if (v > 240) {
+        warn.textContent = 'Warning: แรงดันเกิน';
+      } else {
+        warn.textContent = '';
+      }
+    });
+
+    // ---------------------------------------------- keydown: กดแป้นพิมพ์
+    document.getElementById('name').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        document.getElementById('greeting').textContent = 'สวัสดี ' + event.target.value;
+      }
+    });
+
+    // ---------------------------------------------- event.target: รู้ว่าปุ่มไหนถูกกด
+    document.querySelectorAll('.line-btn').forEach(btn => {
+      btn.addEventListener('click', (event) => {
+        document.getElementById('line-result').textContent = 'เลือก ' + event.target.textContent;
+      });
+    });
+
+    // ---------------------------------------------- mouse: ลำดับ mouseover → mousedown → mouseup
+    const box = document.getElementById('hover-box');
+    box.addEventListener('mouseover', () => { box.style.background = '#fff3b8'; });
+    box.addEventListener('mouseout', () => { box.style.background = ''; });
+  </script>
+</body>
+</html>

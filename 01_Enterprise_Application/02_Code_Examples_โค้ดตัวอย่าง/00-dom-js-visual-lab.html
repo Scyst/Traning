@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สื่อการสอน Visual Lab: เข้าใจ JavaScript DOM &amp; Event แบบเห็นภาพ (เชื่อมหน้าเว็บให้มีชีวิต)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #111827;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #22c55e;
+      --warn: #eab308;
+      --bad: #ef4444;
+      --purple: #a855f7;
+      --scale: 1;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      font-size: calc(16px * var(--scale));
+    }
+
+    body {
+      margin: 0;
+      font-family: "Leelawadee UI", "Tahoma", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ===== Top Classroom Header ===== */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand .pill {
+      background: #eab308;
+      color: #422006;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-btn {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tool-btn:hover { background: #334155; }
+
+    /* ===== Chapter Tabs ===== */
+    .tabs {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 9px 15px;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { border-color: var(--accent); color: #fff; }
+    .tab-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    }
+
+    /* ===== Main Container ===== */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+
+    .intro-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-left: 5px solid var(--accent);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .intro-banner h2 {
+      margin: 0 0 4px;
+      font-size: 1.25rem;
+      color: #7dd3fc;
+    }
+    .intro-banner p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.96rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .card-panel h3 {
+      margin: 0 0 12px;
+      font-size: 1.08rem;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hint-box {
+      background: #0f172a;
+      border: 1px dashed #475569;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      margin-top: 12px;
+    }
+    .hint-box b { color: #fde047; }
+
+    code, .mono {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .pill-btn {
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pill-btn:hover { background: #334155; }
+    .pill-btn.active {
+      background: #0369a1;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .pill-btn.danger.active {
+      background: #b91c1c;
+      border-color: #f87171;
+    }
+    .pill-btn.success.active {
+      background: #15803d;
+      border-color: #4ade80;
+    }
+    .pill-btn.warn.active {
+      background: #a16207;
+      border-color: #facc15;
+    }
+
+    /* ===== Tok / Code Anatomy ===== */
+    .anatomy-stage {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.22rem;
+      line-height: 2.1;
+      overflow-x: auto;
+    }
+    .tok {
+      display: inline-block;
+      padding: 3px 9px;
+      margin: 2px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .tok:hover { transform: translateY(-2px); }
+    .tok.active { box-shadow: 0 0 0 3px #fff; transform: translateY(-2px); }
+    .tok-doc  { background: #581c87; color: #e9d5ff; border-color: #a855f7; }
+    .tok-fn   { background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+    .tok-id   { background: #064e3b; color: #6ee7b7; border-color: #10b981; }
+    .tok-prop { background: #78350f; color: #fde68a; border-color: #f59e0b; }
+    .tok-val  { background: #831843; color: #fbcfe8; border-color: #ec4899; }
+
+    .explain-card {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: #0f172a;
+      border-left: 5px solid #38bdf8;
+      min-height: 88px;
+    }
+    .explain-card h4 { margin: 0 0 4px; color: #38bdf8; font-size: 1.05rem; }
+    .explain-card p { margin: 0; color: #e2e8f0; font-size: 0.95rem; }
+
+    .code-tree {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      color: #e2e8f0;
+    }
+
+    /* ===== Bridge Diagram (Lesson 1) ===== */
+    .bridge-stage {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 180px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    @media (max-width: 820px) {
+      .bridge-stage { grid-template-columns: 1fr; }
+    }
+    .bridge-box {
+      background: #1e293b;
+      border: 2px solid #475569;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.25s;
+    }
+    .bridge-box.glow-blue {
+      border-color: #38bdf8;
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.35);
+    }
+    .bridge-box.glow-yellow {
+      border-color: #facc15;
+      box-shadow: 0 0 22px rgba(250, 204, 21, 0.35);
+    }
+    .bridge-wire {
+      text-align: center;
+      padding: 10px 6px;
+      border-radius: 10px;
+      background: #111827;
+      border: 2px dashed #64748b;
+      font-weight: 800;
+      font-size: 0.88rem;
+      transition: all 0.25s;
+    }
+    .bridge-wire.active-right {
+      border-color: #38bdf8;
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+    }
+    .bridge-wire.active-left {
+      border-color: #facc15;
+      background: rgba(250, 204, 21, 0.15);
+      color: #fde047;
+    }
+
+    /* ===== Selector Match Highlight (Lesson 2) ===== */
+    .dom-target {
+      transition: all 0.22s ease;
+      position: relative;
+    }
+    .dom-matched {
+      outline: 3px solid #fde047 !important;
+      outline-offset: 3px;
+      box-shadow: 0 0 22px rgba(253, 224, 71, 0.55) !important;
+      background-color: rgba(253, 224, 71, 0.15) !important;
+    }
+    .id-badge {
+      display: inline-block;
+      background: #581c87;
+      color: #e9d5ff;
+      border: 1px solid #a855f7;
+      font-family: Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .cls-badge {
+      display: inline-block;
+      background: #064e3b;
+      color: #6ee7b7;
+      border: 1px solid #10b981;
+      font-family: Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* ===== Event Timeline & Flash (Lesson 4) ===== */
+    .ev-step {
+      flex: 1;
+      background: #0f172a;
+      border: 2px solid #334155;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      font-family: Consolas, monospace;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .ev-step.fired {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.2);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* ===== Flash Animation on DOM Change ===== */
+    @keyframes domPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.9); outline: 3px solid #fde047; }
+      100% { box-shadow: 0 0 0 16px rgba(56, 189, 248, 0); outline: 3px solid transparent; }
+    }
+    .dom-flash {
+      animation: domPulse 0.9s ease-out;
+    }
+
+    /* ===== Line Performance Screen (Lesson 6) ===== */
+    .lp-box {
+      background: #111827;
+      border: 2px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .lp-cards-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .lp-card-item {
+      flex: 1 1 150px;
+      background: #1f2937;
+      border: 2px solid #374151;
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lp-card-item:hover {
+      border-color: #38bdf8;
+    }
+    .lp-status-pill {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+    .lp-status-pill.ok { background: #22c55e; color: #052e16; }
+    .lp-status-pill.warn { background: #eab308; color: #422006; }
+    .lp-status-pill.bad { background: #ef4444; color: #ffffff; }
+
+    .code-line-item {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      white-space: pre;
+      transition: background 0.15s;
+    }
+    .code-line-item:hover, .code-line-item.active-line {
+      background: rgba(250, 204, 21, 0.18);
+      border-left-color: #fde047;
+      color: #fef08a;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบเครื่องมือผู้สอน -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="pill">Visual Lab · Part 2</span>
+      <h1>เข้าใจ JavaScript DOM &amp; Event แบบเห็นภาพ (เชื่อม HTML ให้ขยับและรับคำสั่งได้)</h1>
+    </div>
+    <div class="tools">
+      <button class="tool-btn" onclick="zoomPage(-0.08)">A−</button>
+      <button class="tool-btn" onclick="zoomPage(0.08)">A+</button>
+      <button class="tool-btn" onclick="toggleFullscreen()">⛶ เต็มจอ</button>
+    </div>
+  </header>
+
+  <!-- เมนูสลับบทเรียน 6 บท (ครอบคลุมสไลด์หน้า 58-71 + เชื่อม Workshop & ข้อสอบ) -->
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="showTab('t1', this)">1. DOM คืออะไร? (สายไฟหลังตู้)</button>
+    <button class="tab-btn" onclick="showTab('t2', this)">2. เลือกกล่อง (getElementById)</button>
+    <button class="tab-btn" onclick="showTab('t3', this)">3. เปลี่ยนข้อความ &amp; สี (Update DOM)</button>
+    <button class="tab-btn" onclick="showTab('t4', this)">4. ดักปุ่มกด &amp; ช่องกรอก (Event)</button>
+    <button class="tab-btn" onclick="showTab('t5', this)">5. ลงมือ Workshop 2 (Start/Stop &amp; Meter)</button>
+    <button class="tab-btn" onclick="showTab('t6', this)">6. ถอดรหัสหน้าเว็บจริง (Line Performance)</button>
+  </nav>
+
+  <main class="container">
+
+    <!-- ==================== บทที่ 1: DOM คืออะไร ==================== -->
+    <section id="t1" class="section-view active">
+      <div class="intro-banner">
+        <h2>บทที่ 1: ทำไมต้องมี DOM? — เปรียบเทียบเหมือน "สายไฟหลังตู้คอนโทรลโรงงาน" (สไลด์หน้า 58)</h2>
+        <p>ลำพัง <b>HTML + CSS</b> เป็นได้แค่ "ป้ายไฟหน้าตู้ที่พิมพ์ตัวเลขตายตัวไว้" — ถ้าอยากให้ตัวเลขขยับตามค่าไฟจริง หรือกดปุ่มแล้วทำงาน เราต้องใช้สะพานเชื่อมที่ชื่อว่า <code>document</code> (DOM)</p>
+      </div>
+
+      <div class="card-panel" style="margin-bottom: 18px;">
+        <h3>🔌 การสื่อสาร 2 ทิศทางระหว่าง HTML กับ JavaScript (กดปุ่มเพื่อดูทิศทางสัญญาณ)</h3>
+        <div class="btn-row">
+          <button class="pill-btn active" id="btn-dir-1" onclick="simBridge(1)">
+            ➡️ ขาที่ 1: JavaScript สั่งเปลี่ยนค่าบน HTML (Select &amp; Update DOM)
+          </button>
+          <button class="pill-btn" id="btn-dir-2" onclick="simBridge(2)">
+            ⬅️ ขาที่ 2: ผู้ใช้กดปุ่มบน HTML แล้วส่งสัญญาณบอก JavaScript (Event)
+          </button>
+        </div>
+
+        <div class="bridge-stage">
+          <!-- ฝั่งซ้าย: JavaScript -->
+          <div class="bridge-box glow-blue" id="br-js">
+            <div style="font-size:0.82rem;color:#38bdf8;font-weight:800;">🧠 สมองกลหลังตู้ (JavaScript)</div>
+            <pre class="code-tree" id="br-js-code" style="text-align:left;margin:10px 0 0;font-size:0.84rem;">// สั่งเปลี่ยนตัวเลขในการ์ด Voltage
+let el = document.getElementById('volt');
+el.textContent = '245';</pre>
+          </div>
+
+          <!-- ตรงกลาง: สะพาน DOM -->
+          <div class="bridge-wire active-right" id="br-wire">
+            <div style="font-size:1.3rem;" id="br-arrow">⚡ ➡️ ⚡</div>
+            <div id="br-wire-txt">สายไฟ <code>document</code><br>วิ่งไปหา <code>id="volt"</code></div>
+          </div>
+
+          <!-- ฝั่งขวา: หน้าจอ HTML -->
+          <div class="bridge-box" id="br-html">
+            <div style="font-size:0.82rem;color:#4ade80;font-weight:800;">🖥️ หน้าปัดตู้คอนโทรล (HTML บนหน้าจอ)</div>
+            <div style="background:#040714;border-radius:10px;padding:16px;margin-top:10px;border:1px solid #334155;">
+              <div style="color:#cbd5e1;font-weight:700;font-size:0.95rem;">Voltage <span class="id-badge">id="volt"</span></div>
+              <div style="margin-top:6px;">
+                <span id="br-volt-num" style="font-size:2.4rem;font-weight:800;color:#29b6f6;">245</span>
+                <span style="color:#94a3b8;font-size:1.1rem;">V</span>
+              </div>
+              <button type="button" onclick="simBridge(2)" style="margin-top:10px;padding:7px 14px;border-radius:6px;border:0;background:#eab308;color:#422006;font-weight:800;cursor:pointer;">
+                👆 ลองคลิกปุ่มนี้! (onclick)
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="hint-box" id="br-explain">
+          <b>ขาที่ 1 (JS ➡️ HTML):</b> เมื่อ JavaScript คำนวณเสร็จหรือดึงค่าจาก API มาได้ มันจะใช้คำสั่ง <code>document.getElementById('volt')</code> วิ่งไปจับกล่องที่มีป้าย <code>id="volt"</code> แล้วเปลี่ยนเลขข้างในทันที!
+        </div>
+      </div>
+
+      <!-- ผ่าตัดโค้ด 1 บรรทัด -->
+      <div class="card-panel">
+        <h3>🔍 ผ่าตัดคำสั่งพระเอก 1 บรรทัด (คลิกที่แต่ละท่อนเพื่อดูความหมาย)</h3>
+        <div class="anatomy-stage">
+          <span class="tok tok-doc active" onclick="explainDomTok('doc', this)">document</span>
+          <span>.</span>
+          <span class="tok tok-fn" onclick="explainDomTok('fn', this)">getElementById</span>
+          <span class="tok tok-id" onclick="explainDomTok('id', this)">('volt')</span>
+          <span>.</span>
+          <span class="tok tok-prop" onclick="explainDomTok('prop', this)">textContent</span>
+          <span>=</span>
+          <span class="tok tok-val" onclick="explainDomTok('val', this)">'245'</span>
+          <span>;</span>
+        </div>
+        <div class="explain-card" id="dom-tok-explain">
+          <h4>🌐 1. document (ตัวแทนหน้าเว็บทั้งหมด)</h4>
+          <p>เป็นตัวแปรพิเศษที่เบราว์เซอร์เตรียมไว้ให้แล้ว ใช้เป็น "ประตูทางเข้า" เวลาที่ JavaScript ต้องการคุยกับแท็ก HTML บนหน้าจอ</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 2: SELECT DOM ==================== -->
+    <section id="t2" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 2: การเลือกกล่อง HTML (Select DOM — สไลด์หน้า 59–62)</h2>
+        <p>ในสไลด์มีคำสั่งเลือกกล่อง 4 ตัว นักเรียนมักสับสนว่าต้องใช้อันไหน — <b>ความจริงคือ ในงานจริงและการสอบ ใช้แค่ <code>getElementById</code> ตัวเดียวได้ถึง 95%!</b> ลองกดเทียบทั้ง 4 ตัวด้านล่างได้เลย</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🎯 กดทดลองคำสั่งเลือกกล่องทั้ง 4 แบบในสไลด์</h3>
+          <div class="btn-row">
+            <button class="pill-btn success active" onclick="testDomSelect('byId', this)">
+              ⭐ 1. getElementById('volt-val')
+            </button>
+            <button class="pill-btn" onclick="testDomSelect('byClass', this)">
+              2. getElementsByClassName('card')
+            </button>
+            <button class="pill-btn" onclick="testDomSelect('qsOne', this)">
+              3. querySelector('.card')
+            </button>
+            <button class="pill-btn" onclick="testDomSelect('qsAll', this)">
+              4. querySelectorAll('.unit')
+            </button>
+          </div>
+
+          <pre class="code-tree" id="sel-dom-code" style="margin:0;"></pre>
+
+          <div class="explain-card" id="sel-dom-explain"></div>
+
+          <div class="hint-box">
+            <b>💡 สรุปสั้นๆ ให้จำเข้าห้องสอบ:</b><br>
+            • ถ้าเราเขียน HTML เอง ให้ติดป้าย <code>id="..."</code> ที่กล่องที่ต้องการเปลี่ยนค่า แล้วใช้ <b><code>document.getElementById('ชื่อid')</code></b> เสมอ (ง่ายที่สุด เร็วที่สุด ไม่ต้องใส่จุดหรือ # นำหน้าชื่อ id)<br>
+            • สังเกตคำว่า <code>getElement<b>s</b>ByClassName</code> และ <code>querySelector<b>All</b></code> จะคืนค่ามาเป็น <b>"ตะกร้าหลายใบ (List/Array)"</b> เอาไปสั่ง <code>.textContent = ...</code> ตรงๆ ทันทีไม่ได้ ต้องระบุลำดับเช่น <code>[0]</code> ก่อน!
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <h3>📺 หน้าเว็บจำลอง (กล่องที่ถูกคำสั่งเลือกจะเรืองแสงสีเหลือง)</h3>
+          <div style="background:#0e1628;border:1px solid #334155;border-radius:12px;padding:18px;text-align:center;">
+            <h4 class="dom-target" id="demo-title" style="margin:0 0 4px;font-size:1.3rem;">
+              Electrical Meter <span class="id-badge">id="demo-title"</span>
+            </h4>
+            <p style="margin:0 0 16px;color:#8da2c0;font-size:0.85rem;">Real-time Voltage &amp; Current</p>
+
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <article class="dom-target demo-card" style="flex:1 1 180px;background:#040714;border:1px solid #1e293b;border-radius:10px;padding:18px;">
+                <div style="font-size:0.95rem;font-weight:700;color:#cbd5e1;margin-bottom:8px;">
+                  Voltage <span class="cls-badge">class="card"</span>
+                </div>
+                <div>
+                  <span id="volt-val" class="dom-target" style="font-size:2.2rem;font-weight:800;color:#29b6f6;">230</span>
+                  <span class="dom-target demo-unit" style="color:#9aa5b4;font-size:1rem;">V <span class="cls-badge">class="unit"</span></span>
+                </div>
+                <div style="margin-top:6px;"><span class="id-badge">id="volt-val"</span></div>
+              </article>
+
+              <article class="dom-target demo-card" style="flex:1 1 180px;background:#040714;border:1px solid #1e293b;border-radius:10px;padding:18px;">
+                <div style="font-size:0.95rem;font-weight:700;color:#cbd5e1;margin-bottom:8px;">
+                  Current <span class="cls-badge">class="card"</span>
+                </div>
+                <div>
+                  <span id="curr-val" class="dom-target" style="font-size:2.2rem;font-weight:800;color:#1ed760;">15.8</span>
+                  <span class="dom-target demo-unit" style="color:#9aa5b4;font-size:1rem;">A <span class="cls-badge">class="unit"</span></span>
+                </div>
+                <div style="margin-top:6px;"><span class="id-badge">id="curr-val"</span></div>
+              </article>
+            </div>
+          </div>
+
+          <div id="sel-dom-result" style="margin-top:12px;background:#0b1120;border:1px solid #38bdf8;border-radius:10px;padding:12px 14px;font-size:0.92rem;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 3: UPDATE DOM ==================== -->
+    <section id="t3" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 3: เลือกกล่องได้แล้ว สั่งทำอะไรได้บ้าง? (สไลด์หน้า 67–69)</h2>
+        <p>เมื่อจับกล่องด้วย <code>getElementById</code> ได้แล้ว เราสั่งงานหลักๆ ได้ <b>3 ท่าไม้ตาย</b> คือ: <b>1) เปลี่ยนข้อความ</b> · <b>2) เปลี่ยนสี/สไตล์</b> · <b>3) สลับคลาส/เปิด-ปิดปุ่ม</b></p>
+      </div>
+
+      <div class="grid-2">
+        <!-- ฝั่งซ้าย: 3 ท่าไม้ตายที่ใช้จริง -->
+        <div class="card-panel">
+          <h3>⚡ ทดลอง 3 ท่าไม้ตายเปลี่ยนหน้าเว็บสดๆ</h3>
+          <div class="btn-row">
+            <button class="pill-btn active" onclick="applyDomAction('text', this)">1. เปลี่ยนข้อความ (.textContent)</button>
+            <button class="pill-btn" onclick="applyDomAction('color', this)">2. เปลี่ยนสีตรงๆ (.style.color)</button>
+            <button class="pill-btn" onclick="applyDomAction('class', this)">3. เปลี่ยนคลาสสีป้าย (.className)</button>
+            <button class="pill-btn" onclick="applyDomAction('disable', this)">4. เปิด/ล็อกปุ่มกด (.disabled)</button>
+          </div>
+
+          <pre class="code-tree" id="act-code" style="margin:0;"></pre>
+
+          <div style="background:#0b1120;border:1px solid #334155;border-radius:12px;padding:18px;margin-top:12px;text-align:center;">
+            <p style="margin:0;color:#94a3b8;font-size:0.88rem;">การ์ดจำลองผลการผลิต</p>
+            <p id="act-val" style="margin:6px 0;font-size:2.4rem;font-weight:800;color:#f8fafc;">92.0%</p>
+            <div>
+              <span id="act-badge" class="lp-status-pill ok">ปกติ (OK)</span>
+            </div>
+            <div style="margin-top:12px;">
+              <button id="act-btn" type="button" disabled style="padding:8px 18px;border-radius:8px;border:0;background:#ef4444;color:#fff;font-weight:700;cursor:pointer;">
+                🚨 ปุ่มแจ้งหัวหน้างาน (#alert-btn)
+              </button>
+            </div>
+          </div>
+          <style>
+            #act-btn:disabled { background: #374151 !important; color: #9ca3af !important; cursor: not-allowed !important; }
+          </style>
+        </div>
+
+        <!-- ฝั่งขวา: เทียบ textContent vs innerText vs innerHTML (สไลด์ 67-69) -->
+        <div class="card-panel">
+          <h3>🔬 คลายข้อสงสัยสไลด์หน้า 67–69: <code>textContent</code> vs <code>innerText</code> vs <code>innerHTML</code></h3>
+          <p style="margin:0 0 10px;color:#cbd5e1;font-size:0.9rem;">สมมติในกล่อง <code>&lt;div id="msg"&gt;</code> มีโค้ดแบบนี้อยู่ข้างใน:</p>
+          <pre class="code-tree" style="margin:0 0 12px;font-size:0.83rem;">&lt;div id="msg"&gt;
+  สถานะ: &lt;b&gt;เครื่องจักรปกติ&lt;/b&gt;
+  &lt;span style="display:none"&gt;(รหัสลับซ่อนอยู่)&lt;/span&gt;
+&lt;/div&gt;</pre>
+
+          <div class="btn-row">
+            <button class="pill-btn active" onclick="compareContentProp('textContent', this)">1. .textContent ⭐</button>
+            <button class="pill-btn" onclick="compareContentProp('innerText', this)">2. .innerText</button>
+            <button class="pill-btn" onclick="compareContentProp('innerHTML', this)">3. .innerHTML ⚠️</button>
+          </div>
+
+          <div class="explain-card" id="content-prop-explain" style="margin-top:0;"></div>
+
+          <div class="hint-box">
+            <b>ฟันธงให้จำง่ายๆ:</b><br>
+            • เวลาจะเปลี่ยนตัวเลขหรือข้อความทั่วไป ใช้ <b><code>.textContent</code></b> หรือ <b><code>.innerText</code></b> ได้เลย (ปลอดภัย ไม่โดนแฮกผ่านช่องโหว่ XSS)<br>
+            • ห้ามเอาข้อความที่ผู้ใช้พิมพ์มากรอกใส่ <code>.innerHTML</code> เด็ดขาด!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 4: JAVASCRIPT EVENT ==================== -->
+    <section id="t4" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 4: JavaScript Event — เมื่อผู้ใช้ขยับ หน้าเว็บจะส่งสัญญาณบอก JS! (สไลด์หน้า 63–70)</h2>
+        <p>Event คือ "เหตุการณ์ที่เกิดขึ้นบนหน้าเว็บ" เช่น คลิกปุ่ม (<code>onclick</code>), พิมพ์ข้อความ (<code>onkeydown</code> / <code>oninput</code>), เลือกตัวเลือก (<code>onchange</code>) หรือขยับเมาส์</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🎮 สนามทดลอง Event ยอดฮิต (ลองกด/พิมพ์/ขยับเมาส์จริงได้เลย!)</h3>
+
+          <!-- 1. onclick + event.target (Slide 64 & 70) -->
+          <div style="background:#0b1120;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-weight:700;color:#7dd3fc;margin-bottom:6px;">1. <code>onclick</code> + การดึงชื่อปุ่มผ่าน <code>event.target</code> (สไลด์หน้า 64 &amp; 70)</div>
+            <div class="btn-row" style="margin-bottom:6px;">
+              <button class="pill-btn" onclick="demoBtnClick(event)">ปุ่มเครื่องที่ 1 (Line A)</button>
+              <button class="pill-btn" onclick="demoBtnClick(event)">ปุ่มเครื่องที่ 2 (Line B)</button>
+            </div>
+            <div id="ev-click-out" style="font-size:0.88rem;color:#fde047;font-family:Consolas,monospace;">👆 ลองกดปุ่มใดปุ่มหนึ่งด้านบน</div>
+          </div>
+
+          <!-- 2. onkeydown / oninput + .value (Slide 65) -->
+          <div style="background:#0b1120;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-weight:700;color:#4ade80;margin-bottom:6px;">2. <code>onkeydown</code> / <code>oninput</code> — ดึงค่าที่พิมพ์จากช่อง <code>&lt;input&gt;</code> ด้วย <code>.value</code></div>
+            <input type="text" id="ev-key-in" placeholder="ลองพิมพ์ชื่อผู้แจ้งที่นี่..." oninput="demoKeyInput(this.value)" style="width:100%;padding:9px 12px;border-radius:8px;border:1px solid #475569;background:#1e293b;color:#fff;font:inherit;">
+            <div id="ev-key-out" style="margin-top:6px;font-size:0.88rem;color:#cbd5e1;font-family:Consolas,monospace;">ค่าที่อ่านได้จาก <code>input.value</code>: <b>(ยังไม่ได้พิมพ์)</b></div>
+          </div>
+
+          <!-- 3. Mouse Event Sequence (Slide 66) -->
+          <div style="background:#0b1120;border:1px solid #334155;border-radius:10px;padding:12px;">
+            <div style="font-weight:700;color:#facc15;margin-bottom:6px;">3. ลำดับการเกิด Mouse Event (สไลด์หน้า 66: ชี้เมาส์ ➡️ กดค้าง ➡️ ปล่อยเมาส์)</div>
+            <button type="button"
+              onmouseover="fireMouseStep(1)"
+              onmousedown="fireMouseStep(2)"
+              onmouseup="fireMouseStep(3)"
+              style="width:100%;padding:12px;border-radius:8px;border:2px dashed #38bdf8;background:#1e293b;color:#fff;font-weight:800;cursor:pointer;margin-bottom:10px;">
+              🖱️ เอาเมาส์มาวาง แล้วลองคลิกกด–ปล่อยที่ปุ่มนี้!
+            </button>
+            <div style="display:flex;gap:8px;">
+              <div class="ev-step" id="ms-1">1. onmouseover<br><small>(เมาส์วาง)</small></div>
+              <div class="ev-step" id="ms-2">2. onmousedown<br><small>(กดปุ่มเมาส์ลง)</small></div>
+              <div class="ev-step" id="ms-3">3. onmouseup<br><small>(ปล่อยปุ่มเมาส์)</small></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ฝั่งขวา: กับดัก .textContent vs .value -->
+        <div class="card-panel">
+          <h3>🚨 กับดักอันดับ 1 ที่นักเรียนผิดบ่อยที่สุด! (<code>.textContent</code> vs <code>.value</code>)</h3>
+          <p style="margin:0 0 12px;color:#cbd5e1;font-size:0.94rem;">
+            เวลาจะดึงค่าหรือเปลี่ยนค่า ต้องดูว่าแท็ก HTML ตัวนั้นเป็น <b>"กล่องข้อความทั่วไป"</b> หรือเป็น <b>"ช่องกรอกฟอร์ม (Input)"</b>
+          </p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div style="background:#0b1120;border:2px solid #38bdf8;border-radius:10px;padding:14px;">
+              <div style="color:#38bdf8;font-weight:800;margin-bottom:6px;">📦 กล่องที่มีแท็กเปิด–ปิด</div>
+              <div style="font-size:0.85rem;color:#cbd5e1;margin-bottom:8px;">
+                เช่น <code>&lt;p&gt;</code>, <code>&lt;span&gt;</code>, <code>&lt;h1&gt;</code>, <code>&lt;div&gt;</code>, <code>&lt;button&gt;</code>
+              </div>
+              <pre class="code-tree" style="margin:0;font-size:0.8rem;">&lt;p id="actual"&gt;1,104&lt;/p&gt;
+
+// ✅ ใช้ .textContent หรือ .innerText
+document.getElementById('actual')
+  .textContent = '1,200';</pre>
+            </div>
+
+            <div style="background:#0b1120;border:2px solid #22c55e;border-radius:10px;padding:14px;">
+              <div style="color:#4ade80;font-weight:800;margin-bottom:6px;">⌨️ ช่องให้ผู้ใช้พิมพ์/เลือก</div>
+              <div style="font-size:0.85rem;color:#cbd5e1;margin-bottom:8px;">
+                เช่น <code>&lt;input&gt;</code>, <code>&lt;select&gt;</code>, <code>&lt;textarea&gt;</code>
+              </div>
+              <pre class="code-tree" style="margin:0;font-size:0.8rem;">&lt;input id="sender" type="text"&gt;
+
+// ✅ ต้องใช้ .value เท่านั้น!
+let name = document
+  .getElementById('sender').value;</pre>
+            </div>
+          </div>
+
+          <div class="hint-box" style="margin-top:14px;">
+            <b>จำแม่นๆ ใน 1 ประโยค:</b><br>
+            • กล่องโชว์ข้อความ (<code>&lt;p&gt;</code>, <code>&lt;span&gt;</code>) ใช้ <b><code>.textContent</code></b> (หรือ <code>.innerText</code>)<br>
+            • ช่องกรอกข้อมูล (<code>&lt;input&gt;</code>) ใช้ <b><code>.value</code></b>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 5: WORKSHOP 2 (สไลด์หน้า 71) ==================== -->
+    <section id="t5" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 5: เฉลยเห็นภาพ Workshop 2 (สไลด์หน้า 71) — ลองกดแล้วดูโค้ดที่ทำงานทีละบรรทัด!</h2>
+        <p>ในสไลด์หน้า 71 มี 2 โจทย์ย่อย คือ <b>Workshop 2.1 (ปุ่ม Start / Stop)</b> และ <b>Workshop 2.2 (Simple Meter แจ้งเตือนเมื่อค่าเกิน)</b> ทั้งสองโจทย์ใช้สูตร 3 ขั้นตอนเดียวกันเป๊ะ!</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Workshop 2.1: Start / Stop -->
+        <div class="card-panel">
+          <h3>🟢🔴 Workshop 2.1: ปุ่ม Start / Stop เครื่องจักร</h3>
+          <div style="background:#040714;border:2px solid #334155;border-radius:12px;padding:20px;text-align:center;margin-bottom:12px;">
+            <div style="font-size:1.1rem;font-weight:800;margin-bottom:14px;">
+              STATUS:
+              <span id="ws1-status" style="padding:4px 14px;border-radius:6px;background:#334155;color:#fff;transition:all 0.2s;">
+                START/STOP
+              </span>
+              <span class="id-badge">id="status"</span>
+            </div>
+            <div style="display:flex;justify-content:center;gap:12px;">
+              <button type="button" onclick="runWs1('START')" style="padding:10px 26px;border-radius:8px;border:0;background:#22c55e;color:#052e16;font-weight:800;font-size:1rem;cursor:pointer;">
+                ▶ START
+              </button>
+              <button type="button" onclick="runWs1('STOP')" style="padding:10px 26px;border-radius:8px;border:0;background:#ef4444;color:#fff;font-weight:800;font-size:1rem;cursor:pointer;">
+                ⏹ STOP
+              </button>
+            </div>
+          </div>
+
+          <pre class="code-tree" id="ws1-code" style="margin:0;">&lt;!-- 1. HTML --&gt;
+&lt;h2&gt;STATUS: &lt;span id="status"&gt;START/STOP&lt;/span&gt;&lt;/h2&gt;
+&lt;button onclick="startMachine()"&gt;START&lt;/button&gt;
+&lt;button onclick="stopMachine()"&gt;STOP&lt;/button&gt;
+
+&lt;!-- 2. JavaScript --&gt;
+&lt;script&gt;
+  function startMachine() {
+    let el = document.getElementById('status');
+    el.innerText = 'RUNNING';
+    el.style.color = '#22c55e'; // สีเขียว
+  }
+
+  function stopMachine() {
+    let el = document.getElementById('status');
+    el.innerText = 'STOP';
+    el.style.color = '#ef4444'; // สีแดง
+  }
+&lt;/script&gt;</pre>
+        </div>
+
+        <!-- Workshop 2.2: Simple Meter -->
+        <div class="card-panel">
+          <h3>⚡⚠️ Workshop 2.2: Simple Meter (ป้อนตัวเลข ถ้าเกินค่า ➡️ แสดง Warning)</h3>
+          <div style="background:#040714;border:2px solid #334155;border-radius:12px;padding:20px;text-align:center;margin-bottom:12px;">
+            <div style="color:#cbd5e1;font-weight:700;">Voltage Meter (เกณฑ์ปลอดภัย ≤ 240 V)</div>
+            <div style="margin:8px 0;">
+              <span id="ws2-display" style="font-size:2.6rem;font-weight:800;color:#29b6f6;">230</span>
+              <span style="color:#94a3b8;font-size:1.2rem;">V</span>
+              <span class="id-badge">id="volt-display"</span>
+            </div>
+
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;">
+              <input id="ws2-input" type="number" value="255" placeholder="ป้อนค่า Voltage..." style="padding:8px 12px;border-radius:8px;border:1px solid #475569;background:#1e293b;color:#fff;width:140px;font-size:1rem;font-weight:700;text-align:center;">
+              <button type="button" onclick="runWs2()" style="padding:8px 18px;border-radius:8px;border:0;background:#38bdf8;color:#082f49;font-weight:800;cursor:pointer;">
+                ตรวจสอบค่าไฟ
+              </button>
+              <button type="button" onclick="document.getElementById('ws2-input').value=225;runWs2();" class="pill-btn">ลอง 225V (ปกติ)</button>
+              <button type="button" onclick="document.getElementById('ws2-input').value=260;runWs2();" class="pill-btn">ลอง 260V (เกิน!)</button>
+            </div>
+
+            <p id="ws2-msg" style="margin:12px 0 0;font-weight:800;font-size:1.05rem;color:#22c55e;">
+              ✅ ปกติ (Normal)
+            </p>
+          </div>
+
+          <pre class="code-tree" id="ws2-code" style="margin:0;">&lt;!-- 1. HTML --&gt;
+&lt;input id="volt-input" type="number"&gt;
+&lt;button onclick="checkMeter()"&gt;ตรวจสอบค่าไฟ&lt;/button&gt;
+&lt;p id="warning-msg"&gt;&lt;/p&gt;
+
+&lt;!-- 2. JavaScript --&gt;
+&lt;script&gt;
+  function checkMeter() {
+    // ดึงตัวเลขที่ผู้ใช้พิมพ์จากช่อง input (.value)
+    let val = Number(document.getElementById('volt-input').value);
+    let msg = document.getElementById('warning-msg');
+
+    if (val &gt; 240) {
+      msg.innerText = '⚠️ Warning: ค่าไฟเกินกำหนด!';
+      msg.style.color = '#ef4444'; // สีแดง
+    } else {
+      msg.innerText = '✅ ปกติ (Normal)';
+      msg.style.color = '#22c55e'; // สีเขียว
+    }
+  }
+&lt;/script&gt;</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 6: ถอดรหัสหน้าเว็บจริง (Line Performance) ==================== -->
+    <section id="t6" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 6: ถอดรหัส DOM ในหน้าเว็บจริง (Line Performance &amp; การอัปเดตข้อมูลอัตโนมัติ)</h2>
+        <p>ลองกดปุ่ม <b>สลับเคสข้อมูล</b> ด้านล่าง หรือ <b>คลิกที่การ์ดแต่ละใบบนหน้าจอ</b> เพื่อดูว่าฟังก์ชัน <code>render(data)</code> ใน JavaScript วิ่งไปเปลี่ยนค่าที่ <code>id</code> ไหนด้วยโค้ดบรรทัดใด!</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="pill-btn success active" onclick="simLineCase('normal', this)">🟢 1. กดเลือกเคสปกติ (92.0%)</button>
+        <button class="pill-btn warn" onclick="simLineCase('watch', this)">🟡 2. กดเลือกเคสเฝ้าระวัง (75.0%)</button>
+        <button class="pill-btn danger" onclick="simLineCase('low', this)">🔴 3. กดเลือกเคสต่ำกว่าเป้า (50.0% · เปิดปุ่มแจ้งเตือน!)</button>
+      </div>
+
+      <div class="grid-2">
+        <!-- ฝั่งซ้าย: หน้าจอ Line Performance พร้อมป้าย ID -->
+        <div class="card-panel">
+          <h3>🖥️ หน้าเว็บ Line Performance (คลิกที่กล่องใดก็ได้เพื่อดูโค้ด JS ที่คุมกล่องนั้น)</h3>
+          <div class="lp-box">
+            <div onclick="hlLineCode('line')" style="cursor:pointer;padding:6px;border-radius:8px;">
+              <h4 style="margin:0;font-size:1.35rem;">Line Performance</h4>
+              <p id="lp6-line" style="margin:4px 0 12px;color:#9ca3af;">
+                Line A · กะ Day <span class="id-badge">id="line"</span>
+              </p>
+            </div>
+
+            <div class="lp-cards-grid">
+              <div class="lp-card-item" id="lp6-box-actual" onclick="hlLineCode('actual')">
+                <div style="color:#9ca3af;font-size:0.85rem;">ผลิตได้ (ชิ้น)</div>
+                <div id="lp6-actual" style="font-size:1.85rem;font-weight:800;margin-top:4px;">1,104</div>
+                <span class="id-badge">id="actual"</span>
+              </div>
+
+              <div class="lp-card-item" id="lp6-box-target" onclick="hlLineCode('target')">
+                <div style="color:#9ca3af;font-size:0.85rem;">เป้าหมาย (ชิ้น)</div>
+                <div id="lp6-target" style="font-size:1.85rem;font-weight:800;margin-top:4px;">1,200</div>
+                <span class="id-badge">id="target"</span>
+              </div>
+
+              <div class="lp-card-item" id="lp6-box-defect" onclick="hlLineCode('defect')">
+                <div style="color:#9ca3af;font-size:0.85rem;">ชิ้นงานเสีย</div>
+                <div id="lp6-defect" style="font-size:1.85rem;font-weight:800;margin-top:4px;">18</div>
+                <span class="id-badge">id="defect"</span>
+              </div>
+
+              <div class="lp-card-item" id="lp6-box-perf" onclick="hlLineCode('performance')">
+                <div style="color:#9ca3af;font-size:0.85rem;">Performance</div>
+                <div id="lp6-perf" style="font-size:1.85rem;font-weight:800;margin-top:4px;">92.0%</div>
+                <span class="id-badge">id="performance"</span>
+                <div onclick="event.stopPropagation(); hlLineCode('status');">
+                  <span id="lp6-status" class="lp-status-pill ok">ปกติ</span>
+                  <span class="id-badge">id="status"</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;" onclick="hlLineCode('alert-btn')">
+              <input type="text" placeholder="ชื่อผู้แจ้ง (id=&quot;sender&quot;)" style="padding:8px 12px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#fff;">
+              <button id="lp6-btn" type="button" disabled style="padding:9px 16px;border-radius:8px;border:0;background:#ef4444;color:#fff;font-weight:700;">
+                แจ้งหัวหน้างาน
+              </button>
+              <span class="id-badge">id="alert-btn"</span>
+            </div>
+            <style>
+              #lp6-btn:disabled { background:#374151 !important; color:#9ca3af !important; }
+            </style>
+          </div>
+
+          <div class="explain-card" id="lp6-explain" style="margin-top:12px;">
+            <h4>💡 คลิกที่กล่องตัวเลขหรือปุ่มด้านบน</h4>
+            <p>เพื่อดูว่าโค้ด JavaScript บรรทัดไหนเป็นคนสั่งเปลี่ยนค่าในกล่องนั้น</p>
+          </div>
+        </div>
+
+        <!-- ฝั่งขวา: โค้ดฟังก์ชัน render(data) ที่จับคู่กับแต่ละ ID -->
+        <div class="card-panel">
+          <h3>📝 โค้ด JavaScript จริงที่ใช้ควบคุมหน้าจอนี้ (คลิกแต่ละบรรทัดได้)</h3>
+          <div class="code-tree">
+            <div style="color:#94a3b8;">function render(data) {</div>
+            <div style="color:#94a3b8;">  const percent = (data.actual / data.target) * 100;</div>
+            <div style="color:#94a3b8;">  const status = getStatus(percent); // คืนค่า { key: 'ok'|'warn'|'bad', text: '...' }</div>
+            <br>
+            <div class="code-line-item" data-lid="line" onclick="hlLineCode('line')">  document.getElementById('line').textContent = `Line ${data.line} · กะ ${data.shift}`;</div>
+            <div class="code-line-item" data-lid="actual" onclick="hlLineCode('actual')">  document.getElementById('actual').textContent = data.actual.toLocaleString();</div>
+            <div class="code-line-item" data-lid="target" onclick="hlLineCode('target')">  document.getElementById('target').textContent = data.target.toLocaleString();</div>
+            <div class="code-line-item" data-lid="defect" onclick="hlLineCode('defect')">  document.getElementById('defect').textContent = data.defect;</div>
+            <div class="code-line-item" data-lid="performance" onclick="hlLineCode('performance')">  document.getElementById('performance').textContent = percent.toFixed(1) + '%';</div>
+            <br>
+            <div class="code-line-item" data-lid="status" onclick="hlLineCode('status')">  const statusEl = document.getElementById('status');</div>
+            <div class="code-line-item" data-lid="status" onclick="hlLineCode('status')">  statusEl.textContent = status.text;          // เปลี่ยนคำเป็น ปกติ / เฝ้าระวัง / ต่ำกว่าเป้า</div>
+            <div class="code-line-item" data-lid="status" onclick="hlLineCode('status')">  statusEl.className = 'status ' + status.key; // เปลี่ยนสีป้ายตามคลาส .ok / .warn / .bad</div>
+            <br>
+            <div class="code-line-item" data-lid="alert-btn" onclick="hlLineCode('alert-btn')">  // เปิดปุ่มให้กดได้เฉพาะตอนสถานะเป็น 'bad' (ต่ำกว่าเป้า)</div>
+            <div class="code-line-item" data-lid="alert-btn" onclick="hlLineCode('alert-btn')">  document.getElementById('alert-btn').disabled = (status.key !== 'bad');</div>
+            <div style="color:#94a3b8;">}</div>
+          </div>
+
+          <div class="hint-box">
+            <b>🔗 เชื่อมต่อไปยังเรื่อง API (Workshop 3 สไลด์หน้า 84–85):</b><br>
+            พอเราเขียนฟังก์ชัน <code>render(data)</code> ที่มี DOM ครบแบบนี้แล้ว ตอนดึงข้อมูลจริงจาก Server ด้วย <code>const data = await res.json();</code> เราก็แค่เรียก <code>render(data);</code> บรรทัดเดียว หน้าเว็บทั้งหมดก็อัปเดตตัวเลขเองอัตโนมัติทันที!
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ===== Topbar Zoom & Fullscreen =====
+    let currentScale = 1;
+    function zoomPage(delta) {
+      currentScale = Math.min(1.4, Math.max(0.75, +(currentScale + delta).toFixed(2)));
+      document.documentElement.style.setProperty('--scale', currentScale);
+    }
+    function toggleFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    // ===== Navigation Tabs =====
+    function showTab(tabId, btnEl) {
+      document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
+    }
+
+    // ===== Lesson 1: Bridge Simulator & Anatomy =====
+    function simBridge(dir) {
+      document.getElementById('btn-dir-1').classList.toggle('active', dir === 1);
+      document.getElementById('btn-dir-2').classList.toggle('active', dir === 2);
+
+      const jsBox = document.getElementById('br-js');
+      const htmlBox = document.getElementById('br-html');
+      const wire = document.getElementById('br-wire');
+      const arrow = document.getElementById('br-arrow');
+      const wireTxt = document.getElementById('br-wire-txt');
+      const jsCode = document.getElementById('br-js-code');
+      const voltNum = document.getElementById('br-volt-num');
+      const explain = document.getElementById('br-explain');
+
+      if (dir === 1) {
+        jsBox.className = 'bridge-box glow-blue';
+        htmlBox.className = 'bridge-box';
+        wire.className = 'bridge-wire active-right';
+        arrow.textContent = '⚡ ➡️ ⚡';
+        wireTxt.innerHTML = 'สายไฟ <code>document</code><br>วิ่งไปหา <code>id="volt"</code>';
+        const nextVal = voltNum.textContent === '245' ? '230' : '245';
+        voltNum.textContent = nextVal;
+        voltNum.classList.remove('dom-flash');
+        void voltNum.offsetWidth;
+        voltNum.classList.add('dom-flash');
+        jsCode.textContent =
+`// ขาที่ 1: JS สั่งเปลี่ยนตัวเลขบน HTML
+let el = document.getElementById('volt');
+el.textContent = '${nextVal}';`;
+        explain.innerHTML = '<b>ขาที่ 1 (JS ➡️ HTML):</b> JavaScript ใช้ <code>document.getElementById("volt")</code> วิ่งไปจับกล่องที่มีป้าย <code>id="volt"</code> แล้วเปลี่ยนเลขข้างในทันที!';
+      } else {
+        jsBox.className = 'bridge-box';
+        htmlBox.className = 'bridge-box glow-yellow';
+        wire.className = 'bridge-wire active-left';
+        arrow.textContent = '🔔 ⬅️ 👆';
+        wireTxt.innerHTML = 'ส่ง <code>Event (onclick)</code><br>ไปปลุกฟังก์ชันใน JS!';
+        voltNum.textContent = '255';
+        voltNum.style.color = '#ef4444';
+        setTimeout(() => { voltNum.style.color = '#29b6f6'; }, 900);
+        jsCode.textContent =
+`// ขาที่ 2: ฟังก์ชันใน JS ถูกปลุกเมื่อคนกดปุ่ม!
+function onButtonClick() {
+  alert('ได้รับสัญญาณคลิกจากผู้ใช้แล้ว!');
+}`;
+        explain.innerHTML = '<b>ขาที่ 2 (HTML ➡️ JS):</b> เมื่อผู้ใช้คลิกปุ่มที่มี <code>onclick="..."</code> บนหน้าเว็บ เบราว์เซอร์จะส่งสัญญาณ <b>Event</b> วิ่งย้อนกลับมาปลุก <code>function</code> ใน JavaScript ให้ทำงาน!';
+      }
+    }
+
+    const DOM_TOKS = {
+      doc:  { title: '🌐 1. document (ตัวแทนหน้าเว็บทั้งหมด)', desc: 'เป็นออบเจกต์มาตรฐานที่เบราว์เซอร์สร้างให้โดยอัตโนมัติ เปรียบเหมือน "ตู้ชุมสายหลัก" ที่เชื่อมกับแท็ก HTML ทุกตัวในหน้าเว็บ' },
+      fn:   { title: '🔍 2. .getElementById (คำสั่งค้นหากล่องตามป้าย id)', desc: 'แปลตรงตัวว่า "ไปหยิบ Element ที่มี id ชื่อว่า..." ออกมาให้หน่อย (สะกดตัวพิมพ์เล็ก-ใหญ่ให้เป๊ะ: <code>getElementById</code> — คำว่า Element ไม่มี s เพราะ id มีได้แค่ตัวเดียว!)' },
+      id:   { title: '🪪 3. (\'volt\') (ชื่อ id ของแท็ก HTML ที่ต้องการจับ)', desc: 'ใส่ชื่อ id ที่เราตั้งไว้ใน HTML เช่น <code>&lt;span id="volt"&gt;</code> (ไม่ต้องใส่เครื่องหมาย # นำหน้า)' },
+      prop: { title: '📝 4. .textContent (ส่วนที่เราต้องการเข้าไปอ่านหรือแก้ไข)', desc: 'บอกว่าจะแก้ "ข้อความข้างในกล่อง" (นอกจาก <code>.textContent</code> หรือ <code>.innerText</code> แล้ว ยังเปลี่ยนสีด้วย <code>.style.color</code> หรือเปลี่ยนคลาสด้วย <code>.className</code> ได้ด้วย)' },
+      val:  { title: '✨ 5. = \'245\' (ค่าใหม่ที่ต้องการเอาไปแสดงบนหน้าจอ)', desc: 'เครื่องหมาย <code>=</code> คือการเอาค่าทางขวา ไปทับข้อความเดิมบนหน้าจอทันทีโดยไม่ต้องรีเฟรชหน้าเว็บ!' }
+    };
+    function explainDomTok(key, el) {
+      document.querySelectorAll('.tok').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      const info = DOM_TOKS[key];
+      document.getElementById('dom-tok-explain').innerHTML = `<h4>${info.title}</h4><p>${info.desc}</p>`;
+    }
+
+    // ===== Lesson 2: Select DOM =====
+    const SEL_DOM_DATA = {
+      byId: {
+        code:
+`// ⭐ ท่ามาตรฐานอันดับ 1 (เลือกจาก id="volt-val")
+let el = document.getElementById('volt-val');
+el.textContent = '240'; // สั่งเปลี่ยนค่าได้ทันที!`,
+        title: '⭐ 1. document.getElementById(\'volt-val\') — แนะนำให้ใช้เป็นหลัก!',
+        desc: 'วิ่งไปหยิบกล่องที่มี <code>id="volt-val"</code> ออกมา <b>1 กล่องเดี่ยวๆ</b> สามารถสั่ง <code>.textContent = ...</code> ต่อท้ายได้เลยทันที ง่ายและตรงเป้าที่สุด',
+        result: '🎯 <b>สิ่งที่ได้กลับมา:</b> กล่อง <code>&lt;span id="volt-val"&gt;230&lt;/span&gt;</code> เพียง <b>1 กล่องเดียว</b>',
+        matchIds: ['volt-val']
+      },
+      byClass: {
+        code:
+`// 2. เลือกทุกกล่องที่มี class="card" (สไลด์หน้า 60)
+let cards = document.getElementsByClassName('card');
+console.log(cards.length); // ได้ 2 กล่อง (อยู่ในตะกร้า HTMLCollection)
+// ถ้าจะแก้ใบแรก ต้องระบุลำดับ [0] เช่น cards[0]`,
+        title: '📦 2. document.getElementsByClassName(\'card\') — ได้มาเป็นตะกร้าหลายใบ',
+        desc: 'ใช้เมื่อต้องการกวาดทุกกล่องที่มี <code>class="card"</code> ออกมาพร้อมกัน (สังเกตคำว่า <code>Element<b>s</b></code> มี s)',
+        result: '🧺 <b>สิ่งที่ได้กลับมา:</b> ตะกร้ารวมการ์ดทั้ง <b>2 ใบ</b> (<code>[การ์ดใบที่ 1, การ์ดใบที่ 2]</code>)',
+        matchClass: 'demo-card'
+      },
+      qsOne: {
+        code:
+`// 3. เลือกด้วยสัญลักษณ์ CSS Selector ตัวแรกที่เจอ (สไลด์หน้า 61)
+let firstCard = document.querySelector('.card'); // ใส่จุด . เหมือนเขียน CSS`,
+        title: '🔎 3. document.querySelector(\'.card\') — ใช้ท่าเขียนแบบเดียวกับ CSS (ได้ตัวแรกตัวเดียว)',
+        desc: 'เขียนอ้างอิงเหมือน CSS เช่น <code>.card</code> (คลาส), <code>#volt-val</code> (ไอดี), หรือ <code>input[type="text"]</code> แต่จะหยิบมาแค่ <b>ตัวแรกสุดที่เจอตัวเดียว</b>',
+        result: '🎯 <b>สิ่งที่ได้กลับมา:</b> การ์ดใบที่ 1 เพียง <b>1 ใบแรกสุด</b> ที่เจอในหน้าเว็บ',
+        matchFirstClass: 'demo-card'
+      },
+      qsAll: {
+        code:
+`// 4. เลือกด้วย CSS Selector ทุกตัวที่ตรงเงื่อนไข (สไลด์หน้า 62)
+let units = document.querySelectorAll('.unit');
+// ได้มาทั้งคำว่า "V" และ "A" (2 ตัว) วนลูปด้วย forEach ได้`,
+        title: '🔎 4. document.querySelectorAll(\'.unit\') — ใช้ท่า CSS Selector กวาดมาทุกตัว',
+        desc: 'เหมือน <code>querySelector</code> แต่กวาดมาครบทุกตัวที่ตรงเงื่อนไข นิยมใช้คู่กับปุ่ม Radio หรือ Checkbox หลายๆ อันตามสไลด์หน้า 62',
+        result: '🧺 <b>สิ่งที่ได้กลับมา:</b> ตะกร้า NodeList รวมป้ายหน่วยวัดทั้ง <b>2 ตัว</b> (<code>V</code> และ <code>A</code>)',
+        matchClass: 'demo-unit'
+      }
+    };
+
+    function testDomSelect(mode, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const d = SEL_DOM_DATA[mode];
+      document.getElementById('sel-dom-code').textContent = d.code;
+      document.getElementById('sel-dom-explain').innerHTML = `<h4>${d.title}</h4><p>${d.desc}</p>`;
+      document.getElementById('sel-dom-result').innerHTML = d.result;
+
+      document.querySelectorAll('#t2 .dom-target').forEach(el => el.classList.remove('dom-matched'));
+      if (d.matchIds) {
+        d.matchIds.forEach(id => document.getElementById(id).classList.add('dom-matched'));
+      } else if (d.matchClass) {
+        document.querySelectorAll('#t2 .' + d.matchClass).forEach(el => el.classList.add('dom-matched'));
+      } else if (d.matchFirstClass) {
+        const first = document.querySelector('#t2 .' + d.matchFirstClass);
+        if (first) first.classList.add('dom-matched');
+      }
+    }
+    testDomSelect('byId');
+
+    // ===== Lesson 3: Update DOM =====
+    let actToggle = false;
+    function applyDomAction(type, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      actToggle = !actToggle;
+      const valEl = document.getElementById('act-val');
+      const badgeEl = document.getElementById('act-badge');
+      const btnEl = document.getElementById('act-btn');
+      const codeEl = document.getElementById('act-code');
+
+      if (type === 'text') {
+        const nextTxt = actToggle ? '50.0%' : '92.0%';
+        valEl.textContent = nextTxt;
+        valEl.classList.remove('dom-flash'); void valEl.offsetWidth; valEl.classList.add('dom-flash');
+        codeEl.textContent =
+`// ท่าที่ 1: เปลี่ยนข้อความ/ตัวเลขข้างในกล่อง
+const el = document.getElementById('performance');
+el.textContent = '${nextTxt}';`;
+      } else if (type === 'color') {
+        const nextColor = actToggle ? '#ef4444' : '#22c55e';
+        valEl.style.color = nextColor;
+        valEl.classList.remove('dom-flash'); void valEl.offsetWidth; valEl.classList.add('dom-flash');
+        codeEl.textContent =
+`// ท่าที่ 2: เปลี่ยนสีของตัวอักษรโดยตรงผ่าน .style.color
+const el = document.getElementById('performance');
+el.style.color = '${nextColor}';`;
+      } else if (type === 'class') {
+        const isBad = actToggle;
+        badgeEl.textContent = isBad ? 'ต่ำกว่าเป้า (BAD)' : 'ปกติ (OK)';
+        badgeEl.className = 'lp-status-pill ' + (isBad ? 'bad' : 'ok');
+        badgeEl.classList.remove('dom-flash'); void badgeEl.offsetWidth; badgeEl.classList.add('dom-flash');
+        codeEl.textContent =
+`// ท่าที่ 3: สลับคลาส CSS เพื่อให้เปลี่ยนทั้งสีพื้นหลังและสีตัวอักษร
+const statusEl = document.getElementById('status');
+statusEl.textContent = '${badgeEl.textContent}';
+statusEl.className = 'status ${isBad ? 'bad' : 'ok'}';`;
+      } else if (type === 'disable') {
+        btnEl.disabled = !btnEl.disabled;
+        btnEl.classList.remove('dom-flash'); void btnEl.offsetWidth; btnEl.classList.add('dom-flash');
+        codeEl.textContent =
+`// ท่าที่ 4: เปิด/ล็อกปุ่มกด (.disabled = true คือล็อก, false คือเปิดให้กดได้)
+const alertBtn = document.getElementById('alert-btn');
+alertBtn.disabled = ${btnEl.disabled};`;
+      }
+    }
+    applyDomAction('text');
+
+    const CONTENT_PROPS = {
+      textContent: {
+        title: '⭐ 1. .textContent — ดึง/เขียน "ข้อความล้วนทั้งหมด"',
+        desc: '<b>ตอนอ่านค่า:</b> ได้ <code>"สถานะ: เครื่องจักรปกติ (รหัสลับซ่อนอยู่)"</code> (ดึงข้อความทุกตัวรวมถึงตัวที่ซ่อนอยู่ ไม่เอาแท็ก <code>&lt;b&gt;</code> มาปน)<br><b>ตอนเขียนค่าใหม่:</b> ปลอดภัยและทำงานเร็วที่สุด นิยมใช้เป็นหลักในงานจริง'
+      },
+      innerText: {
+        title: '👁️ 2. .innerText — ดึงเฉพาะ "ข้อความที่ตามองเห็นบนจอเท่านั้น" (สไลด์หน้า 68)',
+        desc: '<b>ตอนอ่านค่า:</b> ได้ <code>"สถานะ: เครื่องจักรปกติ"</code> (ตัดข้อความที่ถูก <code>display: none</code> ซ่อนไว้ออกให้)<br><b>ตอนเขียนค่าใหม่:</b> ใช้เปลี่ยนข้อความบนหน้าจอได้เหมือน <code>textContent</code>'
+      },
+      innerHTML: {
+        title: '⚠️ 3. .innerHTML — ดึง/เขียน "โค้ดแท็ก HTML ข้างในทั้งหมด" (สไลด์หน้า 69)',
+        desc: '<b>ตอนอ่านค่า:</b> ได้โค้ดติดแท็กมาด้วย <code>"สถานะ: &lt;b&gt;เครื่องจักรปกติ&lt;/b&gt;..."</code><br><b>ข้อควรระวัง (OWASP XSS):</b> ถ้าเอาข้อความจากผู้ใช้มาใส่ <code>innerHTML</code> ตรงๆ ผู้ใช้อาจแอบพิมพ์ <code>&lt;script&gt;</code> ฝังไวรัสเข้ามาได้!'
+      }
+    };
+    function compareContentProp(prop, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const info = CONTENT_PROPS[prop];
+      document.getElementById('content-prop-explain').innerHTML = `<h4>${info.title}</h4><p>${info.desc}</p>`;
+    }
+    compareContentProp('textContent');
+
+    // ===== Lesson 4: Events =====
+    function demoBtnClick(e) {
+      const btnText = e.target.innerText;
+      const out = document.getElementById('ev-click-out');
+      out.innerHTML = `✅ เกิด <b>onclick</b>! ดึงชื่อปุ่มด้วย <code>event.target.innerText</code> ได้ค่า = <b>"${btnText}"</b>`;
+    }
+    function demoKeyInput(val) {
+      const out = document.getElementById('ev-key-out');
+      out.innerHTML = `ค่าที่อ่านได้จาก <code>document.getElementById('sender').value</code>: <b style="color:#fde047;">"${val || '(ว่างเปล่า)'}"</b>`;
+    }
+    function fireMouseStep(step) {
+      const el = document.getElementById('ms-' + step);
+      el.classList.add('fired');
+      setTimeout(() => el.classList.remove('fired'), 650);
+    }
+
+    // ===== Lesson 5: Workshop 2.1 & 2.2 =====
+    function runWs1(mode) {
+      const el = document.getElementById('ws1-status');
+      if (mode === 'START') {
+        el.innerText = 'RUNNING';
+        el.style.background = '#22c55e';
+        el.style.color = '#052e16';
+      } else {
+        el.innerText = 'STOP';
+        el.style.background = '#ef4444';
+        el.style.color = '#ffffff';
+      }
+      el.classList.remove('dom-flash'); void el.offsetWidth; el.classList.add('dom-flash');
+    }
+
+    function runWs2() {
+      const val = Number(document.getElementById('ws2-input').value);
+      const disp = document.getElementById('ws2-display');
+      const msg = document.getElementById('ws2-msg');
+
+      disp.innerText = val;
+      disp.classList.remove('dom-flash'); void disp.offsetWidth; disp.classList.add('dom-flash');
+
+      if (val > 240) {
+        disp.style.color = '#ef4444';
+        msg.innerText = '⚠️ Warning: ค่าไฟเกินกำหนด! (' + val + ' V > 240 V)';
+        msg.style.color = '#ef4444';
+      } else {
+        disp.style.color = '#29b6f6';
+        msg.innerText = '✅ ปกติ (Normal · ' + val + ' V)';
+        msg.style.color = '#22c55e';
+      }
+    }
+
+    // ===== Lesson 6: Line Performance Decoder =====
+    const LP6_CASES = {
+      normal: { line: 'A', shift: 'Day', actual: 1104, target: 1200, defect: 18, pct: '92.0%', key: 'ok', text: 'ปกติ' },
+      watch:  { line: 'A', shift: 'Day', actual: 900,  target: 1200, defect: 18, pct: '75.0%', key: 'warn', text: 'เฝ้าระวัง' },
+      low:    { line: 'A', shift: 'Day', actual: 600,  target: 1200, defect: 18, pct: '50.0%', key: 'bad', text: 'ต่ำกว่าเป้า' }
+    };
+
+    const LP6_INFO = {
+      'line': {
+        title: '🪪 id="line" — แสดงชื่อสายการผลิตและกะ',
+        desc: 'ใช้คำสั่ง <code>document.getElementById("line").textContent = ...</code> เพื่อเอาชื่อ Line และ Shift จากตัวแปร Object มาแสดง'
+      },
+      'actual': {
+        title: '🔢 id="actual" — แสดงยอดผลิตได้จริง (ชิ้น)',
+        desc: 'ใช้คำสั่ง <code>document.getElementById("actual").textContent = data.actual.toLocaleString();</code> (ใส่ลูกน้ำหลักพันให้อัตโนมัติ)'
+      },
+      'target': {
+        title: '🎯 id="target" — แสดงเป้าหมายการผลิต (ชิ้น)',
+        desc: 'ใช้คำสั่ง <code>document.getElementById("target").textContent = data.target.toLocaleString();</code>'
+      },
+      'defect': {
+        title: '⚠️ id="defect" — แสดงจำนวนชิ้นงานเสีย',
+        desc: 'ใช้คำสั่ง <code>document.getElementById("defect").textContent = data.defect;</code>'
+      },
+      'performance': {
+        title: '📊 id="performance" — แสดงเปอร์เซ็นต์ที่คำนวณได้',
+        desc: 'หลังคำนวณ <code>percent = (actual / target) * 100</code> แล้ว ใช้ <code>.textContent = percent.toFixed(1) + "%"</code> เพื่อแสดงทศนิยม 1 ตำแหน่ง'
+      },
+      'status': {
+        title: '🏷️ id="status" — ป้ายบอกสถานะ + เปลี่ยนสีตามเกณฑ์',
+        desc: 'เปลี่ยนทั้งข้อความ (<code>statusEl.textContent = status.text</code>) และเปลี่ยนคลาสสี (<code>statusEl.className = "status " + status.key</code>) เพื่อให้ป้ายเปลี่ยนสีเป็น เขียว/เหลือง/แดง!'
+      },
+      'alert-btn': {
+        title: '🚨 id="alert-btn" — ปุ่มกดส่งแจ้งเตือนหัวหน้างาน',
+        desc: 'ควบคุมด้วย <code>document.getElementById("alert-btn").disabled = (status.key !== "bad")</code> คือถ้ายังไม่วิกฤต (ไม่ใช่ bad) ปุ่มจะถูกล็อกไว้ กดได้เฉพาะตอนต่ำกว่าเป้าเท่านั้น!'
+      }
+    };
+
+    function simLineCase(caseKey, btn) {
+      if (btn) {
+        btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const d = LP6_CASES[caseKey];
+      document.getElementById('lp6-actual').textContent = d.actual.toLocaleString();
+      document.getElementById('lp6-target').textContent = d.target.toLocaleString();
+      document.getElementById('lp6-defect').textContent = d.defect;
+      document.getElementById('lp6-perf').textContent = d.pct;
+
+      const st = document.getElementById('lp6-status');
+      st.textContent = d.text;
+      st.className = 'lp-status-pill ' + d.key;
+
+      const alertBtn = document.getElementById('lp6-btn');
+      alertBtn.disabled = (d.key !== 'bad');
+
+      ['lp6-box-actual', 'lp6-box-perf', 'lp6-btn'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('dom-flash');
+        void el.offsetWidth;
+        el.classList.add('dom-flash');
+      });
+    }
+
+    function hlLineCode(lid) {
+      document.querySelectorAll('.code-line-item').forEach(el => {
+        el.classList.toggle('active-line', el.dataset.lid === lid);
+      });
+      const info = LP6_INFO[lid];
+      if (info) {
+        document.getElementById('lp6-explain').innerHTML = `<h4>${info.title}</h4><p>${info.desc}</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

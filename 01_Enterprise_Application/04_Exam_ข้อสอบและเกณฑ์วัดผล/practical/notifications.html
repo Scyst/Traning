@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>แจ้งเตือนที่ได้รับ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;600&display=swap"
+      rel="stylesheet" />
+    <style>
+      :root {
+        --ink: #061217;
+        --deep: #0b2530;
+        --teal: #17636d;
+        --glow: #2fa3a0;
+        --amber: #f5c542;
+        --text: #f3fbfb;
+        --muted: rgba(243, 251, 251, 0.7);
+        --glass: rgba(255, 255, 255, 0.13);
+        --glass-line: rgba(255, 255, 255, 0.2);
+        --ok: #5ee0a0;
+        --bad: #ff7a70;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        background: var(--ink);
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        font-family:
+          'IBM Plex Sans Thai', 'Sarabun', 'Noto Sans Thai', 'Thonburi',
+          system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* พื้นหลังแบบวอลเปเปอร์หน้าจอล็อก */
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background:
+          radial-gradient(
+            900px 620px at 88% 6%,
+            rgba(47, 163, 160, 0.5),
+            transparent 62%
+          ),
+          radial-gradient(
+            760px 760px at 0% 100%,
+            rgba(23, 99, 109, 0.62),
+            transparent 62%
+          ),
+          linear-gradient(160deg, var(--deep) 0%, var(--ink) 72%);
+      }
+
+      .screen {
+        display: grid;
+        gap: 28px;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 36px 16px 64px;
+      }
+
+      /* ===== ฝั่งนาฬิกา ===== */
+      .clockcol {
+        text-align: center;
+      }
+
+      .date {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--muted);
+      }
+
+      .time {
+        margin: 0;
+        font-size: clamp(84px, 24vw, 176px);
+        font-weight: 300;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      h1 {
+        margin: 22px 0 0;
+        font-size: 22px;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .status {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 15px;
+        border: 1px solid var(--glass-line);
+        border-radius: 999px;
+        background: var(--glass);
+        -webkit-backdrop-filter: blur(18px);
+        backdrop-filter: blur(18px);
+        color: var(--text);
+        font: inherit;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 10px var(--ok);
+      }
+      .offline .dot {
+        background: var(--bad);
+        box-shadow: 0 0 10px var(--bad);
+      }
+
+      button.pill {
+        cursor: pointer;
+      }
+      button.pill:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      button.pill[aria-pressed='true'] {
+        background: var(--amber);
+        border-color: transparent;
+        color: #2a2000;
+        font-weight: 600;
+      }
+      button.pill:focus-visible {
+        outline: 2px solid var(--text);
+        outline-offset: 3px;
+      }
+
+      .whoami {
+        margin: 16px 0 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--muted);
+        min-height: 21px;
+      }
+
+      /* ===== ฝั่งแจ้งเตือน ===== */
+      .feed {
+        min-width: 0;
+      }
+
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .stack.only-mine .note:not(.mine) {
+        display: none;
+      }
+
+      .note {
+        display: grid;
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 14px;
+        padding: 14px 16px 14px 14px;
+        border: 1px solid var(--glass-line);
+        border-radius: 24px;
+        background: var(--glass);
+        -webkit-backdrop-filter: blur(24px) saturate(1.4);
+        backdrop-filter: blur(24px) saturate(1.4);
+      }
+
+      .note.mine {
+        border-color: rgba(245, 197, 66, 0.75);
+        box-shadow:
+          0 0 0 1px rgba(245, 197, 66, 0.22),
+          0 14px 44px -14px rgba(245, 197, 66, 0.4);
+      }
+
+      .app {
+        display: grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: #fff;
+      }
+      .app svg {
+        width: 30px;
+        height: 30px;
+        transform-origin: 50% 10%;
+      }
+
+      .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+      }
+
+      .title {
+        font-size: 17px;
+        font-weight: 600;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .ago {
+        flex: none;
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .msg {
+        margin-top: 1px;
+        font-size: 16px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 12px;
+        margin-top: 8px;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .chip {
+        padding: 1px 9px;
+        border-radius: 999px;
+        background: var(--amber);
+        color: #2a2000;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .notice {
+        margin-bottom: 10px;
+        padding: 36px 24px;
+        border: 1px dashed var(--glass-line);
+        border-radius: 24px;
+        text-align: center;
+      }
+      .notice[hidden] {
+        display: none;
+      }
+      .notice strong {
+        display: block;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+      .notice span {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ===== จังหวะเดียวที่มีการเคลื่อนไหว: แจ้งเตือนเข้ามา ===== */
+      @keyframes drop {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes ring {
+        0%,
+        100% {
+          transform: rotate(0);
+        }
+        20% {
+          transform: rotate(-16deg);
+        }
+        40% {
+          transform: rotate(14deg);
+        }
+        60% {
+          transform: rotate(-8deg);
+        }
+        80% {
+          transform: rotate(5deg);
+        }
+      }
+      .note.enter {
+        animation: drop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+        animation-delay: var(--d, 0s);
+      }
+      .note.enter.fresh .app svg {
+        animation: ring 0.8s 0.35s both;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .note.enter,
+        .note.enter.fresh .app svg {
+          animation: none;
+        }
+      }
+
+      /* ===== จอกว้าง (โปรเจกเตอร์ / คอมพิวเตอร์) ===== */
+      @media (min-width: 900px) {
+        .screen {
+          grid-template-columns: minmax(0, 1fr) 460px;
+          align-items: start;
+          gap: 64px;
+          padding: 72px 48px;
+        }
+        .clockcol {
+          position: sticky;
+          top: 72px;
+          text-align: left;
+        }
+        .status {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="screen">
+      <section class="clockcol">
+        <p class="date" id="date"></p>
+        <p class="time" id="clock">--:--</p>
+        <h1>แจ้งเตือนที่ได้รับ</h1>
+        <div class="status">
+          <span class="pill" id="conn"
+            ><span class="dot"></span
+            ><span id="conn-text">กำลังเชื่อมต่อ</span></span
+          >
+          <button
+            class="pill"
+            id="only-mine"
+            type="button"
+            aria-pressed="false">
+            เฉพาะของฉัน
+          </button>
+        </div>
+        <p class="whoami" id="whoami"></p>
+      </section>
+
+      <section class="feed" aria-label="รายการแจ้งเตือน">
+        <div class="notice" id="notice" hidden></div>
+        <ol class="stack" id="stack" role="log" aria-live="polite"></ol>
+      </section>
+    </main>
+
+    <script>
+      // ที่อยู่เซิร์ฟเวอร์ผู้สอน (ถ้าเปิดหน้านี้จากเซิร์ฟเวอร์เอง ก็ใช้ค่านี้ได้เหมือนกัน)
+      const SERVER = window.location.protocol.startsWith('http') ? window.location.origin : 'http://127.0.0.1:8000'
+
+      // เติม ?demo=1 ต่อท้ายที่อยู่ไฟล์ เพื่อดูหน้าตาโดยไม่ต้องต่อเซิร์ฟเวอร์
+      const DEMO = new URLSearchParams(location.search).has('demo')
+
+      const BELL =
+        '<svg viewBox="0 0 32 32" aria-hidden="true">' +
+        '<path d="M16 4c-1.1 0-2 .9-2 2v.6C10.6 7.6 8.5 10.5 8.5 14v4.2L6 22.5v1h20v-1l-2.5-4.3V14c0-3.5-2.1-6.4-5.5-7.4V6c0-1.1-.9-2-2-2z" fill="#f5c542" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/>' +
+        '<path d="M13 26.5a3 3 0 0 0 6 0z" fill="#f5c542" stroke="#3a2a00" stroke-width="1.4" stroke-linejoin="round"/></svg>'
+
+      const stack = document.getElementById('stack')
+      const notice = document.getElementById('notice')
+      const connEl = document.getElementById('conn')
+      const connText = document.getElementById('conn-text')
+      const whoami = document.getElementById('whoami')
+      const toggle = document.getElementById('only-mine')
+
+      const rows = new Map() // key -> { el, agoEl, it }
+      let me = ''
+      let onlyMine = false
+      let everLoaded = false
+      let firstRender = true
+      let total = 0
+      let mineCount = 0
+      let busy = false
+
+      function esc(s) {
+        return String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;'
+            })[c]
+        )
+      }
+
+      /* ---------- นาฬิกา ---------- */
+      function tickClock() {
+        const now = new Date()
+        const hh = String(now.getHours()).padStart(2, '0')
+        const mm = String(now.getMinutes()).padStart(2, '0')
+        document.getElementById('clock').textContent = hh + ':' + mm
+        document.getElementById('date').textContent = now.toLocaleDateString(
+          'th-TH',
+          { weekday: 'long', day: 'numeric', month: 'long' }
+        )
+      }
+      tickClock()
+      setInterval(tickClock, 1000)
+
+      /* ---------- เวลาที่ผ่านมา ---------- */
+      function secondsAgo(hms) {
+        // เซิร์ฟเวอร์ประทับเวลาเป็นเวลาไทย (UTC+7) จึงเทียบกับเวลาไทยเสมอ ไม่พึ่งเขตเวลาของเครื่อง
+        const p = hms.split(':').map(Number)
+        const sentSec = p[0] * 3600 + p[1] * 60 + (p[2] || 0)
+        const nowSec = Math.floor(Date.now() / 1000 + 7 * 3600) % 86400
+        let diff = nowSec - sentSec
+        if (diff < -60) diff += 86400 // ข้ามเที่ยงคืน
+        return Math.max(0, diff)
+      }
+      function ago(hms) {
+        const d = secondsAgo(hms)
+        if (d < 60) return 'เมื่อสักครู่'
+        if (d < 3600) return Math.floor(d / 60) + ' นาทีที่แล้ว'
+        if (d < 86400) return Math.floor(d / 3600) + ' ชั่วโมงที่แล้ว'
+        return hms
+      }
+
+      /* ---------- ข้อมูล ---------- */
+      const demoItems = []
+      function hmsAt(offsetSec) {
+        const d = new Date(Date.now() - offsetSec * 1000)
+        return [d.getHours(), d.getMinutes(), d.getSeconds()]
+          .map((n) => String(n).padStart(2, '0'))
+          .join(':')
+      }
+      if (DEMO) {
+        demoItems.push(
+          {
+            time: hmsAt(75),
+            from: '01-สมชาย',
+            title: 'เริ่มการทำงาน',
+            message: 'มีการกด Start เมื่อ ' + hmsAt(75)
+          },
+          {
+            time: hmsAt(310),
+            from: '02-สายใจ',
+            title: 'เริ่มการทำงาน',
+            message: 'มีการกด Start เมื่อ ' + hmsAt(310)
+          },
+          {
+            time: hmsAt(840),
+            from: '03-มานะ',
+            title: 'ทดสอบระบบแจ้งเตือน',
+            message: 'นี่คือข้อความ ทดสอบระบบการแจ้งเตือน'
+          }
+        )
+        const senders = ['02-สายใจ', '01-สมชาย', '04-กานดา']
+        let n = 0
+        setInterval(() => {
+          const t = hmsAt(0)
+          demoItems.unshift({
+            time: t,
+            from: senders[n++ % senders.length],
+            title: 'แรงดันสูงเกินกำหนด',
+            message: 'ตรวจพบ 244.8 V เมื่อ ' + t
+          })
+          if (demoItems.length > 12) demoItems.pop()
+        }, 7000)
+      }
+
+      async function getData() {
+        if (DEMO) return { you: '01-สมชาย', items: demoItems.slice() }
+        const res = await fetch(SERVER + '/api/notifications', {
+          cache: 'no-store'
+        })
+        if (!res.ok) throw new Error('HTTP ' + res.status)
+        return res.json()
+      }
+
+      /* ---------- วาดการ์ด ---------- */
+      function makeNote(it, mine) {
+        const li = document.createElement('li')
+        li.className = 'note' + (mine ? ' mine' : '')
+        li.innerHTML =
+          '<div class="app">' +
+          BELL +
+          '</div>' +
+          '<div>' +
+          '<div class="head"><span class="title">' +
+          esc(it.title) +
+          '</span><span class="ago"></span></div>' +
+          '<div class="msg">' +
+          esc(it.message) +
+          '</div>' +
+          '<div class="meta"><span>' +
+          esc(it.time) +
+          '</span><span>จาก ' +
+          esc(it.from) +
+          '</span>' +
+          (mine ? '<span class="chip">เครื่องของคุณ</span>' : '') +
+          '</div>' +
+          '</div>'
+        return li
+      }
+
+      function render(data) {
+        me = data.you
+        const items = data.items
+
+        // ทำคีย์ให้แต่ละรายการ (นับจากเก่าสุด เพื่อให้คีย์ไม่เปลี่ยนเมื่อมีรายการใหม่)
+        const seen = {}
+        const keyed = new Array(items.length)
+        for (let i = items.length - 1; i >= 0; i--) {
+          const it = items[i]
+          const base = [it.time, it.from, it.title, it.message].join('|')
+          seen[base] = (seen[base] || 0) + 1
+          keyed[i] = { key: base + '#' + seen[base], it: it, index: i }
+        }
+
+        // ลบการ์ดที่หลุดจากรายการ 50 อันล่าสุดของเซิร์ฟเวอร์
+        const alive = new Set(keyed.map((k) => k.key))
+        rows.forEach((rec, key) => {
+          if (!alive.has(key)) {
+            rec.el.remove()
+            rows.delete(key)
+          }
+        })
+
+        // เพิ่มการ์ดใหม่ (เก่า -> ใหม่ แล้วแทรกบนสุด ให้ใหม่สุดอยู่บน)
+        for (let i = keyed.length - 1; i >= 0; i--) {
+          const k = keyed[i]
+          if (rows.has(k.key)) continue
+          const el = makeNote(k.it, k.it.from === me)
+          el.classList.add('enter')
+          if (firstRender) {
+            el.style.setProperty('--d', Math.min(k.index, 8) * 0.07 + 's')
+          } else {
+            el.classList.add('fresh')
+          }
+          stack.prepend(el)
+          rows.set(k.key, { el: el, agoEl: el.querySelector('.ago'), it: k.it })
+        }
+        firstRender = false
+
+        // อัปเดตเวลา "ผ่านมาแล้ว" ของทุกการ์ด
+        rows.forEach((rec) => {
+          rec.agoEl.textContent = ago(rec.it.time)
+        })
+
+        total = items.length
+        mineCount = items.filter((it) => it.from === me).length
+
+        connText.textContent = 'รับแล้ว ' + total + ' รายการ'
+        whoami.textContent = 'เครื่องของคุณคือ ' + me
+        document.title =
+          (total ? '(' + total + ') ' : '') + 'แจ้งเตือนที่ได้รับ'
+        applyFilter()
+      }
+
+      function applyFilter() {
+        stack.classList.toggle('only-mine', onlyMine)
+        const visible = onlyMine ? mineCount : total
+        if (visible > 0) {
+          notice.hidden = true
+          return
+        }
+        notice.hidden = false
+        if (total > 0 && onlyMine) {
+          notice.innerHTML =
+            '<strong>ยังไม่มีแจ้งเตือนจากเครื่องของคุณ</strong><span>ส่งแจ้งเตือนจาก Dashboard ของคุณ หรือปิด “เฉพาะของฉัน” เพื่อดูของทุกคน</span>'
+        } else {
+          notice.innerHTML =
+            '<strong>ยังไม่มีแจ้งเตือน</strong><span>ส่งแจ้งเตือนจาก Dashboard ของคุณ แจ้งเตือนจะขึ้นที่นี่ทันที</span>'
+        }
+      }
+
+      function setOnline(ok) {
+        connEl.classList.toggle('offline', !ok)
+        if (!ok) connText.textContent = 'เชื่อมต่อไม่ได้'
+      }
+
+      function showError() {
+        notice.hidden = false
+        notice.innerHTML =
+          '<strong>ติดต่อเซิร์ฟเวอร์ไม่ได้</strong><span>ตรวจว่าเครื่องอยู่ในเครือข่ายเดียวกับ ' +
+          esc(new URL(SERVER).hostname) +
+          ' และผู้สอนเปิดเซิร์ฟเวอร์ไว้ หน้านี้จะลองใหม่เองทุก 2 วินาที</span>'
+      }
+
+      async function load() {
+        if (busy) return
+        busy = true
+        try {
+          const data = await getData()
+          everLoaded = true
+          setOnline(true)
+          render(data)
+        } catch (err) {
+          setOnline(false)
+          if (!everLoaded) showError()
+        } finally {
+          busy = false
+        }
+      }
+
+      toggle.addEventListener('click', () => {
+        onlyMine = !onlyMine
+        toggle.setAttribute('aria-pressed', String(onlyMine))
+        applyFilter()
+      })
+
+      load()
+      setInterval(load, 2000)
+    </script>
+  </body>
+</html>

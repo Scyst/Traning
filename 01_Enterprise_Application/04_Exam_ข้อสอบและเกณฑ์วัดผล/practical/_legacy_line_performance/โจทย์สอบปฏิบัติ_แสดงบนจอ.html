@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>โจทย์สอบปฏิบัติ · Line Performance</title>
+<style>
+  :root {
+    --bg: #0b1220;
+    --panel: #121c33;
+    --panel-2: #18243f;
+    --line: #26365a;
+    --text: #f1f5f9;
+    --muted: #9fb0cc;
+    --green: #22c55e;
+    --green-d: #15803d;
+    --yellow: #facc15;
+    --red: #ef4444;
+    --gray: #6b7280;
+    --blue: #38bdf8;
+    --scale: 1;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: calc(max(11px, min(1.15vw, 2.05vh)) * var(--scale)); }
+  body {
+    margin: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 0.7rem;
+    padding: 0.8rem 1.2rem 0.9rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Sarabun", "Leelawadee UI", "Segoe UI", Tahoma, sans-serif;
+    line-height: 1.4;
+    overflow: hidden;
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background: #0b1220;
+    border: 1px solid var(--line);
+    padding: 0 0.35em;
+    border-radius: 0.3em;
+    color: var(--blue);
+    font-weight: 700;
+    font-size: 0.92em;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .title { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+  .title h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: .2px; }
+  .badge {
+    background: var(--yellow); color: #3b2a00; font-weight: 800;
+    padding: 0.15rem 0.8rem; border-radius: 999px; font-size: 0.95rem;
+  }
+  .tools { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
+  .timer {
+    font-family: Consolas, monospace; font-size: 1.9rem; font-weight: 800;
+    color: var(--yellow); background: #000a; border: 1px solid var(--line);
+    padding: 0.05rem 0.7rem; border-radius: 0.5rem; min-width: 6.2ch; text-align: center;
+  }
+  .timer.urgent { color: var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: .45; } }
+  button.tb {
+    background: var(--panel-2); color: var(--text); border: 1px solid var(--line);
+    border-radius: 0.5rem; padding: 0.35rem 0.8rem; font: inherit; font-size: 0.9rem;
+    font-weight: 700; cursor: pointer;
+  }
+  button.tb:hover { border-color: var(--blue); }
+  button.tb.on { background: var(--green-d); border-color: var(--green); }
+
+  /* ---------- Rule strip ---------- */
+  .rules {
+    background: linear-gradient(90deg, #0f3d26, #123022);
+    border: 1px solid var(--green-d);
+    border-left: 0.4rem solid var(--green);
+    border-radius: 0.6rem;
+    padding: 0.45rem 1rem;
+    font-size: 1rem;
+  }
+  .rules b { color: #bbf7d0; }
+
+  /* ---------- Main ---------- */
+  main { min-height: 0; }
+  .view { display: none; height: 100%; min-height: 0; }
+  .view.active { display: grid; gap: 0.9rem; }
+  #view-main { grid-template-columns: 1.02fr 1fr; }
+  #view-help { grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 0.9rem;
+    padding: 0.8rem 1.1rem; min-height: 0; display: flex; flex-direction: column; gap: 0.6rem;
+    overflow: auto;
+  }
+  .panel h2 { margin: 0; font-size: 1.3rem; color: #bbf7d0; display: flex; align-items: center; justify-content: space-between; gap: .6rem; flex-wrap: wrap; }
+  .hint { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+
+  /* state buttons */
+  .states { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .st {
+    border: 1px solid var(--line); background: var(--panel-2); color: var(--text);
+    padding: 0.3rem 0.8rem; border-radius: 0.5rem; font: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer;
+  }
+  .st.active { background: #fff; color: #0b1220; border-color: #fff; }
+
+  /* mock browser */
+  .frame { border: 1px solid #3b4d78; border-radius: 0.7rem; overflow: hidden; flex: 0 0 auto; }
+  .bar { background: #0b1220; padding: 0.35rem 0.8rem; display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--muted); }
+  .dot { width: .6rem; height: .6rem; border-radius: 50%; display: inline-block; }
+  .url { background: #1a2745; padding: 0.05rem 0.8rem; border-radius: 99px; margin-left: .4rem; font-family: Consolas, monospace; }
+  .screen { background: #111827; padding: 0.9rem 1.1rem 1rem; }
+  .screen h3 { margin: 0; font-size: 1.5rem; }
+  .screen .ln { margin: 0 0 0.7rem; color: #9ca3af; font-size: 0.95rem; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+  .card { background: #1f2937; border-radius: 0.6rem; padding: 0.6rem 0.8rem; }
+  .card .l { margin: 0; color: #9ca3af; font-size: 0.82rem; }
+  .card .v { margin: 0.1rem 0 0; font-size: 2.2rem; font-weight: 800; line-height: 1.15; }
+  .chip { display: inline-block; margin-top: .3rem; padding: .1rem .7rem; border-radius: .4rem; font-weight: 800; font-size: .9rem; }
+  .chip.ok { background: #22c55e; color: #052e16; }
+  .chip.warn { background: #eab308; color: #422006; }
+  .chip.bad { background: #ef4444; color: #fff; }
+  .actions { display: flex; align-items: center; gap: .8rem; margin-top: .7rem; flex-wrap: wrap; }
+  .abtn {
+    min-height: 2.6rem; padding: .3rem 1.2rem; border: 0; border-radius: .5rem; font: inherit;
+    font-size: 1rem; font-weight: 800; color: #fff; background: #ef4444; cursor: pointer;
+  }
+  .abtn:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+  .ares { color: #4ade80; font-weight: 700; }
+  .foot { margin-top: .5rem; display: flex; gap: 1.2rem; font-size: .88rem; }
+  .err { color: #f87171; font-weight: 700; }
+  .upd { color: #9ca3af; }
+
+  /* thresholds */
+  .th { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+  .th div { border-radius: .6rem; padding: .35rem .6rem; font-weight: 800; font-size: .95rem; line-height: 1.25; }
+  .th small { display: block; font-weight: 700; opacity: .85; }
+  .t-ok { background: #14532d; color: #bbf7d0; border: 1px solid #22c55e; }
+  .t-warn { background: #5b4400; color: #fef08a; border: 1px solid #eab308; }
+  .t-bad { background: #5f1717; color: #fecaca; border: 1px solid #ef4444; }
+  .t-off { background: #2b3445; color: #cbd5e1; border: 1px solid #6b7280; }
+
+  /* steps */
+  .steps { display: grid; grid-template-rows: repeat(6, 1fr); gap: .5rem; flex: 1; min-height: 0; }
+  .step {
+    display: grid; grid-template-columns: 2.6rem 1fr; gap: .8rem; align-items: center;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: .7rem; padding: .4rem .8rem;
+  }
+  .num {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%; background: var(--green); color: #04210f;
+    font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; justify-content: center;
+  }
+  .step h3 { margin: 0; font-size: 1.22rem; display: flex; justify-content: space-between; gap: .6rem; }
+  .step h3 span { color: var(--yellow); font-size: .95rem; white-space: nowrap; }
+  .step p { margin: .05rem 0 0; color: #cbd5e1; font-size: .98rem; }
+
+  /* footer: webhook */
+  footer {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: .9rem; align-items: center;
+  }
+  .field { display: flex; align-items: center; gap: .6rem; background: var(--panel); border: 1px solid var(--line); border-radius: .7rem; padding: .35rem .8rem; }
+  .field label { font-weight: 800; white-space: nowrap; color: var(--muted); font-size: .95rem; }
+  .field input {
+    flex: 1; min-width: 0; background: #0b1220; color: #fca5a5; border: 1px dashed #4b5d86; border-radius: .5rem;
+    padding: .3rem .7rem; font: inherit; font-family: Consolas, monospace; font-size: 1.15rem; font-weight: 800;
+  }
+  .field.sub input { color: var(--blue); }
+
+  /* help view */
+  .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .chips code { font-size: 1.05rem; padding: .1em .6em; }
+  table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+  th, td { border: 1px solid var(--line); padding: .35rem .6rem; text-align: left; }
+  th { background: var(--panel-2); color: #bbf7d0; }
+  ol, ul { margin: 0; padding-left: 1.4rem; display: grid; gap: .35rem; font-size: 1.05rem; }
+  .span2 { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    <span class="badge">100 คะแนน · 120 นาที</span>
+    <h1>สอบปฏิบัติ: สร้างหน้าเว็บ Line Performance</h1>
+  </div>
+  <div class="tools">
+    <span class="timer" id="timer">120:00</span>
+    <button class="tb" id="tbtn" onclick="toggleTimer()">▶ เริ่มจับเวลา</button>
+    <button class="tb" onclick="resetTimer()">รีเซ็ต</button>
+    <button class="tb on" id="v1" onclick="showView('main')">โจทย์</button>
+    <button class="tb" id="v2" onclick="showView('help')">ข้อมูลช่วย</button>
+    <button class="tb" onclick="scale(-0.08)">A−</button>
+    <button class="tb" onclick="scale(0.08)">A+</button>
+    <button class="tb" onclick="fullscreen()">⛶ เต็มจอ</button>
+  </div>
+</header>
+
+<div class="rules">
+  <b>กติกา (Open-World):</b> เปิดสไลด์ · ดู Workshop เก่า · ใช้ AI · ถามเพื่อน · ถามอาจารย์ ได้ทุกอย่าง
+  &nbsp;|&nbsp; <b>ข้อระวัง:</b> เปิดด้วย <b>Live Server</b> · ห้ามเปลี่ยนชื่อ <code>id</code> ใน <code>index.html</code> และชื่อฟังก์ชันใน <code>script.js</code>
+</div>
+
+<main>
+  <!-- ======== VIEW 1: โจทย์ ======== -->
+  <section class="view active" id="view-main">
+    <div class="panel">
+      <h2>🎯 หน้าเว็บที่ต้องทำให้ได้ <span class="hint">กดปุ่มสลับดูสถานะ</span></h2>
+      <div class="states">
+        <button class="st active" onclick="setMock('ok',this)">🟢 ปกติ 92.0%</button>
+        <button class="st" onclick="setMock('warn',this)">🟡 เฝ้าระวัง 75.0%</button>
+        <button class="st" onclick="setMock('bad',this)">🔴 ต่ำกว่าเป้า 50.0%</button>
+        <button class="st" onclick="setMock('err',this)">⚠️ โหลดไม่สำเร็จ</button>
+      </div>
+      <div class="frame">
+        <div class="bar">
+          <span class="dot" style="background:#ef4444"></span><span class="dot" style="background:#eab308"></span><span class="dot" style="background:#22c55e"></span>
+          <span class="url">http://127.0.0.1:5500/index.html</span>
+        </div>
+        <div class="screen">
+          <h3>Line Performance</h3>
+          <p class="ln">Line A · กะ Day</p>
+          <div class="cards">
+            <div class="card"><p class="l">ผลิตได้ (ชิ้น)</p><p class="v" id="m-actual">1,104</p></div>
+            <div class="card"><p class="l">เป้าหมาย (ชิ้น)</p><p class="v" id="m-target">1,200</p></div>
+            <div class="card"><p class="l">ชิ้นงานเสีย</p><p class="v" id="m-defect">18</p></div>
+            <div class="card"><p class="l">Performance</p><p class="v" id="m-perf">92.0%</p><span class="chip ok" id="m-chip">ปกติ</span></div>
+          </div>
+          <div class="actions">
+            <input id="m-sender" type="text" placeholder="ชื่อผู้แจ้ง (เช่น 05 สมชาย)" style="padding:.4rem .6rem;border-radius:.4rem;border:1px solid #374151;background:#1f2937;color:#e5e7eb;font-size:.82rem;">
+            <button class="abtn" id="m-btn" disabled onclick="mockAlert()">แจ้งหัวหน้างาน</button>
+            <span class="ares" id="m-res"></span>
+          </div>
+          <div class="foot"><span class="err" id="m-err"></span><span class="upd">อัปเดตล่าสุด 09:15:30</span></div>
+        </div>
+      </div>
+      <div class="th">
+        <div class="t-ok">85.0% ขึ้นไป<small>ปกติ · สีเขียว</small></div>
+        <div class="t-warn">60.0 – 84.9%<small>เฝ้าระวัง · สีเหลือง</small></div>
+        <div class="t-bad">ต่ำกว่า 60.0%<small>ต่ำกว่าเป้า · สีแดง</small></div>
+        <div class="t-off">target ≤ 0<small>ไม่มีข้อมูล · สีเทา</small></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🛠️ สิ่งที่ต้องทำ 6 ข้อ <span class="hint">แก้ต่อจากโฟลเดอร์ starter/</span></h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><div>
+          <h3>จัดหน้าจอให้เหมือนตัวอย่าง <span>15 คะแนน</span></h3>
+          <p>การ์ด 4 ใบเรียงแถว · ตัวเลขใหญ่ · มีสีสถานะ · ปุ่มใหญ่ ≥ 44px <code>style.css</code></p></div></div>
+        <div class="step"><div class="num">2</div><div>
+          <h3>ดึงข้อมูล JSON มาแสดง <span>20 คะแนน</span></h3>
+          <p><code>fetch</code> ไฟล์ <code>data/performance.json</code> · ถ้าพังให้ขึ้น "โหลดข้อมูลไม่สำเร็จ"</p></div></div>
+        <div class="step"><div class="num">3</div><div>
+          <h3>คำนวณ % และเปลี่ยนสีสถานะ <span>20 คะแนน</span></h3>
+          <p>ผลิตได้ ÷ เป้าหมาย × 100 ปัดทศนิยม 1 ตำแหน่ง แล้วใส่ข้อความ + สีตามเกณฑ์</p></div></div>
+        <div class="step"><div class="num">4</div><div>
+          <h3>อัปเดตข้อมูลเองทุก 10 วินาที <span>10 คะแนน</span></h3>
+          <p>โหลดทันทีตอนเปิดหน้า แล้วโหลดซ้ำทุก 10 วินาที พร้อมแสดงเวลาอัปเดตล่าสุด</p></div></div>
+        <div class="step"><div class="num">5</div><div>
+          <h3>ปุ่มแจ้งหัวหน้างาน (Webhook) <span>15 คะแนน</span></h3>
+          <p>กดได้เฉพาะตอน "ต่ำกว่าเป้า" · ส่ง <code>POST</code> JSON ไป Webhook · กดซ้ำไม่ได้</p></div></div>
+        <div class="step"><div class="num">6</div><div>
+          <h3>ทดสอบ 5 ไฟล์ + ส่งงาน <span>20 คะแนน</span></h3>
+          <p>ลองไฟล์ใน <code>data/samples/</code> ให้ครบ (ดูค่าขอบ 85.0 / 60.0) แล้วส่งโฟลเดอร์เป็น <code>.zip</code></p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== VIEW 2: ข้อมูลช่วย ======== -->
+  <section class="view" id="view-help">
+    <div class="panel">
+      <h2>🏷️ id ใน index.html (ห้ามลบ / ห้ามเปลี่ยนชื่อ)</h2>
+      <div class="chips">
+        <code>#line</code><code>#actual</code><code>#target</code><code>#defect</code><code>#performance</code>
+        <code>#status</code><code>#alert-btn</code><code>#alert-result</code><code>#message</code><code>#updated</code>
+      </div>
+      <h2 style="margin-top:.6rem">📤 ก่อนส่งงาน</h2>
+      <ol>
+        <li>ตรวจว่า <code>DATA_URL</code> กลับเป็น <code>'data/performance.json'</code></li>
+        <li>เปิด Console (F12) ต้องไม่มีข้อความสีแดง</li>
+        <li>บีบอัดทั้งโฟลเดอร์ ตั้งชื่อ <code>รุ่น-เลขที่-ชื่อ.zip</code></li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h2>🧪 ไฟล์ทดสอบใน data/samples/</h2>
+      <table>
+        <tr><th>ไฟล์</th><th>ผลิตได้ / เป้า</th><th>ผลที่ควรได้</th><th>ปุ่มแจ้งเตือน</th></tr>
+        <tr><td><code>normal.json</code></td><td>1104 / 1200</td><td>92.0% · ปกติ</td><td>กดไม่ได้</td></tr>
+        <tr><td><code>watch.json</code></td><td>900 / 1200</td><td>75.0% · เฝ้าระวัง</td><td>กดไม่ได้</td></tr>
+        <tr><td><code>boundary-85.json</code></td><td>1020 / 1200</td><td>85.0% · ปกติ</td><td>กดไม่ได้</td></tr>
+        <tr><td><code>boundary-60.json</code></td><td>720 / 1200</td><td>60.0% · เฝ้าระวัง</td><td>กดไม่ได้</td></tr>
+        <tr><td><code>low.json</code></td><td>600 / 1200</td><td>50.0% · ต่ำกว่าเป้า</td><td><b>กดได้</b></td></tr>
+      </table>
+    </div>
+    <div class="panel span2">
+      <h2>📊 สัดส่วนคะแนน (รวม 100)</h2>
+      <table>
+        <tr><th>ข้อ</th><th>งาน</th><th>คะแนน</th></tr>
+        <tr><td>1</td><td>จัดหน้าจอ Dashboard</td><td>15</td></tr>
+        <tr><td>2</td><td>ดึงข้อมูลด้วย fetch</td><td>20</td></tr>
+        <tr><td>3</td><td>คำนวณ % และแสดงสถานะ</td><td>20</td></tr>
+        <tr><td>4</td><td>อัปเดตอัตโนมัติ</td><td>10</td></tr>
+        <tr><td>5</td><td>ปุ่มแจ้งเตือน Webhook</td><td>15</td></tr>
+        <tr><td>6</td><td>ทดสอบ 5 ไฟล์ + ส่งงาน</td><td>15</td></tr>
+        <tr><td>—</td><td>คุณภาพโค้ด (ไม่มี error ใน Console)</td><td>5</td></tr>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="field"><label for="wh">WEBHOOK_URL (ข้อ 5)</label><input id="wh" value="http://10.1.9.112:8000/api/notify" placeholder="วาง URL ห้องเรียนที่นี่..." oninput="save()"></div>
+  <div class="field sub"><label for="sb">ส่งงาน</label><input id="sb" value="รุ่น-เลขที่-ชื่อ.zip" oninput="save()"></div>
+</footer>
+
+<script>
+const S = {
+  ok:   { a:'1,104', t:'1,200', p:'92.0%', txt:'ปกติ',        cls:'ok',   dis:true,  err:'' },
+  warn: { a:'900',   t:'1,200', p:'75.0%', txt:'เฝ้าระวัง',    cls:'warn', dis:true,  err:'' },
+  bad:  { a:'600',   t:'1,200', p:'50.0%', txt:'ต่ำกว่าเป้า',  cls:'bad',  dis:false, err:'' },
+  err:  { a:'1,104', t:'1,200', p:'92.0%', txt:'ปกติ',        cls:'ok',   dis:true,  err:'โหลดข้อมูลไม่สำเร็จ' }
+};
+const $ = id => document.getElementById(id);
+function setMock(k, el) {
+  document.querySelectorAll('.st').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const d = S[k];
+  $('m-actual').textContent = d.a; $('m-target').textContent = d.t; $('m-perf').textContent = d.p;
+  $('m-chip').textContent = d.txt; $('m-chip').className = 'chip ' + d.cls;
+  $('m-btn').disabled = d.dis; $('m-res').textContent = ''; $('m-err').textContent = d.err;
+}
+function mockAlert() { $('m-btn').disabled = true; $('m-res').textContent = 'ส่งแจ้งเตือนแล้ว'; }
+
+function showView(v) {
+  $('view-main').classList.toggle('active', v === 'main');
+  $('view-help').classList.toggle('active', v === 'help');
+  $('v1').classList.toggle('on', v === 'main');
+  $('v2').classList.toggle('on', v === 'help');
+}
+
+let left = 120 * 60, tm = null;
+function draw() {
+  $('timer').textContent = String(Math.floor(left / 60)).padStart(2, '0') + ':' + String(left % 60).padStart(2, '0');
+  $('timer').classList.toggle('urgent', left <= 300);
+}
+function toggleTimer() {
+  if (tm) { clearInterval(tm); tm = null; $('tbtn').textContent = '▶ เริ่มต่อ'; return; }
+  tm = setInterval(() => { if (left > 0) { left--; draw(); } else { clearInterval(tm); tm = null; $('tbtn').textContent = 'หมดเวลา'; } }, 1000);
+  $('tbtn').textContent = '⏸ พัก';
+}
+function resetTimer() { clearInterval(tm); tm = null; left = 7200; $('tbtn').textContent = '▶ เริ่มจับเวลา'; draw(); }
+
+let sc = 1;
+function scale(d) { sc = Math.min(1.5, Math.max(0.7, +(sc + d).toFixed(2))); document.documentElement.style.setProperty('--scale', sc); }
+function fullscreen() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); }
+function save() { localStorage.setItem('boi_wh', $('wh').value); localStorage.setItem('boi_sb', $('sb').value); }
+(function () { const w = localStorage.getItem('boi_wh'), s = localStorage.getItem('boi_sb'); if (w !== null) $('wh').value = w; if (s !== null) $('sb').value = s; })();
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === '1') showView('main');
+  if (e.key === '2') showView('help');
+  if (e.key === 'f' || e.key === 'F') fullscreen();
+});
+if (location.hash === '#help') showView('help');
+draw();
+</script>
+</body>
+</html>

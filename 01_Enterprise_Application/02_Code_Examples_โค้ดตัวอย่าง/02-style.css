@@ -1,0 +1,9 @@
+/* External Style Sheet สำหรับ 02-css-basics.html
+   หลายหน้าใช้ไฟล์นี้ร่วมกันได้ แก้ที่เดียวเปลี่ยนทุกหน้า */
+
+.header {
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}

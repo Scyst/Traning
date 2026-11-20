@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- ส่งข้อมูลด้วย POST ไปยัง Webhook เพื่อแจ้งเตือน · สไลด์ 86–90, Workshop 4 -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Webhook POST</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 24px; }
+    button { min-width: 44px; min-height: 44px; padding: 8px 20px; }
+    pre { background: #f3f3f3; padding: 12px; }
+  </style>
+</head>
+<body>
+  <p>Webhook URL: <input id="url" type="url" size="60" placeholder="ใส่ URL ช่องแจ้งเตือนของห้องเรียน"></p>
+  <button id="start-btn">Start เครื่อง (และส่งแจ้งเตือน)</button>
+  <p id="result"></p>
+  <p>ข้อมูลที่จะส่ง:</p>
+  <pre id="preview"></pre>
+
+  <script>
+    // ห้ามใช้ช่องแจ้งเตือนจริงของโรงงานตอนฝึก
+    // งานจริงไม่ควรให้หน้าเว็บยิง Webhook ตรง เพราะใครก็เปิด DevTools เห็น URL และ token ได้
+    // ให้ส่งผ่าน Backend ของเราแทน
+
+    function buildPayload() {
+      return {
+        title: 'Machine started',
+        message: 'M-01 เริ่มทำงานเวลา ' + new Date().toLocaleTimeString('th-TH')
+      };
+    }
+    document.getElementById('preview').textContent = JSON.stringify(buildPayload(), null, 2);
+
+    async function sendAlert(url, payload) {
+      const res = await fetch(url, {
+        method: 'POST',                                  // ส่งข้อมูลใหม่
+        headers: { 'Content-Type': 'application/json' }, // บอก Server ว่า body เป็น JSON
+        body: JSON.stringify(payload)                    // ลืม stringify จะส่งไปเป็น "[object Object]"
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res;
+    }
+
+    const btn = document.getElementById('start-btn');
+    const result = document.getElementById('result');
+
+    btn.addEventListener('click', async () => {
+      const url = document.getElementById('url').value.trim();
+      if (!url) {
+        result.textContent = 'ใส่ Webhook URL ก่อน';
+        return;
+      }
+      btn.disabled = true;                 // กันกดซ้ำระหว่างรอ ไม่ให้แจ้งเตือนซ้ำหลายครั้ง
+      result.textContent = 'กำลังส่ง…';
+      try {
+        await sendAlert(url, buildPayload());
+        result.textContent = 'ส่งแจ้งเตือนแล้ว';
+      } catch (err) {
+        result.textContent = 'ส่งไม่สำเร็จ: ' + err.message;  // เช่น CORS, URL ผิด, เน็ตหลุด
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    // เปิด F12 › Network แล้วกดปุ่ม จะเห็น request:
+    // 1) OPTIONS (preflight) เพราะส่ง Content-Type: application/json ข้ามโดเมน
+    // 2) POST พร้อม Payload ที่แท็บ Payload
+  </script>
+</body>
+</html>

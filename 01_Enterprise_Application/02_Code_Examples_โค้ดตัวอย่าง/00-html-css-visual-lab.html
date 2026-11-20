@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>สื่อการสอน Visual Lab: เข้าใจ HTML &amp; CSS แบบเห็นภาพ (กล่องซ้อนกล่อง)</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --panel-2: #111827;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --ok: #22c55e;
+      --warn: #eab308;
+      --bad: #ef4444;
+      --purple: #a855f7;
+      --scale: 1;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      font-size: calc(16px * var(--scale));
+    }
+
+    body {
+      margin: 0;
+      font-family: "Leelawadee UI", "Tahoma", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    /* ===== Top Classroom Header ===== */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand .pill {
+      background: #0ea5e9;
+      color: #082f49;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.78rem;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.15rem;
+    }
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tool-btn {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tool-btn:hover { background: #334155; }
+
+    /* ===== Chapter Tabs ===== */
+    .tabs {
+      background: #111827;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 9px 15px;
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { border-color: var(--accent); color: #fff; }
+    .tab-btn.active {
+      background: #0284c7;
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    }
+
+    /* ===== Main Container ===== */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section-view { display: none; }
+    .section-view.active { display: block; }
+
+    .intro-banner {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid #334155;
+      border-left: 5px solid var(--accent);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+    .intro-banner h2 {
+      margin: 0 0 4px;
+      font-size: 1.25rem;
+      color: #7dd3fc;
+    }
+    .intro-banner p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 0.96rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+
+    .card-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .card-panel h3 {
+      margin: 0 0 12px;
+      font-size: 1.08rem;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .hint-box {
+      background: #0f172a;
+      border: 1px dashed #475569;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      margin-top: 12px;
+    }
+    .hint-box b { color: #fde047; }
+
+    code, .mono {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .pill-btn {
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font: inherit;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .pill-btn:hover { background: #334155; }
+    .pill-btn.active {
+      background: #0369a1;
+      border-color: #38bdf8;
+      color: #fff;
+    }
+    .pill-btn.danger.active {
+      background: #b91c1c;
+      border-color: #f87171;
+    }
+    .pill-btn.success.active {
+      background: #15803d;
+      border-color: #4ade80;
+    }
+
+    /* ===== LESSON 1: TAG ANATOMY & BLOCK/INLINE ===== */
+    .anatomy-stage {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.3rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .tok {
+      display: inline-block;
+      padding: 3px 8px;
+      margin: 2px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .tok:hover { transform: translateY(-2px); }
+    .tok.active { box-shadow: 0 0 0 3px #fff; transform: translateY(-2px); }
+    .tok-open { background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+    .tok-id   { background: #581c87; color: #e9d5ff; border-color: #a855f7; }
+    .tok-cls  { background: #064e3b; color: #6ee7b7; border-color: #10b981; }
+    .tok-txt  { background: #78350f; color: #fde68a; border-color: #f59e0b; }
+    .tok-close{ background: #1e3a8a; color: #93c5fd; border-color: #3b82f6; }
+
+    .explain-card {
+      margin-top: 14px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: #0f172a;
+      border-left: 5px solid #38bdf8;
+      min-height: 92px;
+    }
+    .explain-card h4 { margin: 0 0 4px; color: #38bdf8; font-size: 1.05rem; }
+    .explain-card p { margin: 0; color: #e2e8f0; font-size: 0.95rem; }
+
+    .block-inline-stage {
+      background: #0b1120;
+      border: 1px dashed #475569;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .demo-block {
+      background: rgba(56, 189, 248, 0.18);
+      border: 2px solid #38bdf8;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .demo-inline {
+      background: rgba(34, 197, 94, 0.22);
+      border: 2px solid #22c55e;
+      border-radius: 6px;
+      padding: 4px 10px;
+      margin: 2px 4px 2px 0;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    .broken-preview {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 10px;
+    }
+    .sim-card {
+      background: #1f2937;
+      border: 2px solid #38bdf8;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .sim-card.second { border-color: #f59e0b; }
+
+    /* ===== LESSON 2: NESTED BOXES (กล่องซ้อนกล่อง) ===== */
+    .nest-layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.25fr);
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .nest-layout { grid-template-columns: 1fr; }
+    }
+
+    .code-tree {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 12px;
+      font-family: Consolas, monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+    }
+    .code-line {
+      padding: 2px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: pre;
+      overflow-x: auto;
+      border-left: 3px solid transparent;
+      transition: background 0.12s;
+    }
+    .code-line:hover, .code-line.hl {
+      background: rgba(56, 189, 248, 0.2);
+      border-left-color: #38bdf8;
+    }
+
+    .box-stage {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 22px;
+      perspective: 1100px;
+      min-height: 390px;
+    }
+
+    .nbox {
+      position: relative;
+      border-radius: 10px;
+      padding: 28px 14px 14px;
+      border: 2px solid;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      cursor: pointer;
+    }
+    .nbox-tag {
+      position: absolute;
+      top: 5px;
+      left: 10px;
+      font-family: Consolas, monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 1px 7px;
+      border-radius: 5px;
+      pointer-events: none;
+    }
+    .nbox.hl {
+      box-shadow: 0 0 0 4px #ffffff, 0 10px 28px rgba(56, 189, 248, 0.45);
+    }
+
+    .nb-main { background: rgba(168, 85, 247, 0.12); border-color: #a855f7; }
+    .nb-main > .nbox-tag { background: #a855f7; color: #fff; }
+
+    .nb-section { background: rgba(56, 189, 248, 0.12); border-color: #38bdf8; }
+    .nb-section > .nbox-tag { background: #38bdf8; color: #082f49; }
+
+    .nb-cards-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .nb-article {
+      flex: 1 1 160px;
+      background: rgba(34, 197, 94, 0.12);
+      border-color: #22c55e;
+    }
+    .nb-article > .nbox-tag { background: #22c55e; color: #052e16; }
+
+    .nb-p {
+      background: rgba(250, 204, 21, 0.14);
+      border-color: #eab308;
+      margin-top: 8px;
+      padding: 24px 10px 8px;
+      font-weight: 700;
+      text-align: center;
+    }
+    .nb-p > .nbox-tag { background: #eab308; color: #422006; }
+
+    /* 3D Exploded Layer Mode */
+    .box-stage.exploded .nb-main {
+      transform: rotateX(18deg) rotateY(-10deg);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+    }
+    .box-stage.exploded .nb-section {
+      transform: translateZ(26px) translateY(-4px);
+      box-shadow: 0 14px 25px rgba(0,0,0,0.5);
+    }
+    .box-stage.exploded .nb-article {
+      transform: translateZ(28px) translateY(-6px);
+      box-shadow: 0 14px 24px rgba(0,0,0,0.5);
+    }
+    .box-stage.exploded .nb-p {
+      transform: translateZ(24px) translateY(-4px);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.45);
+    }
+
+    .family-badge-bar {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      font-size: 0.92rem;
+    }
+
+    /* ===== LESSON 3: BOX MODEL ===== */
+    .bm-stage {
+      background: #0b1120;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      min-height: 310px;
+      overflow: auto;
+    }
+    .bm-margin {
+      background: rgba(249, 115, 22, 0.25);
+      border: 2px dashed #fb923c;
+      border-radius: 10px;
+      position: relative;
+      display: inline-block;
+      transition: padding 0.1s;
+    }
+    .bm-margin-lbl {
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #fdba74;
+    }
+    .bm-border {
+      background: #facc15;
+      border-radius: 8px;
+      position: relative;
+      transition: padding 0.1s, border-radius 0.1s;
+    }
+    .bm-padding {
+      background: #166534;
+      border-radius: 6px;
+      position: relative;
+      transition: padding 0.1s;
+    }
+    .bm-padding-lbl {
+      position: absolute;
+      top: 2px;
+      left: 6px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #bbf7d0;
+    }
+    .bm-content {
+      background: #1d4ed8;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 4px;
+      text-align: center;
+      min-width: 150px;
+    }
+    .bm-content .big { font-size: 1.7rem; font-weight: 800; display: block; }
+    .bm-neighbor {
+      background: #1e293b;
+      border: 2px solid #64748b;
+      border-radius: 10px;
+      padding: 18px 14px;
+      color: #94a3b8;
+      font-weight: 700;
+      text-align: center;
+      width: 120px;
+    }
+
+    .slider-row {
+      display: grid;
+      grid-template-columns: 145px 1fr 58px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 0.92rem;
+    }
+    .slider-row input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
+    .slider-val {
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      text-align: right;
+      color: #fde047;
+    }
+
+    .ruler-box-wrap {
+      margin-top: 14px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .ruler-bar {
+      height: 18px;
+      background: #38bdf8;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #082f49;
+      font-weight: 800;
+      font-size: 0.78rem;
+      transition: width 0.2s;
+      margin-top: 8px;
+    }
+
+    /* ===== LESSON 4: CSS SELECTORS ===== */
+    .sel-preview {
+      background: #111827;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .sel-target {
+      transition: all 0.2s ease;
+    }
+    .sel-matched {
+      outline: 3px solid #fde047 !important;
+      outline-offset: 2px;
+      box-shadow: 0 0 20px rgba(253, 224, 71, 0.55) !important;
+      background-color: rgba(253, 224, 71, 0.14) !important;
+    }
+    .sel-input-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .sel-input-bar input {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #fde047;
+      font-family: Consolas, monospace;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .spec-battle {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .spec-rule {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-family: Consolas, monospace;
+      font-size: 0.9rem;
+    }
+    .spec-rule.winner {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.15);
+    }
+    .spec-rule.loser {
+      opacity: 0.55;
+      text-decoration: line-through;
+    }
+
+    /* ===== LESSON 5: FLEXBOX ===== */
+    .flex-viewport {
+      background: #0b1120;
+      border: 2px solid #475569;
+      border-radius: 12px;
+      padding: 16px;
+      margin: 0 auto;
+      max-width: 100%;
+      transition: width 0.2s;
+      overflow-x: auto;
+    }
+    .flex-parent {
+      border: 3px dashed #38bdf8;
+      border-radius: 10px;
+      padding: 14px;
+      min-height: 190px;
+      background: rgba(56, 189, 248, 0.06);
+      position: relative;
+    }
+    .flex-child {
+      background: #1f2937;
+      border: 2px solid #22c55e;
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+    .flex-child .t { color: #94a3b8; font-size: 0.82rem; margin: 0; }
+    .flex-child .n { font-size: 1.5rem; font-weight: 800; margin: 4px 0 0; }
+
+    /* ===== LESSON 6: REAL LINE PERFORMANCE X-RAY ===== */
+    .xray-layout {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .xray-layout { grid-template-columns: 1fr; }
+    }
+
+    .step-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .step-check input { margin-top: 4px; width: 18px; height: 18px; accent-color: #22c55e; }
+    .step-check code { color: #7dd3fc; font-size: 0.82rem; display: block; margin-top: 2px; }
+
+    /* Live Simulated Line Performance Screen */
+    .lp-screen {
+      border-radius: 12px;
+      border: 2px solid #334155;
+      padding: 20px;
+      min-height: 360px;
+      background: #ffffff;
+      color: #000000;
+      font-family: "Times New Roman", serif;
+      transition: all 0.25s ease;
+    }
+    .lp-screen.s-theme {
+      background: #111827;
+      color: #e5e7eb;
+      font-family: "Leelawadee UI", Tahoma, sans-serif;
+    }
+    .lp-screen h2.lp-h1 { margin: 0; font-size: 1.65rem; }
+    .lp-screen p.lp-sub { margin: 4px 0 18px; opacity: 0.75; }
+
+    .lp-cards { display: block; }
+    .lp-screen.s-flex .lp-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .lp-card { margin-bottom: 10px; }
+    .lp-screen.s-flex .lp-card { flex: 1 1 150px; margin-bottom: 0; }
+    .lp-screen.s-card .lp-card {
+      background: #1f2937;
+      color: #e5e7eb;
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid #374151;
+    }
+    .lp-label { margin: 0; }
+    .lp-screen.s-theme .lp-label { color: #9ca3af; font-size: 0.9rem; }
+    .lp-val { margin: 6px 0 0; }
+    .lp-screen.s-typo .lp-val { font-size: 2.1rem; font-weight: 800; }
+
+    .lp-status { display: inline-block; margin: 8px 0 0; }
+    .lp-screen.s-typo .lp-status {
+      padding: 3px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: #22c55e;
+      color: #052e16;
+    }
+    .lp-screen.s-typo .lp-status.bad {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .lp-actions { margin-top: 16px; }
+    .lp-screen.s-btn .lp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .lp-screen.s-btn .lp-btn {
+      min-height: 44px;
+      padding: 10px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: #ef4444;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .lp-screen.s-btn .lp-input {
+      min-height: 44px;
+      padding: 8px 12px;
+      border: 1px solid #4b5563;
+      border-radius: 8px;
+      background: #1f2937;
+      color: #fff;
+    }
+
+    /* X-Ray Overlay */
+    .lp-screen.xray-on [data-xtag] {
+      outline: 2px dashed #38bdf8 !important;
+      outline-offset: 2px;
+      position: relative;
+      padding-top: 24px !important;
+    }
+    .lp-screen.xray-on [data-xtag]::before {
+      content: attr(data-xtag);
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      background: #0284c7;
+      color: #ffffff;
+      font-family: Consolas, monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      line-height: 1.3;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .lp-screen.xray-on .lp-status,
+    .lp-screen.xray-on .lp-btn {
+      padding: 24px 16px 8px !important;
+      min-width: 155px;
+      text-align: center;
+    }
+    .lp-screen.xray-on .lp-cards {
+      outline-color: #a855f7 !important;
+      background: rgba(168, 85, 247, 0.08) !important;
+      padding: 28px 10px 10px !important;
+    }
+    .lp-screen.xray-on .lp-cards::before { background: #9333ea; }
+    .lp-screen.xray-on .lp-card { outline-color: #22c55e !important; }
+    .lp-screen.xray-on .lp-card::before { background: #15803d; }
+
+    .inspector-box {
+      margin-top: 12px;
+      background: #0b1120;
+      border: 1px solid #38bdf8;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- แถบเครื่องมือผู้สอน -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="pill">Visual Lab</span>
+      <h1>เข้าใจ HTML &amp; CSS แบบเห็นภาพ (แท็ก · กล่องซ้อนกล่อง · Box Model · Flexbox)</h1>
+    </div>
+    <div class="tools">
+      <button class="tool-btn" onclick="zoomPage(-0.08)">A−</button>
+      <button class="tool-btn" onclick="zoomPage(0.08)">A+</button>
+      <button class="tool-btn" onclick="toggleFullscreen()">⛶ เต็มจอ</button>
+    </div>
+  </header>
+
+  <!-- เมนูสลับบทเรียน -->
+  <nav class="tabs">
+    <button class="tab-btn active" onclick="showTab('t1', this)">1. แท็ก HTML = กล่องมีฉลาก</button>
+    <button class="tab-btn" onclick="showTab('t2', this)">2. กล่องซ้อนกล่อง (แม่–ลูก)</button>
+    <button class="tab-btn" onclick="showTab('t3', this)">3. กล่อง 4 ชั้น (Box Model)</button>
+    <button class="tab-btn" onclick="showTab('t4', this)">4. Selector (ทาสีให้ถูกกล่อง)</button>
+    <button class="tab-btn" onclick="showTab('t5', this)">5. Flexbox (จับกล่องเรียงแถว)</button>
+    <button class="tab-btn" onclick="showTab('t6', this)">6. ห้องแปลงร่าง &amp; X-Ray หน้าเว็บจริง</button>
+  </nav>
+
+  <main class="container">
+
+    <!-- ==================== บทที่ 1: แท็ก HTML ==================== -->
+    <section id="t1" class="section-view active">
+      <div class="intro-banner">
+        <h2>บทที่ 1: แท็ก HTML ก็เหมือน "กล่องกระดาษที่ติดฉลากไว้"</h2>
+        <p>กฎเหล็กข้อเดียวของ HTML: เปิดกล่องด้วย <code>&lt;ชื่อ&gt;</code> ใส่ของข้างใน แล้วต้องปิดกล่องด้วย <code>&lt;/ชื่อ&gt;</code> — กดคลิกที่ส่วนประกอบด้านล่างเพื่อดูหน้าที่จริง</p>
+      </div>
+
+      <div class="card-panel" style="margin-bottom: 18px;">
+        <h3>🔍 ผ่าตัดโค้ด 1 บรรทัด (คลิกที่แต่ละส่วนเพื่อดูความหมาย)</h3>
+        <div class="anatomy-stage">
+          <span class="tok tok-open active" onclick="explainPart('open', this)">&lt;p</span>
+          <span class="tok tok-id" onclick="explainPart('id', this)">id="actual"</span>
+          <span class="tok tok-cls" onclick="explainPart('cls', this)">class="value ok"</span>
+          <span class="tok tok-open" onclick="explainPart('openEnd', this)">&gt;</span>
+          <span class="tok tok-txt" onclick="explainPart('content', this)">1,104 ชิ้น</span>
+          <span class="tok tok-close" onclick="explainPart('close', this)">&lt;/p&gt;</span>
+        </div>
+        <div class="explain-card" id="part-explain">
+          <h4>📦 แท็กเปิด &lt;p ...&gt; (Opening Tag)</h4>
+          <p>เป็นการบอกเบราว์เซอร์ว่า "เริ่มสร้างกล่องข้อความย่อหน้า (Paragraph) ตรงนี้" เพื่อเตรียมใส่ข้อมูลข้างใน</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🧱 นิสัยของกล่อง 2 แบบ: Block vs Inline</h3>
+          <div class="btn-row">
+            <button class="pill-btn active" onclick="setBoxHabit('normal', this)">ดูเทียบกันปกติ</button>
+            <button class="pill-btn" onclick="setBoxHabit('allBlock', this)">จับทุกตัวเป็น Block (ขึ้นบรรทัดใหม่หมด)</button>
+            <button class="pill-btn" onclick="setBoxHabit('allInline', this)">จับทุกตัวเป็น Inline (เรียงต่อแถวเดียว)</button>
+          </div>
+          <div class="block-inline-stage" id="habit-stage">
+            <div class="demo-block" data-habit="block">&lt;div&gt; / &lt;p&gt; = กล่องแบบ Block (กินเต็มความกว้าง 1 แถวเสมอ)</div>
+            <div class="demo-block" data-habit="block">&lt;h1&gt; หัวข้อใหญ่ = Block (ขึ้นบรรทัดใหม่ให้เอง)</div>
+            <span class="demo-inline" data-habit="inline">&lt;span&gt; ชิ้น</span>
+            <span class="demo-inline" data-habit="inline">&lt;strong&gt; เน้นหนา</span>
+            <span class="demo-inline" data-habit="inline">&lt;button&gt; กดปุ่ม</span>
+          </div>
+          <div class="hint-box">
+            <b>จำง่ายๆ:</b> <b>Block</b> = ลังใหญ่ 1 ใบวางขวางเต็มชั้น (ใบต่อไปต้องลงชั้นล่าง) · <b>Inline</b> = ของชิ้นเล็ก วางเรียงต่อข้างๆ กันในบรรทัดเดียวได้
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <h3>⚠️ ถ้า "ลืมปิดแท็ก &lt;/div&gt;" จะเกิดอะไรขึ้น?</h3>
+          <div class="btn-row">
+            <button class="pill-btn success active" onclick="toggleBrokenTag(false, this)">✅ ปิดแท็กครบ (&lt;/div&gt; ครบ)</button>
+            <button class="pill-btn danger" onclick="toggleBrokenTag(true, this)">💥 ลืมปิด &lt;/div&gt; การ์ดใบที่ 1</button>
+          </div>
+          <pre class="code-tree" id="broken-code" style="margin:0;"></pre>
+          <div class="broken-preview" id="broken-visual"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 2: กล่องซ้อนกล่อง ==================== -->
+    <section id="t2" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 2: กล่องซ้อนกล่อง (Nested Boxes &amp; กล่องแม่–กล่องลูก)</h2>
+        <p>หน้าเว็บทั้งหน้าคือการเอา <b>กล่องเล็ก</b> ใส่ไว้ใน <b>กล่องใหญ่</b> (เหมือนกล่องใส่อะไหล่ที่วางอยู่ในลังรวม แล้วลังรวมวางอยู่ในโกดังอีกที) ลองเอาเมาส์ชี้หรือคลิกที่โค้ดหรือกล่องได้เลย!</p>
+      </div>
+
+      <div class="btn-row">
+        <button class="pill-btn active" id="btn-flat" onclick="setExplode(false)">📐 มุมมองแบน (หน้าเว็บจริง)</button>
+        <button class="pill-btn" id="btn-3d" onclick="setExplode(true)">🧊 กางออกเป็นชั้น 3 มิติ (เห็นกล่องซ้อนชัดเจน!)</button>
+      </div>
+
+      <div class="nest-layout">
+        <div class="card-panel">
+          <h3>📝 ฝั่งโค้ด HTML (สังเกตการย่อหน้า!)</h3>
+          <div class="code-tree" id="nest-code">
+            <div class="code-line" data-nid="main" onmouseenter="hlNest('main')" onclick="hlNest('main')">&lt;main&gt; <span style="color:#a855f7;">// กล่องใหญ่สุด (คุณย่า)</span></div>
+            <div class="code-line" data-nid="cards" onmouseenter="hlNest('cards')" onclick="hlNest('cards')">  &lt;section class="cards"&gt; <span style="color:#38bdf8;">// กล่องแม่รวมการ์ด</span></div>
+            <div class="code-line" data-nid="card1" onmouseenter="hlNest('card1')" onclick="hlNest('card1')">    &lt;article class="card"&gt; <span style="color:#4ade80;">// กล่องลูกใบที่ 1</span></div>
+            <div class="code-line" data-nid="p1a" onmouseenter="hlNest('p1a')" onclick="hlNest('p1a')">      &lt;p class="label"&gt;ผลิตได้ (ชิ้น)&lt;/p&gt;</div>
+            <div class="code-line" data-nid="p1b" onmouseenter="hlNest('p1b')" onclick="hlNest('p1b')">      &lt;p id="actual" class="value"&gt;1,104&lt;/p&gt;</div>
+            <div class="code-line" data-nid="card1" onmouseenter="hlNest('card1')" onclick="hlNest('card1')">    &lt;/article&gt;</div>
+            <div class="code-line" data-nid="card2" onmouseenter="hlNest('card2')" onclick="hlNest('card2')">    &lt;article class="card"&gt; <span style="color:#4ade80;">// กล่องลูกใบที่ 2</span></div>
+            <div class="code-line" data-nid="p2a" onmouseenter="hlNest('p2a')" onclick="hlNest('p2a')">      &lt;p class="label"&gt;เป้าหมาย (ชิ้น)&lt;/p&gt;</div>
+            <div class="code-line" data-nid="p2b" onmouseenter="hlNest('p2b')" onclick="hlNest('p2b')">      &lt;p id="target" class="value"&gt;1,200&lt;/p&gt;</div>
+            <div class="code-line" data-nid="card2" onmouseenter="hlNest('card2')" onclick="hlNest('card2')">    &lt;/article&gt;</div>
+            <div class="code-line" data-nid="cards" onmouseenter="hlNest('cards')" onclick="hlNest('cards')">  &lt;/section&gt;</div>
+            <div class="code-line" data-nid="main" onmouseenter="hlNest('main')" onclick="hlNest('main')">&lt;/main&gt;</div>
+          </div>
+          <div class="family-badge-bar" id="family-info">
+            👆 ชี้หรือคลิกที่โค้ด หรือคลิกที่กล่องด้านขวา เพื่อดูว่ากล่องไหนเป็น <b>แม่ (Parent)</b> และกล่องไหนเป็น <b>ลูก (Child)</b>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <h3>📦 ภาพจำลองกล่องซ้อนกล่องจริง</h3>
+          <div class="box-stage" id="nest-stage">
+            <div class="nbox nb-main" data-nid="main" onclick="event.stopPropagation(); hlNest('main')">
+              <span class="nbox-tag">&lt;main&gt; (ชั้นที่ 1 · กล่องใหญ่สุด)</span>
+              <div class="nbox nb-section" data-nid="cards" onclick="event.stopPropagation(); hlNest('cards')">
+                <span class="nbox-tag">&lt;section class="cards"&gt; (ชั้นที่ 2 · กล่องแม่)</span>
+                <div class="nb-cards-row">
+                  <div class="nbox nb-article" data-nid="card1" onclick="event.stopPropagation(); hlNest('card1')">
+                    <span class="nbox-tag">&lt;article class="card"&gt; (ลูก 1)</span>
+                    <div class="nbox nb-p" data-nid="p1a" onclick="event.stopPropagation(); hlNest('p1a')">
+                      <span class="nbox-tag">&lt;p class="label"&gt; (หลาน)</span>
+                      ผลิตได้ (ชิ้น)
+                    </div>
+                    <div class="nbox nb-p" data-nid="p1b" onclick="event.stopPropagation(); hlNest('p1b')">
+                      <span class="nbox-tag">&lt;p id="actual"&gt; (หลาน)</span>
+                      <span style="font-size:1.5rem;">1,104</span>
+                    </div>
+                  </div>
+                  <div class="nbox nb-article" data-nid="card2" onclick="event.stopPropagation(); hlNest('card2')">
+                    <span class="nbox-tag">&lt;article class="card"&gt; (ลูก 2)</span>
+                    <div class="nbox nb-p" data-nid="p2a" onclick="event.stopPropagation(); hlNest('p2a')">
+                      <span class="nbox-tag">&lt;p class="label"&gt; (หลาน)</span>
+                      เป้าหมาย (ชิ้น)
+                    </div>
+                    <div class="nbox nb-p" data-nid="p2b" onclick="event.stopPropagation(); hlNest('p2b')">
+                      <span class="nbox-tag">&lt;p id="target"&gt; (หลาน)</span>
+                      <span style="font-size:1.5rem;">1,200</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="hint-box">
+            <b>ทำไมต้องจำเรื่อง "แม่–ลูก"?</b> เพราะตอนจัดหน้าด้วย CSS เช่น <code>display: flex;</code> เราต้องสั่งที่ <b>กล่องแม่ (&lt;section class="cards"&gt;)</b> ลูกๆ ข้างใน (<code>&lt;article class="card"&gt;</code>) ถึงจะเรียงข้างกัน!
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 3: BOX MODEL ==================== -->
+    <section id="t3" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 3: กล่อง 4 ชั้น (CSS Box Model) — ป้องกันงงเรื่อง Margin vs Padding</h2>
+        <p>ลองลากแถบเลื่อนด้านซ้าย แล้วสังเกตว่า <b>Padding</b> ขยายจากข้างใน (ดันขอบกล่องให้อ้วนขึ้น) ส่วน <b>Margin</b> เป็นระยะว่างนอกกล่อง (ผลักกล่องข้างเคียงให้ถอยออกไป)</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🎛️ ปรับแต่งชั้นของกล่องสดๆ</h3>
+          <div class="slider-row">
+            <label style="color:#4ade80;font-weight:700;">Padding (ด้านใน):</label>
+            <input type="range" id="sl-pad" min="0" max="44" value="20" oninput="updateBoxModel()">
+            <span class="slider-val" id="val-pad">20px</span>
+          </div>
+          <div class="slider-row">
+            <label style="color:#facc15;font-weight:700;">Border (เส้นขอบ):</label>
+            <input type="range" id="sl-bor" min="0" max="14" value="4" oninput="updateBoxModel()">
+            <span class="slider-val" id="val-bor">4px</span>
+          </div>
+          <div class="slider-row">
+            <label style="color:#fb923c;font-weight:700;">Margin (ด้านนอก):</label>
+            <input type="range" id="sl-mar" min="0" max="44" value="20" oninput="updateBoxModel()">
+            <span class="slider-val" id="val-mar">20px</span>
+          </div>
+          <div class="slider-row">
+            <label style="color:#e2e8f0;font-weight:700;">Border Radius (มน):</label>
+            <input type="range" id="sl-rad" min="0" max="24" value="10" oninput="updateBoxModel()">
+            <span class="slider-val" id="val-rad">10px</span>
+          </div>
+
+          <pre class="code-tree" id="bm-css" style="margin-top:10px;"></pre>
+
+          <div class="ruler-box-wrap">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+              <b>📏 ความกว้างจริงของกล่องเมื่อตั้ง <code>width: 220px;</code></b>
+              <button class="pill-btn active" id="btn-bs" onclick="toggleBoxSizing()">โหมดปัจจุบัน: border-box</button>
+            </div>
+            <div id="bs-explain" style="font-size:0.88rem;color:#cbd5e1;margin-top:6px;"></div>
+            <div class="ruler-bar" id="bs-bar" style="width:220px;">220 px</div>
+          </div>
+        </div>
+
+        <div class="card-panel">
+          <h3>📦 ภาพจำลอง 4 ชั้น (สีตรงกับ DevTools F12!)</h3>
+          <div class="bm-stage">
+            <div class="bm-margin" id="bm-margin">
+              <span class="bm-margin-lbl">MARGIN</span>
+              <div class="bm-border" id="bm-border">
+                <div class="bm-padding" id="bm-padding">
+                  <span class="bm-padding-lbl">PADDING</span>
+                  <div class="bm-content">
+                    <span>ผลิตได้ (ชิ้น)</span>
+                    <span class="big">1,104</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bm-neighbor">กล่องข้างๆ<br>(เพื่อนบ้าน)</div>
+          </div>
+          <div class="hint-box">
+            <b>ทริคจำง่ายๆ ไม่สับสน:</b><br>
+            🟦 <b>Content</b> = ของข้างใน (ข้อความ/รูป) &nbsp;|&nbsp;
+            🟩 <b>Padding</b> = โฟมกันกระแทก<i>ในกล่อง</i> (ทำกล่องอ้วน)<br>
+            🟨 <b>Border</b> = ผนังกล่อง &nbsp;|&nbsp;
+            🟧 <b>Margin</b> = ทางเดิน<i>นอกกล่อง</i> (ผลักเพื่อนบ้านออก)
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 4: CSS SELECTORS ==================== -->
+    <section id="t4" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 4: CSS Selector — จะทาสีกล่องไหน ต้องเรียกชื่อกล่องให้ถูก!</h2>
+        <p>CSS ต้อง "ชี้เป้า" ก่อนแล้วค่อย "สั่งแต่ง" ลองกดปุ่ม Selector ด้านล่าง (หรือพิมพ์เอง) เพื่อดูว่าเบราว์เซอร์ยิงเลเซอร์จับโดนกล่องไหนบ้าง</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🎯 กดทดลองยิง Selector</h3>
+          <div class="btn-row">
+            <button class="pill-btn active" onclick="testSelector('p', this)"><code>p</code> (ทุกแท็ก p)</button>
+            <button class="pill-btn" onclick="testSelector('.card', this)"><code>.card</code> (ป้าย class)</button>
+            <button class="pill-btn" onclick="testSelector('.card .value', this)"><code>.card .value</code> (ลูกในกล่อง)</button>
+            <button class="pill-btn" onclick="testSelector('#actual', this)"><code>#actual</code> (id เดียว)</button>
+            <button class="pill-btn" onclick="testSelector('#alert-btn', this)"><code>#alert-btn</code> (ปุ่ม)</button>
+            <button class="pill-btn" onclick="testSelector('.status.bad', this)"><code>.status.bad</code> (2 คลาสติด)</button>
+          </div>
+          <div class="sel-input-bar">
+            <input type="text" id="sel-input" value="p" oninput="runSelector(this.value)" placeholder="พิมพ์ Selector เอง เช่น .card p">
+          </div>
+          <div class="explain-card" id="sel-explain" style="margin-top:0;min-height:70px;"></div>
+
+          <h3 style="margin-top:18px;">⚔️ ศึกชนกัน! ถ้าสั่งสีเดียวกัน 2 ที่ ใครชนะ?</h3>
+          <div class="btn-row">
+            <button class="pill-btn active" onclick="setBattleStep(1, this)">1. แค่ชื่อแท็ก (p)</button>
+            <button class="pill-btn" onclick="setBattleStep(2, this)">2. เพิ่ม .class (.warn)</button>
+            <button class="pill-btn" onclick="setBattleStep(3, this)">3. เพิ่ม #id (#critical)</button>
+          </div>
+          <div class="spec-battle" id="battle-list"></div>
+          <div id="battle-result" style="margin-top:10px;padding:10px;border-radius:8px;background:#0b1120;text-align:center;font-weight:800;font-size:1.1rem;"></div>
+        </div>
+
+        <div class="card-panel">
+          <h3>📺 ผลลัพธ์: กล่องที่โดนจับคู่จะเรืองแสงสีเหลือง</h3>
+          <div class="sel-preview" id="sel-preview">
+            <h4 style="margin:0 0 4px;">Line Performance (&lt;h4&gt;)</h4>
+            <p id="line-txt" style="margin:0 0 12px;color:#94a3b8;">&lt;p id="line-txt"&gt; Line A · กะ Day</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <article class="card sel-target" style="flex:1 1 130px;background:#1f2937;padding:12px;border-radius:8px;border:1px solid #374151;">
+                <p class="label sel-target" style="margin:0;color:#9ca3af;font-size:0.85rem;">&lt;p class="label"&gt; ผลิตได้</p>
+                <p id="actual" class="value sel-target" style="margin:4px 0 0;font-size:1.6rem;font-weight:800;">600</p>
+              </article>
+              <article class="card sel-target" style="flex:1 1 130px;background:#1f2937;padding:12px;border-radius:8px;border:1px solid #374151;">
+                <p class="label sel-target" style="margin:0;color:#9ca3af;font-size:0.85rem;">&lt;p class="label"&gt; สถานะ</p>
+                <p class="value sel-target" style="margin:4px 0 0;font-size:1.6rem;font-weight:800;">50.0%</p>
+                <span class="status bad sel-target" style="display:inline-block;margin-top:6px;background:#ef4444;color:#fff;padding:2px 8px;border-radius:5px;font-weight:700;font-size:0.85rem;">ต่ำกว่าเป้า</span>
+              </article>
+            </div>
+            <div style="margin-top:12px;">
+              <button id="alert-btn" class="sel-target" type="button" style="padding:10px 16px;border-radius:8px;border:0;background:#ef4444;color:#fff;font-weight:700;">&lt;button id="alert-btn"&gt; แจ้งหัวหน้างาน</button>
+            </div>
+          </div>
+          <div class="hint-box">
+            <b>สรุป 3 สัญลักษณ์สำคัญที่สุด:</b><br>
+            • <b>ไม่ใส่จุด</b> (<code>p</code>) = เรียกตามชื่อแท็ก &nbsp;|&nbsp;
+            • <b>ใส่จุดนำหน้า</b> (<code>.card</code>) = เรียก <code>class="..."</code> &nbsp;|&nbsp;
+            • <b>ใส่ # นำหน้า</b> (<code>#actual</code>) = เรียก <code>id="..."</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 5: FLEXBOX ==================== -->
+    <section id="t5" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 5: Flexbox (จับการ์ด 4 ใบมาเรียงเป็นแถว — แก้กับดักยอดฮิต!)</h2>
+        <p>จำง่ายๆ ประโยคเดียว: <b>"สั่ง <code>display: flex</code> ที่กล่องแม่ — กล่องลูกข้างในจะยอมเรียงข้างกันทันที!"</b></p>
+      </div>
+
+      <div class="card-panel" style="margin-bottom:18px;">
+        <h3>🚨 ทดลองเทียบกับดักอันดับ 1 ที่ทุกคนทำผิด</h3>
+        <div class="btn-row" style="margin-bottom:0;">
+          <button class="pill-btn danger" id="fx-wrong" onclick="setFlexTarget('wrong')">❌ ผิด: เผลอใส่ display: flex ที่กล่องลูก (.card)</button>
+          <button class="pill-btn success active" id="fx-right" onclick="setFlexTarget('right')">✅ ถูก: ใส่ display: flex ที่กล่องแม่ (.cards)</button>
+        </div>
+        <div id="fx-trap-msg" class="hint-box" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card-panel">
+          <h3>🎛️ ควบคุมการจัดเรียงของกล่องแม่ (.cards)</h3>
+          <div style="margin-bottom:10px;">
+            <b>ทิศทาง (<code>flex-direction</code>):</b>
+            <div class="btn-row" style="margin-top:4px;">
+              <button class="pill-btn active" onclick="setFlexProp('dir','row',this)">row (แนวนอน)</button>
+              <button class="pill-btn" onclick="setFlexProp('dir','column',this)">column (แนวตั้ง)</button>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <b>จัดแนวนอน (<code>justify-content</code>):</b>
+            <div class="btn-row" style="margin-top:4px;">
+              <button class="pill-btn active" onclick="setFlexProp('jc','flex-start',this)">flex-start</button>
+              <button class="pill-btn" onclick="setFlexProp('jc','center',this)">center</button>
+              <button class="pill-btn" onclick="setFlexProp('jc','space-between',this)">space-between</button>
+              <button class="pill-btn" onclick="setFlexProp('jc','space-around',this)">space-around</button>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;">
+            <b>ตัดขึ้นบรรทัดใหม่ (<code>flex-wrap</code>):</b>
+            <div class="btn-row" style="margin-top:4px;">
+              <button class="pill-btn active" onclick="setFlexProp('wrap','wrap',this)">wrap (จอแคบแล้วปัดลงล่าง)</button>
+              <button class="pill-btn" onclick="setFlexProp('wrap','nowrap',this)">nowrap (เบียดในแถวเดียว)</button>
+            </div>
+          </div>
+          <div class="slider-row">
+            <label><b>ระยะห่าง (<code>gap</code>):</b></label>
+            <input type="range" id="fx-gap" min="0" max="32" value="14" oninput="renderFlex()">
+            <span class="slider-val" id="fx-gap-val">14px</span>
+          </div>
+          <div class="slider-row">
+            <label><b>จำลองความกว้างจอ:</b></label>
+            <input type="range" id="fx-width" min="320" max="760" value="760" oninput="renderFlex()">
+            <span class="slider-val" id="fx-width-val">760px</span>
+          </div>
+          <pre class="code-tree" id="fx-css-out" style="margin:0;"></pre>
+        </div>
+
+        <div class="card-panel">
+          <h3>📺 หน้าตากล่องแม่ (.cards) และกล่องลูก (.card × 4)</h3>
+          <div class="flex-viewport" id="fx-viewport">
+            <div class="flex-parent" id="fx-parent">
+              <div class="flex-child"><p class="t">ผลิตได้</p><p class="n">1,104</p></div>
+              <div class="flex-child"><p class="t">เป้าหมาย</p><p class="n">1,200</p></div>
+              <div class="flex-child"><p class="t">ของเสีย</p><p class="n">18</p></div>
+              <div class="flex-child"><p class="t">Performance</p><p class="n" style="color:#4ade80;">92.0%</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== บทที่ 6: ห้องแปลงร่าง & X-Ray หน้าเว็บจริง ==================== -->
+    <section id="t6" class="section-view">
+      <div class="intro-banner">
+        <h2>บทที่ 6: ห้องแปลงร่าง &amp; โหมด X-Ray บนหน้าเว็บจริง (Line Performance)</h2>
+        <p>ลองติ๊กปิด CSS ทั้งหมด เพื่อดูว่า <b>ถ้ามีแต่ HTML ล้วนๆ หน้าตาเป็นยังไง</b> แล้วค่อยๆ ติ๊กเปิด CSS ทีละขั้น พร้อมเปิด <b>โหมด X-Ray</b> เพื่อเห็นขอบเขตกล่องทุกใบ!</p>
+      </div>
+
+      <div class="xray-layout">
+        <div class="card-panel">
+          <h3>🧰 เปิด/ปิดทีละส่วนเพื่อดูการเปลี่ยนแปลง</h3>
+
+          <label class="step-check" style="border-color:#38bdf8;background:rgba(56,189,248,0.12);">
+            <input type="checkbox" id="chk-xray" checked onchange="updateTransform()">
+            <div>
+              <b>🔍 เปิดโหมด X-Ray มองทะลุกล่อง</b>
+              <span>ตีเส้นประ + ป้ายบอกชื่อแท็กบนทุกกล่อง</span>
+            </div>
+          </label>
+
+          <hr style="border-color:#334155;margin:12px 0;">
+
+          <div class="btn-row">
+            <button class="pill-btn" id="btn-raw" onclick="setAllSteps(false, this)">HTML เปลือยๆ (0% CSS)</button>
+            <button class="pill-btn active" id="btn-full" onclick="setAllSteps(true, this)">หน้าเว็บสมบูรณ์ (100%)</button>
+          </div>
+
+          <label class="step-check">
+            <input type="checkbox" class="lp-step" id="st-theme" checked onchange="updateTransform()">
+            <div>
+              <b>1. พื้นหลัง &amp; ฟอนต์ (Theme)</b>
+              <code>body { background: #111827; color: #e5e7eb; }</code>
+            </div>
+          </label>
+
+          <label class="step-check">
+            <input type="checkbox" class="lp-step" id="st-card" checked onchange="updateTransform()">
+            <div>
+              <b>2. กรอบกล่อง &amp; นวม (Card + Padding)</b>
+              <code>.card { background: #1f2937; padding: 16px; border-radius: 10px; }</code>
+            </div>
+          </label>
+
+          <label class="step-check">
+            <input type="checkbox" class="lp-step" id="st-flex" checked onchange="updateTransform()">
+            <div>
+              <b>3. เรียงการ์ดเป็นแถว (Flexbox)</b>
+              <code>.cards { display: flex; flex-wrap: wrap; gap: 14px; }</code>
+            </div>
+          </label>
+
+          <label class="step-check">
+            <input type="checkbox" class="lp-step" id="st-typo" checked onchange="updateTransform()">
+            <div>
+              <b>4. ตัวเลขใหญ่ &amp; สีสถานะ (.value / .status)</b>
+              <code>.value { font-size: 2.1rem; } .status.ok { background: #22c55e; }</code>
+            </div>
+          </label>
+
+          <label class="step-check">
+            <input type="checkbox" class="lp-step" id="st-btn" checked onchange="updateTransform()">
+            <div>
+              <b>5. ปุ่มกดใหญ่ ≥ 44px (#alert-btn)</b>
+              <code>#alert-btn { min-height: 44px; background: #ef4444; }</code>
+            </div>
+          </label>
+        </div>
+
+        <div class="card-panel">
+          <h3>🖥️ หน้าเว็บ Line Performance (คลิกที่กล่องใดก็ได้เพื่อสืบหาแท็ก)</h3>
+          <div class="lp-screen s-theme s-card s-flex s-typo s-btn xray-on" id="lp-screen">
+            <header data-xtag="<header>" onclick="inspectEl(event, '&lt;header&gt;', 'ส่วนหัวของหน้าเว็บ ใส่ชื่อหัวข้อหลัก h1 และรหัสสายการผลิต')">
+              <h2 class="lp-h1" data-xtag="<h1>" onclick="inspectEl(event, '&lt;h1&gt;', 'หัวข้อหลักใหญ่สุด (Block element)')">Line Performance</h2>
+              <p class="lp-sub" data-xtag='<p id="line">' onclick="inspectEl(event, '&lt;p id=&quot;line&quot;&gt;', 'ข้อความบอก Line และกะ (มี id=&quot;line&quot; ไว้ให้ JS เปลี่ยนข้อความ)')">Line A · กะ Day</p>
+            </header>
+
+            <main data-xtag="<main>" onclick="inspectEl(event, '&lt;main&gt;', 'กล่องเนื้อหาหลักของหน้าเว็บ ครอบทั้งส่วนการ์ดและปุ่มกด')">
+              <section class="lp-cards" data-xtag='<section class="cards"> (กล่องแม่)' onclick="inspectEl(event, '&lt;section class=&quot;cards&quot;&gt;', 'กล่องแม่! เราใส่ display: flex ที่นี่เพื่อให้การ์ด 4 ใบข้างในเรียงเป็นแถว')">
+                <article class="lp-card" data-xtag='<article class="card">' onclick="inspectEl(event, '&lt;article class=&quot;card&quot;&gt;', 'การ์ดใบที่ 1 ใช้ class=&quot;card&quot; ร่วมกับอีก 3 ใบเพื่อให้ CSS แต่งหน้าตาเหมือนกัน')">
+                  <p class="lp-label" data-xtag='<p class="label">' onclick="inspectEl(event, '&lt;p class=&quot;label&quot;&gt;', 'ป้ายข้อความอธิบายหัวข้อการ์ด ใช้ class=&quot;label&quot; แต่งสีตัวอักษรให้เป็นสีเทาอ่อนเหมือนกันทุกใบ')">ผลิตได้ (ชิ้น)</p>
+                  <p class="lp-val" data-xtag='<p id="actual" class="value">' onclick="inspectEl(event, '&lt;p id=&quot;actual&quot; class=&quot;value&quot;&gt;', 'ใช้ class=&quot;value&quot; ทำให้ตัวเลขใหญ่ด้วย CSS และใส่ id=&quot;actual&quot; เพื่อรอรับตัวเลขจาก JavaScript')">1,104</p>
+                </article>
+                <article class="lp-card" data-xtag='<article class="card">' onclick="inspectEl(event, '&lt;article class=&quot;card&quot;&gt;', 'การ์ดใบที่ 2')">
+                  <p class="lp-label" data-xtag='<p class="label">' onclick="inspectEl(event, '&lt;p class=&quot;label&quot;&gt;', 'ป้ายข้อความหัวข้อการ์ด')">เป้าหมาย (ชิ้น)</p>
+                  <p class="lp-val" data-xtag='<p id="target" class="value">' onclick="inspectEl(event, '&lt;p id=&quot;target&quot; class=&quot;value&quot;&gt;', 'ใส่ class=&quot;value&quot; แต่งตัวเลขใหญ่ + id=&quot;target&quot; ให้ JS มาแก้เลขเป้าหมาย')">1,200</p>
+                </article>
+                <article class="lp-card" data-xtag='<article class="card">' onclick="inspectEl(event, '&lt;article class=&quot;card&quot;&gt;', 'การ์ดใบที่ 3')">
+                  <p class="lp-label" data-xtag='<p class="label">' onclick="inspectEl(event, '&lt;p class=&quot;label&quot;&gt;', 'ป้ายข้อความหัวข้อการ์ด')">ชิ้นงานเสีย</p>
+                  <p class="lp-val" data-xtag='<p id="defect" class="value">' onclick="inspectEl(event, '&lt;p id=&quot;defect&quot; class=&quot;value&quot;&gt;', 'ใส่ class=&quot;value&quot; แต่งตัวเลขใหญ่ + id=&quot;defect&quot;')">18</p>
+                </article>
+                <article class="lp-card" data-xtag='<article class="card">' onclick="inspectEl(event, '&lt;article class=&quot;card&quot;&gt;', 'การ์ดใบที่ 4 มีป้ายสถานะข้างใน')">
+                  <p class="lp-label" data-xtag='<p class="label">' onclick="inspectEl(event, '&lt;p class=&quot;label&quot;&gt;', 'ป้ายข้อความหัวข้อการ์ด')">Performance</p>
+                  <p class="lp-val" data-xtag='<p id="performance" class="value">' onclick="inspectEl(event, '&lt;p id=&quot;performance&quot; class=&quot;value&quot;&gt;', 'แสดง % ที่ JS คำนวณได้')">92.0%</p>
+                  <p class="lp-status" data-xtag='<p id="status">' onclick="inspectEl(event, '&lt;p id=&quot;status&quot; class=&quot;status ok&quot;&gt;', 'ป้ายสถานะ: ติด 2 คลาสคู่กัน (.status บอกทรงกล่อง + .ok บอกสีเขียว)')">ปกติ</p>
+                </article>
+              </section>
+
+              <section class="lp-actions" data-xtag='<section class="actions">' onclick="inspectEl(event, '&lt;section class=&quot;actions&quot;&gt;', 'กล่องรวมช่องกรอกชื่อและปุ่มแจ้งเตือน')">
+                <span style="display:inline-block;" data-xtag='<input id="sender">' onclick="inspectEl(event, '&lt;input id=&quot;sender&quot;&gt;', 'แท็กเปิดปิดในตัวเอง (ไม่ต้องมี &lt;/input&gt;) สำหรับรับข้อความ')">
+                  <input class="lp-input" type="text" placeholder="ชื่อผู้แจ้ง (เช่น 05 สมชาย)">
+                </span>
+                <button class="lp-btn" type="button" data-xtag='<button id="alert-btn">' onclick="inspectEl(event, '&lt;button id=&quot;alert-btn&quot;&gt;', 'ปุ่มกดขนาดใหญ่ไม่ต่ำกว่า 44x44px เพื่อให้นิ้วกดบนมือถือถนัด')">แจ้งหัวหน้างาน</button>
+              </section>
+            </main>
+          </div>
+
+          <div class="inspector-box" id="inspector-out">
+            👆 <b>คลิกที่กล่องใดก็ได้บนหน้าเว็บด้านบน</b> เพื่อดูว่ากล่องนั้นใช้แท็กและ CSS อะไร!
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ===== Topbar Zoom & Fullscreen =====
+    let currentScale = 1;
+    function zoomPage(delta) {
+      currentScale = Math.min(1.4, Math.max(0.75, +(currentScale + delta).toFixed(2)));
+      document.documentElement.style.setProperty('--scale', currentScale);
+    }
+    function toggleFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    // ===== Navigation Tabs =====
+    function showTab(tabId, btnEl) {
+      document.querySelectorAll('.section-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
+    }
+
+    // ===== Lesson 1: Tag Anatomy =====
+    const PARTS = {
+      open:    { title: '📦 แท็กเปิด <p ...> (Opening Tag)', desc: 'บอกเบราว์เซอร์ว่า "เริ่มสร้างกล่องข้อความย่อหน้า (Paragraph) ตรงนี้"' },
+      id:      { title: '🪪 id="actual" (ทะเบียนเฉพาะตัว)', desc: 'ใช้ตั้งชื่อเฉพาะเจาะจง <b>ห้ามซ้ำกันทั้งหน้าเว็บ</b> มีไว้ให้ JavaScript เรียกหาตัวนี้เป๊ะๆ เช่น <code>document.getElementById("actual")</code>' },
+      cls:     { title: '🏷️ class="value ok" (ป้ายหมวดหมู่ ใช้ซ้ำได้)', desc: 'ป้ายติดกล่องไว้ให้ CSS มาทาสี (1 กล่องติดหลายป้ายได้โดยเว้นวรรค เช่น ป้าย value ทำให้ตัวใหญ่ + ป้าย ok ทำให้สีเขียว)' },
+      openEnd: { title: '➡️ เครื่องหมาย > (จบส่วนหัวของแท็กเปิด)', desc: 'ปิดวงเล็บของแท็กเปิด เพื่อบอกว่าต่อไปนี้คือ "เนื้อหาข้างในกล่อง" แล้วนะ' },
+      content: { title: '📝 เนื้อหาในกล่อง (Content)', desc: 'สิ่งที่จะไปโชว์ให้คนใช้เห็นบนหน้าจอจริงๆ เช่น ตัวเลข 1,104 ชิ้น หรือข้อความ' },
+      close:   { title: '🔒 แท็กปิด </p> (Closing Tag)', desc: 'เครื่องหมาย / คือ "ปิดกล่อง" ต้องมีคู่กับแท็กเปิดเสมอ ยกเว้นแท็กเดี่ยว เช่น <input>, <img>, <br>' }
+    };
+    function explainPart(key, el) {
+      document.querySelectorAll('.tok').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      const info = PARTS[key];
+      document.getElementById('part-explain').innerHTML = `<h4>${info.title}</h4><p>${info.desc}</p>`;
+    }
+
+    function setBoxHabit(mode, btn) {
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const stage = document.getElementById('habit-stage');
+      stage.querySelectorAll('[data-habit]').forEach(el => {
+        if (mode === 'normal') {
+          el.style.display = el.dataset.habit === 'block' ? 'block' : 'inline-block';
+        } else if (mode === 'allBlock') {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'inline-block';
+        }
+      });
+    }
+
+    function toggleBrokenTag(isBroken, btn) {
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const codeEl = document.getElementById('broken-code');
+      const visEl = document.getElementById('broken-visual');
+      if (!isBroken) {
+        codeEl.textContent =
+`<div class="card">
+  <p>การ์ดใบที่ 1</p>
+</div>  <!-- ✅ ปิดกล่องที่ 1 แล้ว -->
+
+<div class="card">
+  <p>การ์ดใบที่ 2</p>
+</div>`;
+        visEl.innerHTML = `
+          <div class="sim-card">📦 กล่องการ์ดใบที่ 1 (ปิดเรียบร้อย)</div>
+          <div class="sim-card second">📦 กล่องการ์ดใบที่ 2 (อยู่แยกกันสวยงาม)</div>`;
+      } else {
+        codeEl.textContent =
+`<div class="card">
+  <p>การ์ดใบที่ 1</p>
+        <!-- 💥 ลืมปิด </div> ตรงนี้!! -->
+<div class="card">
+  <p>การ์ดใบที่ 2</p>
+</div>`;
+        visEl.innerHTML = `
+          <div class="sim-card">
+            📦 กล่องการ์ดใบที่ 1 (ยังไม่ได้ปิดฝา!)
+            <div class="sim-card second" style="margin-top:8px;">📦 กล่องการ์ดใบที่ 2 เลยโดนดูดเข้าไปซ้อนอยู่ข้างในใบที่ 1 เฉยเลย! 💥</div>
+          </div>`;
+      }
+    }
+    toggleBrokenTag(false, document.querySelector('#t1 .pill-btn.success'));
+
+    // ===== Lesson 2: Nested Boxes =====
+    const NEST_FAMILY = {
+      main:  '📦 <b>&lt;main&gt;</b> | <b>ชั้น:</b> กล่องนอกสุด (คุณย่า) | <b>ลูกโดยตรง:</b> &lt;section class="cards"&gt;',
+      cards: '📦 <b>&lt;section class="cards"&gt;</b> | <b>แม่:</b> &lt;main&gt; | <b>ลูกโดยตรง:</b> การ์ด 2 ใบ (&lt;article class="card"&gt;) — <i>ใส่ display: flex ตรงนี้!</i>',
+      card1: '📦 <b>&lt;article class="card"&gt; (ใบที่ 1)</b> | <b>แม่:</b> &lt;section class="cards"&gt; | <b>ลูกโดยตรง:</b> &lt;p class="label"&gt; และ &lt;p id="actual"&gt;',
+      card2: '📦 <b>&lt;article class="card"&gt; (ใบที่ 2)</b> | <b>แม่:</b> &lt;section class="cards"&gt; | <b>ลูกโดยตรง:</b> &lt;p class="label"&gt; และ &lt;p id="target"&gt;',
+      p1a:   '📝 <b>&lt;p class="label"&gt;</b> | <b>แม่:</b> การ์ดใบที่ 1 (&lt;article&gt;) | <b>ของข้างใน:</b> ข้อความ "ผลิตได้ (ชิ้น)"',
+      p1b:   '🔢 <b>&lt;p id="actual"&gt;</b> | <b>แม่:</b> การ์ดใบที่ 1 (&lt;article&gt;) | <b>ของข้างใน:</b> ตัวเลข "1,104"',
+      p2a:   '📝 <b>&lt;p class="label"&gt;</b> | <b>แม่:</b> การ์ดใบที่ 2 (&lt;article&gt;) | <b>ของข้างใน:</b> ข้อความ "เป้าหมาย (ชิ้น)"',
+      p2b:   '🔢 <b>&lt;p id="target"&gt;</b> | <b>แม่:</b> การ์ดใบที่ 2 (&lt;article&gt;) | <b>ของข้างใน:</b> ตัวเลข "1,200"'
+    };
+    function hlNest(nid) {
+      document.querySelectorAll('.code-line').forEach(el => el.classList.toggle('hl', el.dataset.nid === nid));
+      document.querySelectorAll('.nbox').forEach(el => el.classList.toggle('hl', el.dataset.nid === nid));
+      document.getElementById('family-info').innerHTML = NEST_FAMILY[nid] || '';
+    }
+    function setExplode(on) {
+      document.getElementById('nest-stage').classList.toggle('exploded', on);
+      document.getElementById('btn-flat').classList.toggle('active', !on);
+      document.getElementById('btn-3d').classList.toggle('active', on);
+    }
+
+    // ===== Lesson 3: Box Model =====
+    let isBorderBox = true;
+    function toggleBoxSizing() {
+      isBorderBox = !isBorderBox;
+      document.getElementById('btn-bs').textContent = 'โหมดปัจจุบัน: ' + (isBorderBox ? 'border-box' : 'content-box');
+      updateBoxModel();
+    }
+    function updateBoxModel() {
+      const pad = +document.getElementById('sl-pad').value;
+      const bor = +document.getElementById('sl-bor').value;
+      const mar = +document.getElementById('sl-mar').value;
+      const rad = +document.getElementById('sl-rad').value;
+
+      document.getElementById('val-pad').textContent = pad + 'px';
+      document.getElementById('val-bor').textContent = bor + 'px';
+      document.getElementById('val-mar').textContent = mar + 'px';
+      document.getElementById('val-rad').textContent = rad + 'px';
+
+      document.getElementById('bm-margin').style.padding = mar + 'px';
+      document.getElementById('bm-border').style.padding = bor + 'px';
+      document.getElementById('bm-border').style.borderRadius = rad + 'px';
+      document.getElementById('bm-padding').style.padding = pad + 'px';
+
+      document.getElementById('bm-css').textContent =
+`.card {
+  width: 220px;
+  padding: ${pad}px;
+  border: ${bor}px solid #facc15;
+  margin: ${mar}px;
+  border-radius: ${rad}px;
+  box-sizing: ${isBorderBox ? 'border-box' : 'content-box'};
+}`;
+
+      const realWidth = isBorderBox ? 220 : (220 + pad * 2 + bor * 2);
+      const bar = document.getElementById('bs-bar');
+      bar.style.width = Math.min(380, realWidth) + 'px';
+      bar.textContent = realWidth + ' px';
+      bar.style.background = isBorderBox ? '#22c55e' : '#ef4444';
+      bar.style.color = isBorderBox ? '#052e16' : '#ffffff';
+
+      document.getElementById('bs-explain').innerHTML = isBorderBox
+        ? `✅ <b>border-box:</b> กว้างรวม <b>220 px เป๊ะ!</b> (padding + border ถูกหักเข้าด้านใน ไม่ล้นจอ)`
+        : `⚠️ <b>content-box (ค่าตั้งต้น):</b> กว้างจริงบวมเป็น 220 + (${pad}×2) + (${bor}×2) = <b>${realWidth} px!</b> มักทำเว็บล้นจอ!`;
+    }
+    updateBoxModel();
+
+    // ===== Lesson 4: Selectors & Specificity =====
+    const SEL_INFO = {
+      'p':            'จับทุกแท็ก &lt;p&gt; ทั้งหมดในหน้าเว็บ ไม่สนว่าอยู่ในการ์ดหรือไม่',
+      '.card':        'จับทุกกล่องที่มี class="card" (ได้การ์ดครบทุกใบ)',
+      '.card .value': 'เว้นวรรค = หา <b>.value ที่อยู่ข้างใน .card</b> เท่านั้น!',
+      '#actual':      'เครื่องหมาย # เจาะจงหาแค่กล่องที่มี id="actual" ตัวเดียว',
+      '#alert-btn':   'เจาะจงไปที่ปุ่ม id="alert-btn" ปุ่มเดียว',
+      '.status.bad':  'เขียนติดกันไม่เว้นวรรค = กล่องนั้นต้องมีทั้ง class="status" และ class="bad" พร้อมกัน'
+    };
+    function testSelector(sel, btn) {
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sel-input').value = sel;
+      runSelector(sel);
+    }
+    function runSelector(sel) {
+      const box = document.getElementById('sel-preview');
+      box.querySelectorAll('.sel-matched').forEach(el => el.classList.remove('sel-matched'));
+      const exp = document.getElementById('sel-explain');
+      try {
+        const matched = box.querySelectorAll(sel);
+        matched.forEach(el => el.classList.add('sel-matched'));
+        const note = SEL_INFO[sel.trim()] || 'กำลังจับคู่ตาม Selector ที่พิมพ์...';
+        exp.innerHTML = `<h4>🎯 จับคู่ได้ ${matched.length} กล่อง</h4><p>${note}</p>`;
+      } catch (e) {
+        exp.innerHTML = `<h4>⚠️ รูปแบบ Selector ยังไม่ถูกต้อง</h4><p>ลองพิมพ์ เช่น <code>p</code>, <code>.card</code>, <code>#actual</code></p>`;
+      }
+    }
+    runSelector('p');
+
+    function setBattleStep(step, btn) {
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const rules = [
+        { code: 'p { color: skyblue; }', score: '1 คะแนน (ชื่อแท็ก)', active: step >= 1, color: '#38bdf8', text: 'สีฟ้า (จาก p)' },
+        { code: '.warn { color: orange; }', score: '10 คะแนน (class)', active: step >= 2, color: '#fb923c', text: 'สีส้ม (จาก .warn)' },
+        { code: '#critical { color: red; }', score: '100 คะแนน (id)', active: step >= 3, color: '#ef4444', text: 'สีแดง (จาก #critical)' }
+      ].filter(r => r.active);
+      const winnerIdx = rules.length - 1;
+      document.getElementById('battle-list').innerHTML = rules.map((r, i) => `
+        <div class="spec-rule ${i === winnerIdx ? 'winner' : 'loser'}">
+          <span>${r.code}</span>
+          <span>${r.score} ${i === winnerIdx ? '🏆 ชนะ!' : ''}</span>
+        </div>
+      `).join('');
+      const w = rules[winnerIdx];
+      document.getElementById('battle-result').innerHTML =
+        `<span style="color:${w.color};">ผลลัพธ์บนจอ: ข้อความเป็น ${w.text}</span>`;
+    }
+    setBattleStep(1, document.querySelector('#t4 .spec-battle').previousElementSibling.querySelector('.pill-btn'));
+
+    // ===== Lesson 5: Flexbox =====
+    let flexState = { target: 'right', dir: 'row', jc: 'flex-start', wrap: 'wrap' };
+    function setFlexTarget(target) {
+      flexState.target = target;
+      document.getElementById('fx-wrong').classList.toggle('active', target === 'wrong');
+      document.getElementById('fx-right').classList.toggle('active', target === 'right');
+      renderFlex();
+    }
+    function setFlexProp(prop, val, btn) {
+      flexState[prop] = val;
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderFlex();
+    }
+    function renderFlex() {
+      const gap = document.getElementById('fx-gap').value;
+      const width = document.getElementById('fx-width').value;
+      document.getElementById('fx-gap-val').textContent = gap + 'px';
+      document.getElementById('fx-width-val').textContent = width + 'px';
+      document.getElementById('fx-viewport').style.width = width + 'px';
+
+      const parent = document.getElementById('fx-parent');
+      const children = parent.querySelectorAll('.flex-child');
+      const trapMsg = document.getElementById('fx-trap-msg');
+
+      if (flexState.target === 'wrong') {
+        parent.style.display = 'block';
+        children.forEach(c => {
+          c.style.display = 'flex';
+          c.style.marginBottom = '10px';
+          c.style.flex = 'none';
+          c.style.justifyContent = 'space-between';
+          c.style.alignItems = 'center';
+        });
+        trapMsg.innerHTML = '❌ <b>ดูสิครับ!</b> การ์ด 4 ใบเรียงลงข้างล่างเหมือนเดิม เพราะคุณไปใส่ <code>display: flex</code> ให้ตัวลูก (.card) ไม่ได้ใส่ให้กล่องแม่ (.cards)';
+        document.getElementById('fx-css-out').textContent =
+`/* ❌ ผิดที่! ใส่ที่ลูก การ์ดไม่เรียงข้างกัน */
+.card {
+  display: flex;
+}`;
+      } else {
+        parent.style.display = 'flex';
+        parent.style.flexDirection = flexState.dir;
+        parent.style.justifyContent = flexState.jc;
+        parent.style.flexWrap = flexState.wrap;
+        parent.style.gap = gap + 'px';
+        children.forEach(c => {
+          c.style.display = 'block';
+          c.style.marginBottom = '0';
+          c.style.flex = flexState.dir === 'row' ? '0 1 118px' : '0 0 auto';
+        });
+        trapMsg.innerHTML = '✅ <b>ถูกต้อง!</b> ใส่ <code>display: flex</code> ที่กล่องแม่ (<code>.cards</code>) กล่องลูกทั้ง 4 ใบเรียงข้างกันทันที ลองกดเปลี่ยน <code>justify-content</code> หรือเลื่อนความกว้างจอให้แคบลงดูครับ!';
+        document.getElementById('fx-css-out').textContent =
+`.cards {
+  display: flex;
+  flex-direction: ${flexState.dir};
+  justify-content: ${flexState.jc};
+  flex-wrap: ${flexState.wrap};
+  gap: ${gap}px;
+}
+.card {
+  flex: 0 1 118px;
+}`;
+      }
+    }
+    renderFlex();
+
+    // ===== Lesson 6: Line Performance Transform & X-Ray =====
+    function setAllSteps(on, btn) {
+      document.querySelectorAll('.lp-step').forEach(c => { c.checked = on; });
+      document.getElementById('btn-raw').classList.toggle('active', !on);
+      document.getElementById('btn-full').classList.toggle('active', on);
+      updateTransform();
+    }
+    function updateTransform() {
+      const scr = document.getElementById('lp-screen');
+      scr.classList.toggle('xray-on', document.getElementById('chk-xray').checked);
+      scr.classList.toggle('s-theme', document.getElementById('st-theme').checked);
+      scr.classList.toggle('s-card',  document.getElementById('st-card').checked);
+      scr.classList.toggle('s-flex',  document.getElementById('st-flex').checked);
+      scr.classList.toggle('s-typo',  document.getElementById('st-typo').checked);
+      scr.classList.toggle('s-btn',   document.getElementById('st-btn').checked);
+    }
+    function inspectEl(ev, tagName, desc) {
+      ev.stopPropagation();
+      document.getElementById('inspector-out').innerHTML =
+        `🔎 <b>กำลังชี้ที่:</b> <code style="color:#fde047;">${tagName}</code><br>${desc}`;
+    }
+  </script>
+</body>
+</html>

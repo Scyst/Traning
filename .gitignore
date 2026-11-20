@@ -1,0 +1,18 @@
+# Runtime / OS / Office lock artifacts
+__pycache__/
+*.pyc
+*.pyo
+~$*
+*.tmp
+.DS_Store
+Thumbs.db
+*.zip
+
+# Exam server runtime state (clears between cohorts)
+01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_progress.json
+
+# Note: If pushing to a PUBLIC repository, uncomment the lines below to exclude trainee PII/submissions:
+# User Training-BOI.txt
+# 01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/submissions/
+# 03_Audit_สรุปคะแนนการสอบ/*.xlsx
+# 03_Audit_สรุปคะแนนการสอบ/*.pdf

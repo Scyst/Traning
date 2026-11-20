@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- CSS พื้นฐาน: 3 วิธีเขียน, Selector, ตัวอักษร, Box Model · สไลด์ 28–33 -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Basics</title>
+
+  <!-- วิธีที่ 3 External: แยกเป็นไฟล์ .css (แนะนำสำหรับงานจริง) -->
+  <link rel="stylesheet" href="02-style.css">
+
+  <!-- วิธีที่ 2 Internal: เขียนใน <style> ที่ head ใช้ได้เฉพาะหน้านี้ -->
+  <style>
+    /* ---------------- Selector ที่ใช้บ่อย ---------------- */
+    p { color: #444; }                    /* ชื่อแท็ก: ทุก <p> */
+    .label { color: #888; }               /* .class: ทุกตัวที่มี class="label" */
+    #title { letter-spacing: 1px; }       /* #id: ตัวที่มี id="title" ตัวเดียว */
+    .card p { margin: 4px 0; }            /* p ที่อยู่ข้างใน .card */
+
+    /* ---------------- ตัวอักษร ---------------- */
+    .value {
+      font-family: Tahoma, sans-serif;    /* ฟอนต์ ใส่ตัวสำรองไว้ด้วยเสมอ */
+      font-size: 32px;                    /* ขนาด */
+      font-weight: bold;                  /* ความหนา */
+      color: #0a7d3c;                     /* สีตัวอักษร */
+    }
+
+    /* ---------------- Box Model ----------------
+       content → padding (ระยะด้านใน) → border (เส้นขอบ) → margin (ระยะด้านนอก) */
+    * { box-sizing: border-box; }         /* width รวม padding และ border แล้ว คำนวณง่าย */
+    .card {
+      width: 260px;
+      padding: 16px;
+      border: 2px solid #ccc;
+      border-radius: 8px;                 /* มุมโค้ง */
+      margin: 16px;
+      background: #f7f7f7;
+    }
+
+    /* ---------------- ลำดับความสำคัญเมื่อกฎชนกัน ----------------
+       style ในแท็ก > #id > .class > ชื่อแท็ก ถ้าเท่ากัน ตัวที่เขียนทีหลังชนะ */
+    .warn { color: orange; }
+    #special { color: red; }              /* ชนะ .warn เพราะ id เจาะจงกว่า */
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 id="title">Hello World</h1>       <!-- แต่งจาก 02-style.css -->
+  </div>
+
+  <div class="card">
+    <p class="label">Voltage</p>
+    <p class="value">230 V</p>
+  </div>
+
+  <p class="warn">ข้อความนี้สีส้ม (.warn)</p>
+  <p class="warn" id="special">ข้อความนี้สีแดง เพราะ #special ชนะ .warn</p>
+
+  <!-- วิธีที่ 1 Inline: เขียนใน attribute style ของแท็ก ใช้เฉพาะจุดนั้น แก้ยาก ไม่แนะนำ -->
+  <p style="color: blue;">ข้อความนี้แต่งแบบ Inline</p>
+
+  <!-- ลองคลิกขวาที่ข้อความใดก็ได้ › Inspect เพื่อดูว่า CSS ตัวไหนมีผล และตัวไหนถูกขีดฆ่า -->
+</body>
+</html>

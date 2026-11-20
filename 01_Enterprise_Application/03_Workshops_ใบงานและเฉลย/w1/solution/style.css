@@ -1,0 +1,35 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: Tahoma, sans-serif;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+header { text-align: center; margin-bottom: 24px; }
+h1 { margin: 0; }
+.sub { margin: 4px 0 0; color: #9ca3af; }
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.card {
+  flex: 1 1 240px;
+  max-width: 420px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #0b1220;
+  text-align: center;
+}
+
+.label { margin: 0; font-weight: bold; }
+.value { margin: 12px 0 0; font-size: 40px; font-weight: bold; }
+.unit { font-size: 16px; color: #9ca3af; }
+.voltage { color: #38bdf8; }
+.current { color: #22c55e; }

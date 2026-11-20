@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<!-- ดึงข้อมูลด้วย fetch: then, async/await, จัดการ error, อัปเดตอัตโนมัติ · สไลด์ 81–85, Workshop 3
+     ต้องเปิดผ่าน Live Server (http://...) ไม่ใช่ดับเบิลคลิกไฟล์ เพราะ fetch ใช้กับ file:// ไม่ได้ -->
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Fetch</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; padding: 24px; }
+    .value { font-size: 32px; font-weight: bold; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <p>แรงดัน: <span id="voltage" class="value">–</span> V</p>
+  <p>กระแส: <span id="current" class="value">–</span> A</p>
+  <p id="status">กำลังโหลด…</p>
+  <button id="bad-btn">ลองโหลด URL ที่ไม่มีอยู่จริง</button>
+
+  <script>
+    const DATA_URL = 'data/meter.json';   // งานจริงเปลี่ยนเป็น URL ของ API
+    const statusEl = document.getElementById('status');
+
+    // ---------------------------------------------- แบบที่ 1: .then (แบบในสไลด์ 83)
+    function loadWithThen() {
+      fetch(DATA_URL)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not OK');
+          }
+          return response.json();          // แปลงข้อความ JSON เป็น Object
+        })
+        .then(data => {
+          console.log('then:', data);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    // ---------------------------------------------- แบบที่ 2: async/await (อ่านง่ายกว่า ผลเหมือนกัน)
+    async function loadMeter(url = DATA_URL) {
+      try {
+        const res = await fetch(url, { cache: 'no-store' });
+        // fetch ไม่เข้า catch เองเมื่อได้ 404 หรือ 500 ต้องเช็ก res.ok
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();     // ลืม await จะได้ Promise แทนข้อมูล
+        document.getElementById('voltage').textContent = data.voltage;
+        document.getElementById('current').textContent = data.current;
+        statusEl.textContent = 'อัปเดตล่าสุด ' + new Date().toLocaleTimeString('th-TH');
+        statusEl.className = '';
+      } catch (err) {
+        // ค่าเดิมบนหน้าจอยังอยู่ แค่แจ้งว่าโหลดรอบนี้ไม่สำเร็จ
+        statusEl.textContent = 'โหลดข้อมูลไม่สำเร็จ (' + err.message + ')';
+        statusEl.className = 'error';
+      }
+    }
+
+    loadWithThen();
+    loadMeter();
+
+    // ---------------------------------------------- อัปเดตอัตโนมัติ (Polling)
+    // ห้องเรียนทั้งห้องยิง API พร้อมกัน ตั้งไม่ต่ำกว่า 5 วินาที
+    const timer = setInterval(loadMeter, 5000);
+    // หยุดได้ด้วย clearInterval(timer)
+
+    // ---------------------------------------------- ทดลองกรณีผิดพลาด
+    document.getElementById('bad-btn').addEventListener('click', () => {
+      loadMeter('data/not-found.json');   // ได้ 404 → แสดงข้อความ error
+    });
+  </script>
+</body>
+</html>

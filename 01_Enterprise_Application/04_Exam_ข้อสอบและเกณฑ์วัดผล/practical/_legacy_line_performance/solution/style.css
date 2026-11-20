@@ -1,0 +1,72 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: "Leelawadee UI", Tahoma, sans-serif;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+header h1 { margin: 0; font-size: 28px; }
+#line { margin: 4px 0 24px; color: #9ca3af; }
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.card {
+  flex: 1 1 200px;
+  padding: 20px;
+  border-radius: 10px;
+  background: #1f2937;
+}
+
+.label { margin: 0; color: #9ca3af; }
+.value { margin: 8px 0 0; font-size: 40px; font-weight: 700; }
+
+/* มาตรฐานสี Industrial UI: เขียว ปกติ / เหลือง เฝ้าระวัง / แดง ต่ำกว่าเป้า / เทา ไม่มีข้อมูล */
+.status {
+  display: inline-block;
+  margin: 12px 0 0;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.status.ok   { background: #22c55e; color: #052e16; }
+.status.warn { background: #eab308; color: #422006; }
+.status.bad  { background: #ef4444; color: #ffffff; }
+.status.off  { background: #6b7280; color: #ffffff; }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 24px; }
+
+#sender {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #e5e7eb;
+  font: inherit;
+  min-width: 240px;
+}
+#sender:focus { outline: 2px solid #38bdf8; border-color: transparent; }
+
+#alert-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #ef4444;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+#alert-btn:disabled { background: #374151; color: #9ca3af; cursor: not-allowed; }
+
+#message { color: #f87171; }
+#updated { color: #9ca3af; font-size: 14px; }
