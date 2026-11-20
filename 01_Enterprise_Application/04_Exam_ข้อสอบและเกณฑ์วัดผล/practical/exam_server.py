@@ -27,7 +27,12 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, quote
 
-from audit_exporter import export_audit_workbook, parse_theory_csv
+from audit_exporter import (
+    export_audit_workbook,
+    normalize_audit_row,
+    parse_theory_csv,
+    render_audit_print_html,
+)
 from auto_grader import grade_practical_submission, grade_workshop_submission
 from grading_rules import calculate_help_penalty
 from portal_ui import DOWNLOAD_HTML, MONITOR_HTML, PIN_LOGIN_HTML
@@ -114,6 +119,8 @@ state: Dict[str, Any] = {
     "notifications": [],
     "help_requests": [],        # newest first
     "theory_submissions": [],   # offline / LAN theory submissions
+    "audit_meta": {"cohort": "รุ่นที่ 4", "date_range": ""},
+    "audit_rows": [],
 }
 
 
@@ -180,6 +187,10 @@ def load_saved_progress() -> None:
             state["help_requests"] = saved.get("help_requests", [])[:300]
             state["theory_submissions"] = saved.get("theory_submissions", [])[:200]
             state["class_stage"] = saved.get("class_stage", "exam")
+            if isinstance(saved.get("audit_meta"), dict):
+                state["audit_meta"] = saved["audit_meta"]
+            if isinstance(saved.get("audit_rows"), list):
+                state["audit_rows"] = saved["audit_rows"]
             refresh_student_help_summaries()
     except Exception as exc:
         print(f"[warn] โหลดไฟล์ความคืบหน้าไม่สำเร็จ: {exc}")
@@ -195,6 +206,8 @@ def save_progress() -> None:
                     "notifications": state["notifications"][:120],
                     "help_requests": state["help_requests"][:300],
                     "theory_submissions": state["theory_submissions"][:200],
+                    "audit_meta": state["audit_meta"],
+                    "audit_rows": state["audit_rows"],
                 },
                 f,
                 ensure_ascii=False,
@@ -375,6 +388,202 @@ def grade_all_workshops_locked() -> int:
     return count
 
 
+def _split_sender(sender: str) -> Tuple[str, str]:
+    m = re.match(r"^(\d+)[-_\s]*(.+)$", (sender or "").strip())
+    if m:
+        return m.group(1).zfill(2), m.group(2).strip()
+    return "", (sender or "").strip()
+
+
+def _norm_name(name: str) -> str:
+    return re.sub(r"\s+", " ", (name or "").strip())
+
+
+def _seat_sort_key(row: Dict[str, Any]) -> Tuple[int, int, str]:
+    seat_raw = str(row.get("seat") or "").strip()
+    m = re.match(r"^(\d+)", seat_raw)
+    if not m and row.get("sender"):
+        m = re.match(r"^(\d+)", str(row["sender"]).strip())
+    if m:
+        return (0, int(m.group(1)), str(row.get("first_name") or row.get("full_name") or ""))
+    return (1, 9999, str(row.get("first_name") or row.get("full_name") or ""))
+
+
+def build_live_audit_rows_locked(theory_csv: str = "") -> List[Dict[str, Any]]:
+    """Build normalized Audit v2 rows by unioning Live Practical/Workshops, LAN Theory, CSV, and saved roster edits."""
+    parsed_csv = parse_theory_csv(theory_csv) if theory_csv else {}
+
+    # Deduplicate CSV rows (parse_theory_csv stores keys by both name and seat:XX)
+    csv_records: List[Dict[str, Any]] = []
+    seen_csv_ids = set()
+    for rec in parsed_csv.values():
+        if id(rec) not in seen_csv_ids:
+            seen_csv_ids.add(id(rec))
+            csv_records.append(rec)
+
+    # Merge CSV + LAN theory_submissions into lookup without losing CSV pre_20 or dept
+    theory_lookup: Dict[str, Dict[str, Any]] = dict(parsed_csv)
+    lan_records: List[Dict[str, Any]] = []
+    for ts in state["theory_submissions"]:
+        t_name = _norm_name(ts.get("studentName") or "")
+        t_seat = str(ts.get("seatNo") or "").strip()
+        seat_key = f"seat:{t_seat.zfill(2) if t_seat.isdigit() else t_seat}" if t_seat else ""
+        base_csv = (theory_lookup.get(t_name) if t_name else None) or (theory_lookup.get(seat_key) if seat_key else None) or {}
+        t_rec = {
+            "cohort": base_csv.get("cohort", ""),
+            "seat": t_seat or base_csv.get("seat", ""),
+            "name": t_name or base_csv.get("name", ""),
+            "dept": str(ts.get("department") or "").strip() or base_csv.get("dept", ""),
+            "pre_20": base_csv.get("pre_20"),
+            "post_hr_20": ts.get("postHr20") if ts.get("postHr20") is not None else base_csv.get("post_hr_20"),
+            "topics": ts.get("topicScores") or base_csv.get("topics") or [0] * 6,
+        }
+        lan_records.append(t_rec)
+        if t_rec["name"]:
+            theory_lookup[t_rec["name"]] = t_rec
+        if seat_key:
+            theory_lookup[seat_key] = t_rec
+
+    # Index existing saved audit_rows to preserve emp_id, prefix, dept, pre_20, and manual-only rows
+    saved_rows = list(state.get("audit_rows") or [])
+    saved_by_sender: Dict[str, int] = {}
+    saved_by_seat: Dict[str, int] = {}
+    saved_by_name: Dict[str, int] = {}
+    for idx, sr in enumerate(saved_rows):
+        s_sender = str(sr.get("sender") or "").strip()
+        s_seat = str(sr.get("seat") or "").strip()
+        if not s_seat and s_sender:
+            s_seat, _ = _split_sender(s_sender)
+        s_seat_pad = s_seat.zfill(2) if s_seat.isdigit() else s_seat
+        s_fl = _norm_name(f"{sr.get('first_name', '')} {sr.get('last_name', '')}")
+        s_full = _norm_name(sr.get("full_name") or "")
+        if s_sender:
+            saved_by_sender[s_sender] = idx
+        if s_seat_pad:
+            saved_by_seat[s_seat_pad] = idx
+        if s_fl:
+            saved_by_name[s_fl] = idx
+        if s_full:
+            saved_by_name[s_full] = idx
+
+    matched_saved_indices = set()
+    matched_theory_ids = set()
+    rows_out: List[Dict[str, Any]] = []
+
+    def _find_saved(sender_key: str, seat_pad: str, name_cand: str) -> Dict[str, Any]:
+        for idx in (
+            saved_by_sender.get(sender_key),
+            saved_by_seat.get(seat_pad) if seat_pad else None,
+            saved_by_name.get(_norm_name(name_cand)) if name_cand else None,
+        ):
+            if idx is not None and idx not in matched_saved_indices:
+                matched_saved_indices.add(idx)
+                return saved_rows[idx]
+        return {}
+
+    def _finish_row(base_rec: Dict[str, Any], sender_val: str, seat_val: str) -> Dict[str, Any]:
+        norm = normalize_audit_row(base_rec)
+        norm["sender"] = sender_val
+        norm["seat"] = seat_val
+        return norm
+
+    # 1. Students present in live classroom submissions / help logs
+    for sender in sorted(state["students"].keys()):
+        s = state["students"][sender]
+        seat_pad, name_part = _split_sender(sender)
+        seat_key = f"seat:{seat_pad}" if seat_pad else ""
+        t_rec = (
+            theory_lookup.get(sender)
+            or theory_lookup.get(_norm_name(name_part))
+            or (theory_lookup.get(seat_key) if seat_key else None)
+            or {}
+        )
+        if t_rec:
+            matched_theory_ids.add(id(t_rec))
+            if t_rec.get("name") and parsed_csv.get(t_rec["name"]):
+                matched_theory_ids.add(id(parsed_csv[t_rec["name"]]))
+            if seat_key and parsed_csv.get(seat_key):
+                matched_theory_ids.add(id(parsed_csv[seat_key]))
+
+        prev = _find_saved(sender, seat_pad, t_rec.get("name") or name_part)
+
+        ws_grades = s.get("workshop_grades") or {}
+        ws_scores = [ws_grades[w]["raw_5"] if w in ws_grades and ws_grades[w].get("ok") else 0.0 for w in WORKSHOP_IDS]
+        has_any_ws = any(w in ws_grades for w in WORKSHOP_IDS)
+
+        ag = s.get("auto_grade") or {}
+        todos = ag.get("todo_scores") if ag.get("ok") else []
+        prac_deduct = round(
+            float(ag.get("dup_penalty") or 0)
+            + float(ag.get("false_alarm_penalty") or 0)
+            + float(ag.get("help_penalty") or 0),
+            1,
+        )
+
+        note_bits = []
+        if ag.get("live_bonus_info"):
+            note_bits.append(ag["live_bonus_info"])
+        if ag.get("notes"):
+            note_bits.extend(ag["notes"])
+
+        # Preserve edited Thai name/prefix/emp_id from saved rows unless fresh CSV explicitly provides a name
+        use_prev_name = (not theory_csv or not t_rec.get("name")) and (prev.get("first_name") or prev.get("last_name"))
+        rec_in: Dict[str, Any] = {
+            "emp_id": prev.get("emp_id", ""),
+            "prefix": prev.get("prefix", ""),
+            "first_name": prev.get("first_name", "") if use_prev_name else "",
+            "last_name": prev.get("last_name", "") if use_prev_name else "",
+            "full_name": t_rec.get("name") or (f"{prev.get('prefix','')}{prev.get('first_name','')} {prev.get('last_name','')}".strip() if use_prev_name else name_part),
+            "dept": (t_rec.get("dept") if theory_csv and t_rec.get("dept") else "") or prev.get("dept") or t_rec.get("dept") or "",
+            "pre_20": t_rec.get("pre_20") if t_rec.get("pre_20") is not None else prev.get("pre_20"),
+            "post_hr_20": t_rec.get("post_hr_20") if t_rec.get("post_hr_20") is not None else prev.get("post_hr_20"),
+            "topics": t_rec.get("topics") or prev.get("topics") or [],
+            "workshops": ws_scores if has_any_ws else (prev.get("workshops") or []),
+            "ws_help_penalty": (s.get("workshop_help_info") or {}).get("applied_penalty", prev.get("ws_help_penalty", 0.0)),
+            "practical_todos": todos or (prev.get("practical_todos") or []),
+            "practical_deduct": prac_deduct if todos else prev.get("practical_deduct"),
+            "audit_note": " | ".join(note_bits) or prev.get("audit_note", ""),
+        }
+        rows_out.append(_finish_row(rec_in, sender, seat_pad))
+
+    # 2. Trainees from LAN theory_submissions or uploaded CSV who have not submitted practical/workshop yet
+    for t_rec in lan_records + csv_records:
+        if id(t_rec) in matched_theory_ids:
+            continue
+        matched_theory_ids.add(id(t_rec))
+        t_seat = str(t_rec.get("seat") or "").strip()
+        seat_pad = t_seat.zfill(2) if t_seat.isdigit() else t_seat
+        t_name = str(t_rec.get("name") or "").strip()
+        prev = _find_saved("", seat_pad, t_name)
+        use_prev_name = (not theory_csv or not t_name) and (prev.get("first_name") or prev.get("last_name"))
+        rec_in = {
+            "emp_id": prev.get("emp_id", ""),
+            "prefix": prev.get("prefix", ""),
+            "first_name": prev.get("first_name", "") if use_prev_name else "",
+            "last_name": prev.get("last_name", "") if use_prev_name else "",
+            "full_name": t_name or prev.get("full_name", ""),
+            "dept": t_rec.get("dept") or prev.get("dept") or "",
+            "pre_20": t_rec.get("pre_20") if t_rec.get("pre_20") is not None else prev.get("pre_20"),
+            "post_hr_20": t_rec.get("post_hr_20") if t_rec.get("post_hr_20") is not None else prev.get("post_hr_20"),
+            "topics": t_rec.get("topics") or prev.get("topics") or [],
+            "workshops": prev.get("workshops") or [],
+            "ws_help_penalty": prev.get("ws_help_penalty", 0.0),
+            "practical_todos": prev.get("practical_todos") or [],
+            "practical_deduct": prev.get("practical_deduct"),
+            "audit_note": prev.get("audit_note", "") or "มีผลทฤษฎี/CSV (ยังไม่ส่งไฟล์ปฏิบัติ)",
+        }
+        rows_out.append(_finish_row(rec_in, prev.get("sender", ""), seat_pad or str(prev.get("seat") or "")))
+
+    # 3. Manual / HR-swapped rows stored only in state["audit_rows"]
+    for idx, sr in enumerate(saved_rows):
+        if idx in matched_saved_indices:
+            continue
+        rows_out.append(_finish_row(sr, str(sr.get("sender") or ""), str(sr.get("seat") or "")))
+
+    rows_out.sort(key=_seat_sort_key)
+    return rows_out
+
+
 def zip_directory_bytes(folder: str, archive_root: str) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -464,10 +673,10 @@ class ExamHandler(BaseHTTPRequestHandler):
         qs = parse_qs(self.path.split("?", 1)[1] if "?" in self.path else "")
 
         # Instructor-only routes
-        instructor_routes = {"/", "/monitor", "/api/status", "/api/submission", "/api/submission/download", "/api/submissions.zip"}
+        instructor_routes = {"/", "/monitor", "/audit/print", "/api/status", "/api/submission", "/api/submission/download", "/api/submissions.zip"}
         if path in instructor_routes or raw_path == "/solution" or raw_path.startswith("/solution/"):
             if not self.is_instructor():
-                if path in ("/", "/monitor"):
+                if path in ("/", "/monitor", "/audit/print"):
                     self.send_bytes(401, "text/html; charset=utf-8", PIN_LOGIN_HTML.encode("utf-8"))
                 else:
                     self.send_json(401, {"error": "เฉพาะผู้สอนเท่านั้น (กรุณายืนยันตัวตนด้วย PIN)"})
@@ -476,6 +685,21 @@ class ExamHandler(BaseHTTPRequestHandler):
         if path in ("/", "/monitor"):
             html = MONITOR_HTML.replace("__LAN_IP__", SERVER_IP).replace("__PORT__", str(SERVER_PORT))
             self.send_bytes(200, "text/html; charset=utf-8", html.encode("utf-8"))
+        elif path == "/audit/print":
+            with state_lock:
+                meta = state.get("audit_meta") or {}
+                cohort = str(meta.get("cohort") or "รุ่นที่ 4").strip()
+                date_range = str(meta.get("date_range") or "").strip()
+                rows = state.get("audit_rows") or build_live_audit_rows_locked("")
+                help_snap = list(reversed(state["help_requests"]))
+            subtitle = date_range or f"โครงสร้างเกณฑ์ v2.1 (ทฤษฎี 30 + Workshop 20 + ปฏิบัติ 50 = 100 · เกณฑ์ผ่าน >=60) · พิมพ์เมื่อ {datetime.now(TZ).strftime('%Y-%m-%d %H:%M')}"
+            print_html = render_audit_print_html(
+                cohort_title=f"หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) {cohort}",
+                date_subtitle=subtitle,
+                rows_data=rows,
+                help_requests=help_snap,
+            )
+            self.send_bytes(200, "text/html; charset=utf-8", print_html.encode("utf-8"))
         elif path in ("/download", "/get", "/submit", "/workshop"):
             html = DOWNLOAD_HTML.replace("__LAN_IP__", SERVER_IP).replace("__PORT__", str(SERVER_PORT))
             self.send_bytes(200, "text/html; charset=utf-8", html.encode("utf-8"))
@@ -576,6 +800,8 @@ class ExamHandler(BaseHTTPRequestHandler):
                     "notifications": state["notifications"],
                     "help_requests": state["help_requests"],
                     "theory_submissions": state["theory_submissions"],
+                    "audit_meta": state["audit_meta"],
+                    "audit_rows": state["audit_rows"],
                     "pin_hint": INSTRUCTOR_PIN,
                 }
             self.send_json(200, body)
@@ -672,7 +898,7 @@ class ExamHandler(BaseHTTPRequestHandler):
             return
 
         # Instructor-only POST routes
-        if path in ("/api/control", "/api/roster", "/api/reset", "/api/help/resolve", "/api/grade", "/api/workshop/grade", "/api/audit/export"):
+        if path in ("/api/control", "/api/roster", "/api/reset", "/api/help/resolve", "/api/grade", "/api/workshop/grade", "/api/audit/build", "/api/audit/save", "/api/audit/export"):
             if not self.is_instructor():
                 self.send_json(401, {"error": "เฉพาะผู้สอนเท่านั้น (กรุณายืนยันตัวตนด้วย PIN)"})
                 return
@@ -826,77 +1052,90 @@ class ExamHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"ok": True, "graded": cnt})
             return
 
-        if path == "/api/audit/export":
-            cohort = str(fields.get("cohort") or "รุ่นที่ 4").strip()
-            theory_csv = str(fields.get("theory_csv") or "").strip()
-            parsed_csv = parse_theory_csv(theory_csv) if theory_csv else {}
-
+        if path == "/api/audit/build":
             with state_lock:
+                meta = state.get("audit_meta") or {}
+                cohort = str(fields.get("cohort") if fields.get("cohort") is not None else meta.get("cohort") or "รุ่นที่ 4").strip() or "รุ่นที่ 4"
+                date_range = str(fields.get("date_range") if fields.get("date_range") is not None else meta.get("date_range") or "").strip()
+                theory_csv = str(fields.get("theory_csv") or "").strip()
                 grade_all_exam_submissions_locked()
                 grade_all_workshops_locked()
+                rows_data = build_live_audit_rows_locked(theory_csv)
+                state["audit_meta"] = {"cohort": cohort, "date_range": date_range}
+                state["audit_rows"] = rows_data
+                save_progress()
+            self.send_json(200, {"ok": True, "cohort": cohort, "date_range": date_range, "rows": rows_data})
+            return
 
-                # Merge theory lookup from CSV + LAN theory_submissions
-                theory_lookup: Dict[str, Dict[str, Any]] = dict(parsed_csv)
-                for ts in state["theory_submissions"]:
-                    t_rec = {
-                        "name": ts.get("studentName", ""),
-                        "seat": ts.get("seatNo", ""),
-                        "dept": ts.get("department", ""),
-                        "pre_20": None,
-                        "post_hr_20": ts.get("postHr20"),
-                        "topics": ts.get("topicScores") or [0]*6,
-                    }
-                    if t_rec["name"]:
-                        theory_lookup[t_rec["name"]] = t_rec
-                    if t_rec["seat"]:
-                        theory_lookup[f"seat:{str(t_rec['seat']).zfill(2)}"] = t_rec
+        if path == "/api/audit/save":
+            raw_rows = fields.get("rows")
+            if raw_rows is not None and not isinstance(raw_rows, list):
+                self.send_json(400, {"error": "rows ต้องเป็น array"})
+                return
+            with state_lock:
+                meta = state.get("audit_meta") or {}
+                cohort = str(fields.get("cohort") if fields.get("cohort") is not None else meta.get("cohort") or "รุ่นที่ 4").strip() or "รุ่นที่ 4"
+                date_range = str(fields.get("date_range") if fields.get("date_range") is not None else meta.get("date_range") or "").strip()
+                if raw_rows is None:
+                    norm_rows = list(state.get("audit_rows") or [])
+                else:
+                    norm_rows = []
+                    for r in raw_rows:
+                        if not isinstance(r, dict):
+                            continue
+                        nr = normalize_audit_row(r)
+                        nr["sender"] = str(r.get("sender") or "").strip()
+                        nr["seat"] = str(r.get("seat") or "").strip()
+                        norm_rows.append(nr)
+                state["audit_meta"] = {"cohort": cohort, "date_range": date_range}
+                state["audit_rows"] = norm_rows
+                save_progress()
+            self.send_json(200, {"ok": True, "cohort": cohort, "date_range": date_range, "rows": norm_rows})
+            return
 
-                students = sorted(state["students"].values(), key=lambda x: x.get("sender", ""))
-                rows_data: List[Dict[str, Any]] = []
-                for s in students:
-                    sender = s.get("sender", "")
-                    seat_m = re.match(r"^(\d+)[-_\s]*(.+)$", sender)
-                    seat_key = f"seat:{seat_m.group(1).zfill(2)}" if seat_m else ""
-                    name_part = seat_m.group(2).strip() if seat_m else sender
-                    t_rec = theory_lookup.get(sender) or theory_lookup.get(name_part) or (theory_lookup.get(seat_key) if seat_key else None) or {}
+        if path == "/api/audit/export":
+            raw_rows = fields.get("rows")
+            if raw_rows is not None and not isinstance(raw_rows, list):
+                self.send_json(400, {"error": "rows ต้องเป็น array"})
+                return
+            theory_csv = str(fields.get("theory_csv") or "").strip()
 
-                    ws_grades = s.get("workshop_grades") or {}
-                    ws_scores = [ws_grades[w]["raw_5"] if w in ws_grades and ws_grades[w].get("ok") else 0.0 for w in WORKSHOP_IDS]
-                    has_any_ws = any(w in ws_grades for w in WORKSHOP_IDS)
+            with state_lock:
+                meta = state.get("audit_meta") or {}
+                cohort = str(fields.get("cohort") if fields.get("cohort") is not None else meta.get("cohort") or "รุ่นที่ 4").strip() or "รุ่นที่ 4"
+                date_range = str(fields.get("date_range") if fields.get("date_range") is not None else meta.get("date_range") or "").strip()
 
-                    ag = s.get("auto_grade") or {}
-                    todos = ag.get("todo_scores") if ag.get("ok") else []
-                    prac_deduct = round(float(ag.get("dup_penalty") or 0) + float(ag.get("false_alarm_penalty") or 0) + float(ag.get("help_penalty") or 0), 1)
-
-                    note_bits = []
-                    if ag.get("live_bonus_info"):
-                        note_bits.append(ag["live_bonus_info"])
-                    if ag.get("notes"):
-                        note_bits.extend(ag["notes"])
-
-                    rows_data.append({
-                        "full_name": t_rec.get("name") or name_part,
-                        "dept": t_rec.get("dept") or "",
-                        "pre_20": t_rec.get("pre_20"),
-                        "post_hr_20": t_rec.get("post_hr_20"),
-                        "topics": t_rec.get("topics") or [],
-                        "workshops": ws_scores if has_any_ws else [],
-                        "ws_help_penalty": (s.get("workshop_help_info") or {}).get("applied_penalty", 0.0),
-                        "practical_todos": todos or [],
-                        "practical_deduct": prac_deduct if todos else None,
-                        "audit_note": " | ".join(note_bits),
-                    })
+                if raw_rows is not None:
+                    rows_data = []
+                    for r in raw_rows:
+                        if not isinstance(r, dict):
+                            continue
+                        nr = normalize_audit_row(r)
+                        nr["sender"] = str(r.get("sender") or "").strip()
+                        nr["seat"] = str(r.get("seat") or "").strip()
+                        rows_data.append(nr)
+                    state["audit_meta"] = {"cohort": cohort, "date_range": date_range}
+                    state["audit_rows"] = rows_data
+                elif state.get("audit_rows") and not theory_csv:
+                    rows_data = list(state["audit_rows"])
+                else:
+                    grade_all_exam_submissions_locked()
+                    grade_all_workshops_locked()
+                    rows_data = build_live_audit_rows_locked(theory_csv)
+                    state["audit_meta"] = {"cohort": cohort, "date_range": date_range}
+                    state["audit_rows"] = rows_data
 
                 help_snapshot = list(reversed(state["help_requests"]))
                 save_progress()
 
+            subtitle = date_range or f"สรุปผลอัตโนมัติจากระบบ BOI Classroom Portal v2 · ส่งออกวันที่ {datetime.now(TZ).strftime('%Y-%m-%d %H:%M')}"
             fd, tmp_xlsx = tempfile.mkstemp(suffix=".xlsx")
             os.close(fd)
             try:
                 export_audit_workbook(
                     tmp_xlsx,
                     cohort_title=f"หลักสูตร การออกแบบ พัฒนา และบูรณาการแอปพลิเคชันระดับองค์กร (Enterprise Application) {cohort}",
-                    date_subtitle=f"สรุปผลอัตโนมัติจากระบบ BOI Classroom Portal v2 · ส่งออกวันที่ {datetime.now(TZ).strftime('%Y-%m-%d %H:%M')}",
+                    date_subtitle=subtitle,
                     rows_data=rows_data,
                     help_requests=help_snapshot,
                     blank_rows=max(12, len(rows_data)),
@@ -1027,6 +1266,7 @@ class ExamHandler(BaseHTTPRequestHandler):
                 state["notifications"] = []
                 state["help_requests"] = []
                 state["theory_submissions"] = []
+                state["audit_rows"] = []
                 state["last_served_by_ip"] = {}
                 save_progress()
             self.send_json(200, {"ok": True})

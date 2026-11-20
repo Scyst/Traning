@@ -31,6 +31,7 @@ PRACTICAL_DIR = os.path.join(EXAM_DIR, "practical")
 if PRACTICAL_DIR not in sys.path:
     sys.path.insert(0, PRACTICAL_DIR)
 
+import audit_exporter  # noqa: E402
 import auto_grader  # noqa: E402
 import exam_server  # noqa: E402
 import grading_rules  # noqa: E402
@@ -526,6 +527,200 @@ class TestPortalAndServerIntegration(unittest.TestCase):
                 exam_server.WORKSHOP_SUBMISSIONS_DIR = orig_ws_sub
                 exam_server.PROGRESS_FILE = orig_prog
                 exam_server.INSTRUCTOR_PIN = orig_pin
+
+    def test_audit_editor_print_and_cohort_cleanup(self) -> None:
+        # 1. Verify stale Cohort 4-8 static Excel files are removed while Cohorts 1-3 & templates remain
+        repo_root = os.path.dirname(COURSE_DIR)
+        audit_dir = os.path.join(repo_root, "03_Audit_สรุปคะแนนการสอบ")
+        for n in range(4, 9):
+            stale_path = os.path.join(audit_dir, f"0{n}_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_0{n}_สำหรับ_Audit.xlsx")
+            self.assertFalse(os.path.exists(stale_path), f"Stale workbook still exists: {stale_path}")
+        for expected_name in (
+            "00_แบบฟอร์มเปล่า_สรุปคะแนน_วิชา_APP_v2_สำหรับ_Audit.xlsx",
+            "01_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_01_สำหรับ_Audit.xlsx",
+            "02_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_02_สำหรับ_Audit.xlsx",
+            "02_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_02_สำหรับ_Audit.pdf",
+            "03_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_03_สำหรับ_Audit.xlsx",
+            "03_สรุปคะแนนการสอบ_วิชา_APP_รุ่นที่_03.pdf",
+        ):
+            self.assertTrue(os.path.isfile(os.path.join(audit_dir, expected_name)), f"Missing expected file: {expected_name}")
+
+        # 2. Verify normalize_audit_row & render_audit_print_html XSS safety + Leelawadee UI
+        norm = audit_exporter.normalize_audit_row({
+            "emp_id": "BOI-99",
+            "full_name": "นางสาวทดสอบ <script>alert(1)</script> ใจดี",
+            "dept": "IT",
+            "pre_20": 12,
+            "post_hr_20": 18,
+            "topics": [5, 5, 4, 4, 4, 4],       # 26/30
+            "workshops": [5, 4, 4, 5],          # 18/20
+            "ws_help_penalty": 1.0,             # 17/20
+            "practical_todos": [10, 10, 7, 7, 8],  # 42/50
+            "practical_deduct": 2.0,            # 40/50
+        })
+        self.assertEqual(norm["prefix"], "นางสาว")
+        self.assertEqual(norm["theory_30"], 26.0)
+        self.assertEqual(norm["workshop_20"], 17.0)
+        self.assertEqual(norm["practical_50"], 40.0)
+        self.assertEqual(norm["total_100"], 83.0)
+        self.assertEqual(norm["grade"], "A")
+        html_out = audit_exporter.render_audit_print_html("รุ่นที่ 4", "24-27 พ.ย. 2569", [norm], [])
+        self.assertIn("Leelawadee UI", html_out)
+        self.assertIn("@page", html_out)
+        self.assertNotIn("<script>alert(1)</script>", html_out)
+        self.assertIn("&lt;script&gt;alert(1)&lt;/script&gt;", html_out)
+
+        # 3. Live server integration: /api/audit/build, /api/audit/save, /audit/print, /api/audit/export, LAN 401
+        orig_sub = exam_server.SUBMISSIONS_DIR
+        orig_ws_sub = exam_server.WORKSHOP_SUBMISSIONS_DIR
+        orig_prog = exam_server.PROGRESS_FILE
+        orig_pin = exam_server.INSTRUCTOR_PIN
+        orig_state = {
+            "students": dict(exam_server.state["students"]),
+            "notifications": list(exam_server.state["notifications"]),
+            "help_requests": list(exam_server.state["help_requests"]),
+            "theory_submissions": list(exam_server.state["theory_submissions"]),
+            "audit_meta": dict(exam_server.state["audit_meta"]),
+            "audit_rows": list(exam_server.state["audit_rows"]),
+            "last_served_by_ip": dict(exam_server.state["last_served_by_ip"]),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            exam_server.SUBMISSIONS_DIR = os.path.join(tmp, "submissions")
+            exam_server.WORKSHOP_SUBMISSIONS_DIR = os.path.join(tmp, "workshop_submissions")
+            exam_server.PROGRESS_FILE = os.path.join(tmp, "progress.json")
+            exam_server.INSTRUCTOR_PIN = "4321"
+            os.makedirs(exam_server.SUBMISSIONS_DIR, exist_ok=True)
+            os.makedirs(exam_server.WORKSHOP_SUBMISSIONS_DIR, exist_ok=True)
+            with exam_server.state_lock:
+                exam_server.state["students"] = {
+                    "01-ต้นเดิม": {
+                        "sender": "01-ต้นเดิม",
+                        "auto_grade": {"ok": True, "todo_scores": [12, 10, 8, 6, 8], "dup_penalty": 0, "false_alarm_penalty": 0, "help_penalty": 1.0, "final_50": 43.0},
+                        "workshop_grades": {"w1": {"ok": True, "raw_5": 5}, "w2": {"ok": True, "raw_5": 4}, "w3": {"ok": True, "raw_5": 4}, "w4": {"ok": True, "raw_5": 5}},
+                        "workshop_help_info": {"applied_penalty": 0.5},
+                    }
+                }
+                exam_server.state["theory_submissions"] = [
+                    {"seatNo": "01", "studentName": "01-ต้นเดิม", "department": "QA", "postHr20": 18, "topicScores": [4, 4, 4, 4, 4, 5]},
+                ]
+                exam_server.state["help_requests"] = []
+                exam_server.state["audit_rows"] = []
+
+            class _LanProxyHandler(exam_server.ExamHandler):
+                force_non_loopback = False
+
+                def is_instructor(self) -> bool:
+                    if self.force_non_loopback:
+                        orig_addr = self.client_address
+                        self.client_address = ("192.168.1.55", orig_addr[1])
+                        try:
+                            return super().is_instructor()
+                        finally:
+                            self.client_address = orig_addr
+                    return super().is_instructor()
+
+            srv = exam_server.ThreadingHTTPServer(("127.0.0.1", 0), _LanProxyHandler)
+            port = srv.server_address[1]
+            t = threading.Thread(target=srv.serve_forever, daemon=True)
+            t.start()
+            try:
+                base = f"http://127.0.0.1:{port}"
+                # POST /api/audit/build uniting live student + CSV swapped seat 02
+                csv_text = "รุ่น,เลขที่,ชื่อ-นามสกุล,สังกัด,Pre-Test (20),Post-Test HR (20),หัวข้อ 1 (5),หัวข้อ 2 (5),หัวข้อ 3 (5),หัวข้อ 4 (5),หัวข้อ 5 (5),หัวข้อ 6 (5)\nรุ่นที่ 4,02,นางสมหญิง มาใหม่,HR,10,16,4,4,3,3,4,4\n"
+                req_build = urllib.request.Request(
+                    f"{base}/api/audit/build",
+                    data=json.dumps({"cohort": "รุ่นที่ 4", "date_range": "24-27 พ.ย. 2569", "theory_csv": csv_text}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req_build, timeout=5) as resp:
+                    built = json.loads(resp.read().decode("utf-8"))
+                self.assertTrue(built["ok"])
+                self.assertEqual(len(built["rows"]), 2)
+
+                # Instructor edits seat 01 name + emp_id and adds seat 03 who swapped in mid-class
+                edited_rows = built["rows"]
+                edited_rows[0]["emp_id"] = "EMP-001"
+                edited_rows[0]["prefix"] = "นาย"
+                edited_rows[0]["first_name"] = "สมชาย"
+                edited_rows[0]["last_name"] = "แก้วใส"
+                edited_rows.append({
+                    "seat": "03",
+                    "emp_id": "EMP-003",
+                    "prefix": "นาย",
+                    "first_name": "มาใหม่",
+                    "last_name": "แทนเพื่อน",
+                    "dept": "Engineering",
+                    "pre_20": 11,
+                    "post_hr_20": 15,
+                    "topics": [4, 4, 4, 4, 4, 4],
+                    "workshops": [4, 4, 4, 4],
+                    "ws_help_penalty": 0,
+                    "practical_todos": [10, 10, 6, 6, 8],
+                    "practical_deduct": 0,
+                    "audit_note": "สลับตัวหน้างาน",
+                })
+                req_save = urllib.request.Request(
+                    f"{base}/api/audit/save",
+                    data=json.dumps({"cohort": "รุ่นที่ 4", "date_range": "24-27 พ.ย. 2569", "rows": edited_rows}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req_save, timeout=5) as resp:
+                    saved = json.loads(resp.read().decode("utf-8"))
+                self.assertTrue(saved["ok"])
+                self.assertEqual(len(saved["rows"]), 3)
+                self.assertEqual(saved["rows"][2]["total_100"], 80.0)
+                self.assertEqual(saved["rows"][2]["grade"], "A")
+
+                # Loopback GET /audit/print -> 200 with Leelawadee UI & edited names
+                with urllib.request.urlopen(f"{base}/audit/print", timeout=5) as resp:
+                    self.assertEqual(resp.status, 200)
+                    print_html = resp.read().decode("utf-8")
+                self.assertIn("Leelawadee UI", print_html)
+                self.assertIn("สมชาย", print_html)
+                self.assertIn("มาใหม่", print_html)
+                self.assertIn("รุ่นที่ 4", print_html)
+
+                # Simulated non-loopback LAN GET /audit/print without cookie -> 401
+                _LanProxyHandler.force_non_loopback = True
+                try:
+                    with self.assertRaises(urllib.error.HTTPError) as ctx:
+                        urllib.request.urlopen(f"{base}/audit/print", timeout=5)
+                    self.assertEqual(ctx.exception.code, 401)
+                finally:
+                    _LanProxyHandler.force_non_loopback = False
+
+                # POST /api/audit/export preserves edited/added rows inside generated Excel
+                req_exp = urllib.request.Request(
+                    f"{base}/api/audit/export",
+                    data=json.dumps({"cohort": "รุ่นที่ 4"}).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req_exp, timeout=10) as resp:
+                    xlsx_bytes = resp.read()
+                wb = openpyxl.load_workbook(io.BytesIO(xlsx_bytes), data_only=False)
+                ws = wb["สรุปคะแนนการสอบ_v2"]
+                exported_names = [ws.cell(r, 4).value for r in range(7, 15)]
+                self.assertIn("สมชาย", exported_names)
+                self.assertIn("สมหญิง", exported_names)
+                self.assertIn("มาใหม่", exported_names)
+            finally:
+                srv.shutdown()
+                srv.server_close()
+                exam_server.SUBMISSIONS_DIR = orig_sub
+                exam_server.WORKSHOP_SUBMISSIONS_DIR = orig_ws_sub
+                exam_server.PROGRESS_FILE = orig_prog
+                exam_server.INSTRUCTOR_PIN = orig_pin
+                with exam_server.state_lock:
+                    exam_server.state["students"] = orig_state["students"]
+                    exam_server.state["notifications"] = orig_state["notifications"]
+                    exam_server.state["help_requests"] = orig_state["help_requests"]
+                    exam_server.state["theory_submissions"] = orig_state["theory_submissions"]
+                    exam_server.state["audit_meta"] = orig_state["audit_meta"]
+                    exam_server.state["audit_rows"] = orig_state["audit_rows"]
+                    exam_server.state["last_served_by_ip"] = orig_state["last_served_by_ip"]
 
 
 if __name__ == "__main__":
