@@ -549,7 +549,7 @@ def grade_practical_submission(
 
     live_rec = live_student_record or {}
     false_alarms = int(live_rec.get("false_alarm") or 0)
-    false_alarm_penalty = min(2.5, round(false_alarms * 0.5, 1))
+    false_alarm_penalty = min(1.5, round(false_alarms * 0.5, 1))
     if false_alarm_penalty > 0:
         notes.append(f"ส่งแจ้งเตือนพลาดขณะสถานะปกติ {false_alarms} ครั้ง (-{false_alarm_penalty})")
 

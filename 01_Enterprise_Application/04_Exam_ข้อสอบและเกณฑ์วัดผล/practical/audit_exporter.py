@@ -126,7 +126,7 @@ def export_audit_workbook(
         (28, "รวมปฏิบัติ\nFinal (50)", "F8CBAD", 10),
         (29, "คะแนนรวม\n(100)", "C6E0B4", 10),
         (30, "เกรด", "FFFFFF", 7),
-        (31, "ผลประเมิน\n(>=70)", "D9D9D9", 10),
+        (31, "ผลประเมิน\n(>=60)", "D9D9D9", 10),
     ]
     for col, text, color, width in single_headers:
         ws.merge_cells(start_row=5, start_column=col, end_row=8, end_column=col)
@@ -143,7 +143,7 @@ def export_audit_workbook(
     groups = [
         (9, 14, "ทฤษฎีรวม 6 หัวข้อ (Post-Test + Final แนววิเคราะห์ & Debug · หัวข้อละ 5 ข้อ = 30 คะแนน)", "6 หัวข้ออบรม Enterprise App (ไม่กระจุกคะแนนข้อละ 5)", "9BC2E6", "BDD7EE"),
         (16, 20, "Workshop ระหว่างเรียน (20 คะแนน)", "ส่งงานจริง W1–W4 ผ่านระบบ + หักตาม Help Tiered Cap", "FFE699", "FFF2CC"),
-        (22, 27, "สอบปฏิบัติ Final: Electrical Meter Alert (50 คะแนน)", "5 TODO × 10 คะแนน + หัก Help Tiered Cap (Max -15)", "A9D08E", "C6E0B4"),
+        (22, 27, "สอบปฏิบัติ Final: Electrical Meter Alert (50 คะแนน)", "5 TODO × 10 คะแนน + หัก Help Tiered Cap (Max -10)", "A9D08E", "C6E0B4"),
     ]
     for c1, c2, top_txt, sub_txt, top_col, sub_col in groups:
         ws.merge_cells(start_row=5, start_column=c1, end_row=5, end_column=c2)
@@ -173,14 +173,14 @@ def export_audit_workbook(
         (17, "W2\nDOM/Event", "(5)", "FFF2CC", 8),
         (18, "W3\nAPI Fetch", "(5)", "FFF2CC", 8),
         (19, "W4\nWebhook", "(5)", "FFF2CC", 8),
-        (20, "หัก Help\nWorkshop", "(-Max 8)", "FCE4D6", 9),
+        (20, "หัก Help\nWorkshop", "(-Max 5)", "FCE4D6", 9),
         # V..AA (22..27) Practical
         (22, "TODO 1\nSetup URL", "(10)", "C6E0B4", 8),
         (23, "TODO 2\nDOM Meter", "(10)", "C6E0B4", 8),
         (24, "TODO 3\nCalc Power", "(10)", "C6E0B4", 8),
         (25, "TODO 4\nConditions", "(10)", "C6E0B4", 8),
         (26, "TODO 5\nPOST/Dedup", "(10)", "C6E0B4", 9),
-        (27, "หัก Help/Dup\nสอบปฏิบัติ", "(-Max 15)", "FCE4D6", 10),
+        (27, "หัก Help/Dup\nสอบปฏิบัติ", "(-Max 10)", "FCE4D6", 10),
     ]
     for col, title, wt, bg, width in sub_cols:
         c7 = ws.cell(7, col, title)
@@ -259,7 +259,7 @@ def export_audit_workbook(
 
         ws.cell(r, 29, f'=IF(COUNT(O{r},U{r},AB{r})=0,"",SUM(O{r},U{r},AB{r}))')
         ws.cell(r, 30, f'=IF(AC{r}="","",IF(AC{r}>=80,"A",IF(AC{r}>=70,"B",IF(AC{r}>=60,"C",IF(AC{r}>=50,"D","F")))))')
-        ws.cell(r, 31, f'=IF(AC{r}="","",IF(AC{r}>=70,"ผ่าน","ไม่ผ่าน"))')
+        ws.cell(r, 31, f'=IF(AC{r}="","",IF(AC{r}>=60,"ผ่าน","ไม่ผ่าน"))')
 
         # Style row cells cleanly
         row_fills = {
