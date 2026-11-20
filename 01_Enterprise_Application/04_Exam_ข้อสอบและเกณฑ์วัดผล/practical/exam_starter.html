@@ -165,10 +165,12 @@
           <input id="auto-toggle" type="checkbox" onchange="toggleAuto(this)">
           <span>ตรวจอัตโนมัติทุก 5 วินาที</span>
         </label>
+        <button id="help-btn" type="button" style="background:#b45309;" onclick="requestExamHelp()">🙋 ขอความช่วยเหลือผู้สอน</button>
       </div>
 
       <p id="updated" class="note">ยังไม่ได้ดึงข้อมูล</p>
       <p id="notify-result" class="note"></p>
+      <p id="help-result" class="note"></p>
     </section>
   </main>
 
@@ -191,6 +193,10 @@
     // ฟังก์ชันหลักสำหรับดึงค่าและเรียกตรวจตามลำดับ (ส่วนนี้ไม่ต้องแก้ไข)
     async function checkMachine() {
       const updatedEl = document.getElementById('updated');
+      if (window.location.protocol === 'file:') {
+        updatedEl.innerText = 'กำลังเปิดผ่าน file:// (เบราว์เซอร์อาจบล็อก fetch) แนะนำให้คลิกขวาเปิดด้วย Live Server ใน VS Code';
+        updatedEl.classList.add('error');
+      }
       if (!API_URL) {
         updatedEl.innerText = 'กรุณากำหนด API_URL ใน TODO 1 ก่อน';
         updatedEl.classList.add('error');
@@ -221,7 +227,7 @@
         updatedEl.innerText = 'อัปเดตล่าสุด ' + new Date().toLocaleTimeString('th-TH');
         updatedEl.classList.remove('error');
       } catch (err) {
-        updatedEl.innerText = 'โหลดข้อมูลจาก API ไม่สำเร็จ';
+        updatedEl.innerText = 'โหลดข้อมูลจาก API ไม่สำเร็จ (' + err.message + ') — ตรวจ Live Server หรือ URL ใน TODO 1';
         updatedEl.classList.add('error');
         console.error(err);
       }
@@ -276,6 +282,42 @@
 
       // เขียนโค้ดส่งแจ้งเตือนต่อจากตรงนี้
 
+    }
+
+    // ส่งคำขอความช่วยเหลือไปที่เครื่องผู้สอน (ไม่ต้องแก้ไข)
+    async function requestExamHelp() {
+      const helpEl = document.getElementById('help-result');
+      const sender = (document.getElementById('student-name').value || STUDENT_NAME || '').trim();
+      if (!sender) {
+        helpEl.innerText = 'กรุณากรอกเลขที่-ชื่อผู้สอบก่อนกดขอความช่วยเหลือ';
+        helpEl.className = 'note error';
+        return;
+      }
+      let baseOrigin = '';
+      try {
+        if (API_URL && API_URL.startsWith('http')) baseOrigin = new URL(API_URL).origin;
+        else if (WEBHOOK_URL && WEBHOOK_URL.startsWith('http')) baseOrigin = new URL(WEBHOOK_URL).origin;
+      } catch (e) {}
+      if (!baseOrigin) {
+        helpEl.innerText = 'กรุณาใส่ API_URL ใน TODO 1 ก่อน หรือไปกดปุ่มขอความช่วยเหลือในหน้าเว็บ /download ของผู้สอนครับ';
+        helpEl.className = 'note error';
+        return;
+      }
+      const note = window.prompt('ระบุปัญหาที่ติดอยู่สั้น ๆ (เช่น ติด TODO 4 / ส่งไม่เข้า):', '') || '';
+      try {
+        const res = await fetch(baseOrigin + '/api/help', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sender, scope: 'exam', topic: 'กดขอช่วยจากหน้าข้อสอบปฏิบัติ', note })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+        helpEl.innerText = 'ส่งคำขอความช่วยเหลือถึงผู้สอนแล้ว (คิวที่ #' + data.queue_position + ')';
+        helpEl.className = 'note';
+      } catch (err) {
+        helpEl.innerText = 'ส่งคำขอไม่สำเร็จ: ' + err.message;
+        helpEl.className = 'note error';
+      }
     }
 
     // เปิด-ปิดโหมดตรวจสอบอัตโนมัติ (ไม่ต้องแก้ไข)
