@@ -41,21 +41,26 @@ BOI_Training_Materials/
 
 | งานที่ต้องใช้ | ไฟล์ / คำสั่ง |
 | --- | --- |
-| **ศูนย์รวมลิงก์ & QR เปิดสอน (เริ่มรุ่นใหม่เปิดไฟล์นี้ก่อน)** | `01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html` |
+| **ศูนย์รวมลิงก์ & QR เปิดสอน (Offline QR + ลิงก์)** | `01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html` (หรือ `http://localhost:8000/links`) |
 | เปิด Visual Lab สอนสด | `01_Enterprise_Application/02_Code_Examples_โค้ดตัวอย่าง/00-html-css-visual-lab.html` และ `00-dom-js-visual-lab.html` |
-| รัน Mock API (Workshop 3–4) | `python "01_Enterprise_Application/03_Workshops_ใบงานและเฉลย/mock-api/mock_api.py"` |
-| เปิดข้อสอบรวม Post-Test + Final (26 ข้อ) | `01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html` |
-| รันเซิร์ฟเวอร์สอบปฏิบัติ + ตารางผู้ผ่านแต่ละเคส | `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"` |
+| **รันเซิร์ฟเวอร์ห้องเรียนรวม (Workshop 1–4 + สอบปฏิบัติ + คิวช่วย + Auto-Grade)** | `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"` |
+| รัน Mock API แบบเบา (เฉพาะ Workshop 3–4 กรณีไม่ใช้ระบบส่งงาน) | `python "01_Enterprise_Application/03_Workshops_ใบงานและเฉลย/mock-api/mock_api.py"` |
+| เปิดข้อสอบทฤษฎีรวม v2 (30 ข้อ) | `01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html` |
+| ซิงก์ข้อสอบจาก JSON กลางเข้า `.gs` และ `.html` | `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/build_exam.py"` |
+| รันชุดทดสอบระบบทั้งหมด (v2 Test Suite) | `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/test_platform_v2.py"` |
 | แสดงโจทย์สอบปฏิบัติขึ้นจอ | `01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/โจทย์สอบปฏิบัติ_แสดงบนจอ.html` |
 | กรอกคะแนนและออกไฟล์ Audit รายรุ่น | โฟลเดอร์ `03_Audit_สรุปคะแนนการสอบ/` (ดูรายละเอียดใน `03_Audit_สรุปคะแนนการสอบ/README.md`) |
 
-## คู่มือรับช่วงต่อสำหรับผู้สอนรุ่นที่ 4 เป็นต้นไป
+## คู่มือรับช่วงต่อสำหรับผู้สอนรุ่นที่ 4 เป็นต้นไป (ระบบ v2)
 
-1. **เปิดลิงก์ข้อสอบ Pre-Test / Post-Test:** เปิด [01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html](01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html) ได้ลิงก์และ QR Code สำหรับผู้เรียนทันที (ใน Google Form มีช่องให้เลือก `รุ่นที่เข้าอบรม`) ส่วนสคริปต์จัดการฟอร์ม/ซ่อมชีตคำตอบอยู่ที่ [create_boi_forms.gs](01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/create_boi_forms.gs)
-2. **วันสอน Workshop 3–4:** รัน `python "01_Enterprise_Application/03_Workshops_ใบงานและเฉลย/mock-api/mock_api.py"` (หรือ `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"` แล้วเปิด `http://localhost:8000/notifications` เพื่อแสดงหน้าจอแจ้งเตือน Lockscreen)
-3. **วันสอบปฏิบัติ (วันที่ 4):**
-   - รัน `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"` บนเครื่องผู้สอน
-   - เปิด `http://localhost:8000/` (หน้าคุมเคส + ดูโค้ด), กด **`🗑️ ล้างผลบันทึก`** 1 ครั้งก่อนเริ่มรุ่นใหม่เพื่อล้างตารางของรุ่นที่ 3 (ไม่ลบไฟล์ที่เก็บไว้ใน `practical/submissions/`)
-   - หน้าจอเสริมสำหรับผู้สอน: `http://localhost:8000/notifications` (จอแจ้งเตือน), `http://localhost:8000/prompt` (โจทย์ขึ้นจอ), `http://localhost:8000/solution/` (เฉลยโชว์การทำงาน)
-   - ให้ผู้เรียนเข้า **`http://<IP_เครื่องผู้สอน>:8000/download`** เพื่อดาวน์โหลดไฟล์ `exam_starter.html`, คัดลอก `API_URL`/`WEBHOOK_URL`, และส่งไฟล์งานกลับเมื่อทำเสร็จ
-4. **สรุปคะแนน Audit:** ใช้ไฟล์รุ่นที่ `04..08` หรือคัดลอก [00_แบบฟอร์มเปล่า_สรุปคะแนน_วิชา_APP_สำหรับ_Audit.xlsx](03_Audit_สรุปคะแนนการสอบ/00_แบบฟอร์มเปล่า_สรุปคะแนน_วิชา_APP_สำหรับ_Audit.xlsx) — แนะนำตั้งฟอนต์เป็น `Leelawadee UI` ตามรุ่นที่ 3 ก่อน Export PDF เพื่อป้องกันสระ/วรรณยุกต์เป็นสี่เหลี่ยม (`□`) บน Windows
+1. **โครงสร้างคะแนนใหม่ v2 (`100 คะแนน` — ผ่าน `>= 70`, A `>= 80`):**
+   - **ทฤษฎีรวม (`30 คะแนน`):** ข้อสอบชุดเดียว **30 ข้อ (ข้อละ 1 คะแนน)** แบ่ง 6 หัวข้ออบรม (หัวข้อละ 5 ข้อ) — แยก **Post-Test HR (`/20`)** จาก 20 ข้อแกนหลักให้อัตโนมัติ (แก้ปัญหาคะแนนกระจุกตัวใน 6 ข้อ)
+   - **Workshop ระหว่างเรียน (`20 คะแนน`):** `W1–W4` (ชิ้นละ 5 คะแนน) ตรวจการส่งและโค้ดอัตโนมัติ หัก Help หลังครบโควต้าฟรี 2 ครั้ง (เพดานหักสูงสุด `8` คะแนน)
+   - **สอบปฏิบัติ Final (`50 คะแนน`):** `TODO 1–5` (ข้อละ 10 คะแนน) ตรวจใน Node.js Sandbox (รวมค่าขอบ `240/20/1.5` และเช็กฟังก์ชันซ้ำ) + หัก Help แบบขั้นบันได (เพดานหักสูงสุด `15` คะแนน ไม่มีทางเหลือ 0)
+2. **เปิดลิงก์ข้อสอบ Pre-Test / Post-Test (Google Form):** เปิด [01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html](01_Enterprise_Application/00_ศูนย์รวมลิงก์และQR_เปิดสอน.html) (มีระบบสร้าง QR แบบ Offline ในตัว และหากแก้ข้อสอบใหม่ให้รัน `build_exam.py` แล้วอัปเดตใน [create_boi_forms.gs](01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/create_boi_forms.gs))
+3. **เปิดห้องเรียนและระบบรับส่งงานทุกวัน (`exam_server.py`):**
+   - รัน `python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"` บนเครื่องผู้สอน (หน้า `/` ล็อกสิทธิ์เฉพาะ `localhost` หรือใส่ **PIN** ที่แสดงบน Terminal)
+   - กด **`🗑️ ล้างผลรุ่นนี้`** 1 ครั้งก่อนเริ่มรุ่นใหม่ (ไม่ลบไฟล์เดิมใน `practical/submissions/`)
+   - ให้ผู้เรียนเข้า **`http://<IP_เครื่องผู้สอน>:8000/download`** เพื่อดาวน์โหลดไฟล์ `W1–W4`, `exam_starter.html`, ส่งงานกลับ, และกด **🙋 ขอความช่วยเหลือผู้สอน** เข้าคิวสดได้ตลอดเวลา
+   - วันสอบปฏิบัติ: คลิก **`🤖 Auto-Grade ทั้งห้อง`** -> ตรวจสอบหมายเหตุ -> ไปที่แท็บ **รวมคะแนนออก Excel Audit v2** เพื่อแนบ CSV จาก Google Sheet และดาวน์โหลด `.xlsx` (ฟอนต์ `Leelawadee UI` พร้อมทำ PDF ไม่มีสระ/วรรณยุกต์เป็นสี่เหลี่ยม)
+4. **เก็บประวัติรุ่นที่ 1–3:** ไฟล์ใน [03_Audit_สรุปคะแนนการสอบ/](03_Audit_สรุปคะแนนการสอบ/README.md) ของรุ่น 1–3 คงไว้ตามโครงสร้างเดิม (แบบ v1) ส่วนรุ่นที่ 4 เป็นต้นไปแนะนำใช้ [00_แบบฟอร์มเปล่า_สรุปคะแนน_วิชา_APP_v2_สำหรับ_Audit.xlsx](03_Audit_สรุปคะแนนการสอบ/00_แบบฟอร์มเปล่า_สรุปคะแนน_วิชา_APP_v2_สำหรับ_Audit.xlsx)

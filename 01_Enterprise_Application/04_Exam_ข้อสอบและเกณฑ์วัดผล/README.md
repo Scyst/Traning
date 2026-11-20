@@ -1,41 +1,39 @@
-# ข้อสอบวันที่ 4 (ฉบับปรับปรุงใหม่)
+# ระบบข้อสอบและวัดผล v2 (BOI Enterprise Application)
 
-ชุดข้อสอบฉบับใหม่ลดภาระจากเดิม 52 ข้อ ลงเหลือชุดรวม **26 ข้อ** และปรับข้อสอบปฏิบัติให้ต่อยอดจาก **Workshop 4 (Electrical Meter)** เพื่อให้เหมาะกับผู้เรียนที่เพิ่งเริ่มเขียนโค้ด
+อัปเกรดโครงสร้างการวัดผลเป็น **ทฤษฎีรวม 30 + Workshop ระหว่างเรียน 20 + สอบปฏิบัติ Final 50 = 100 คะแนน** เพื่อลดปัญหาคะแนนทฤษฎีเฟ้อ แยกคะแนนตามหัวข้อให้ละเอียดขึ้น และเก็บหลักฐานงาน Workshop พร้อมประวัติการขอความช่วยเหลือครบถ้วนสำหรับ HR และ Audit
 
-## 1. ข้อสอบภาคทฤษฎีรวม Post-Test (26 ข้อ · 50 คะแนน)
+## 1. ข้อสอบภาคทฤษฎีรวม (30 ข้อ · 30 คะแนน) & เครื่องมือซิงก์กลาง
 
-| ไฟล์ | ใช้ทำอะไร | ใครใช้ |
-| --- | --- | --- |
-| [combined_exam.json](combined_exam.json) | ฐานข้อมูลข้อสอบ Pre-Test (20 ข้อ), Post-Test (20 ข้อ) และ Final วิเคราะห์ 6 หัวข้อ (6 ข้อ) | ผู้ดูแล/สร้างฟอร์ม |
-| [create_boi_forms.gs](create_boi_forms.gs) | สคริปต์ Google Apps Script (รันใน Google Sheet) สร้าง Pre-Test, Post-Test+Final 26 ข้อ และแยกคะแนนเข้าชีต `สรุปคะแนน_Audit` อัตโนมัติ (ไม่สร้างฟอร์มประเมินเพราะใช้ระบบ HR) | ผู้สอน |
-| [ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html](ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html) | เว็บสอบรวม 26 ข้อ ตรวจอัตโนมัติทันที แยกคะแนนตรง 6 ช่องของตาราง Audit (`Post-Test /20` + `Final /30`) | ผู้เรียน / ผู้สอน |
-| [Rubric นำเสนอและ UAT.pdf](Rubric%20นำเสนอและ%20UAT.pdf) | ลำดับกิจกรรมบ่ายวันที่ 4 เกณฑ์ 6 ข้อ และใบให้คะแนนทั้งห้อง | ผู้สอน |
+| ไฟล์ | ใช้ทำอะไร |
+| --- | --- |
+| [combined_exam.json](combined_exam.json) | ฐานข้อมูลข้อสอบหลัก (Single Source of Truth): `preTest` 20 ข้อ + `theoryExam` 30 ข้อ (6 หัวข้อ × 5 ข้อ, แบ่ง 20 ข้อเป็น `isPostCore: true` สำหรับ HR) |
+| [build_exam.py](build_exam.py) | สคริปต์ Build กลาง (`python build_exam.py`) ตรวจโครงสร้างและซิงก์ `combined_exam.json` เข้า `create_boi_forms.gs` และ HTML อัตโนมัติ (ตรวจความตรงกันด้วย `--check`) |
+| [create_boi_forms.gs](create_boi_forms.gs) | Google Apps Script สร้าง Pre-Test + ทฤษฎีรวม 30 ข้อ และคำนวณ `Post-Test HR (20)` + `หัวข้อ 1..6 (ช่องละ 5 = 30)` เข้าชีต `สรุปคะแนน_Audit` (ยังอ่านชีตเก่า 26 ข้อของรุ่น 1–3 ได้) |
+| [ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html](ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html) | เว็บสอบสำรอง 30 ข้อบนเบราว์เซอร์ ส่งคะแนนตรงเข้า `exam_server.py` (`/api/theory/submit`) หรือดาวน์โหลด JSON/CSV ได้ |
+| [test_platform_v2.py](test_platform_v2.py) | ชุดทดสอบอัตโนมัติ (Build sync, GAS VM runtime, Grading Rules, Node Auto-Grader, Live Server API & Security, Audit Export) |
 
-*(ไฟล์ข้อสอบทฤษฎีชุดเดิม 32 ข้อยังคงเก็บไว้ในโฟลเดอร์นี้เพื่ออ้างอิง: `theory_exam.json`, `ข้อสอบทฤษฎี.pdf`, `ข้อสอบทฤษฎีออนไลน์.html`, `เฉลยข้อสอบทฤษฎี.pdf`, `create_theory_google_form.gs`)*
+## 2. พอร์ทัลห้องเรียน, ระบบขอความช่วยเหลือ และ Auto-Grader (`practical/`)
 
-## 2. ข้อสอบปฏิบัติ: Electrical Meter Alert (ต่อยอด Workshop 4 · 50 คะแนน)
+| ไฟล์ | หน้าที่ |
+| --- | --- |
+| [practical/exam_server.py](practical/exam_server.py) | เซิร์ฟเวอร์กลาง: เสิร์ฟ Starter Workshop `W1–W4`, `/api/meter` (ตัด key `scenario` ออกแล้ว), `/api/notify`, ระบบ Help Queue, Auto-Grade, ส่งออก Audit `.xlsx`, ล็อกสิทธิ์ผู้สอนด้วย loopback + PIN |
+| [practical/portal_ui.py](practical/portal_ui.py) | เทมเพลตหน้าจอผู้สอน, หน้าพอร์ทัลผู้เรียน (`/download`), หน้าล็อกอิน PIN สำหรับเครื่องผู้สอนบน Wi-Fi |
+| [practical/grading_rules.py](practical/grading_rules.py) | สูตรคำนวณคะแนนกลางและเกณฑ์หัก Help แบบขั้นบันได + เพดานความปลอดภัย |
+| [practical/auto_grader.py](practical/auto_grader.py) | ตัวตรวจโค้ดอัตโนมัติใน Node.js VM Sandbox (ตรวจ `W1–W4` + `TODO 1–5`, ค่าขอบ `240/20/1.5`, การส่งซ้ำ, และเช็กการประกาศฟังก์ชันซ้ำ) |
+| [practical/audit_exporter.py](practical/audit_exporter.py) | สร้างไฟล์ Excel Audit v2 (`.xlsx` ฟอนต์ `Leelawadee UI` พร้อมชีตหลักฐาน Help) |
+| [practical/exam_starter.html](practical/exam_starter.html) | ไฟล์ข้อสอบปฏิบัติ (`TODO 1–5`) มีระบบวินิจฉัย `file://` และปุ่มเรียกผู้สอน `requestExamHelp()` |
 
-| ไฟล์ / โฟลเดอร์ | ใช้ทำอะไร | ใครใช้ |
-| --- | --- | --- |
-| [practical/exam_server.py](practical/exam_server.py) | รัน API จ่ายค่า Meter + หน้า `/download` (โหลดโจทย์และส่งไฟล์กลับ) + กระดานตรวจผลและเปิดดูโค้ดที่ส่งแบบ Real-time | ผู้สอน |
-| [practical/exam_starter.html](practical/exam_starter.html) | ไฟล์ข้อสอบแบบไฟล์เดียวจบ (สไตล์ Workshop) ให้ผู้เรียนโหลดจาก `http://<IP>:8000/download` แก้แค่ `TODO 1`–`5` | ผู้เรียน |
-| [practical/starter/](practical/starter/) | โฟลเดอร์แยกไฟล์สำรอง (`index.html`, `style.css`, `script.js` โหลดเป็น `starter.zip` ได้ที่ `/download`) | ผู้เรียน |
-| [practical/solution/](practical/solution/) | เฉลยที่ทำงานครบทุกเคส (เปิดดูผ่าน `http://localhost:8000/solution/` ได้ทันที) | ผู้สอนเท่านั้น |
-| [practical/notifications.html](practical/notifications.html) | หน้าจอแจ้งเตือนแบบ Lockscreen สำหรับเปิดโชว์หน้าห้อง (`http://localhost:8000/notifications`) | ผู้สอน / ผู้เรียน |
-| [practical/โจทย์สอบปฏิบัติ_แสดงบนจอ.html](practical/โจทย์สอบปฏิบัติ_แสดงบนจอ.html) | สไลด์โจทย์สอบปฏิบัติสำหรับขึ้นโปรเจคเตอร์หน้าห้อง (เปิดผ่าน `http://localhost:8000/prompt` ได้เลย) | ผู้สอน |
-| [practical/practical_exam.json](practical/practical_exam.json) | ข้อมูลเกณฑ์ 3 เคสผิดปกติ + เกณฑ์ให้คะแนน 5 ข้อ (ข้อละ 10 คะแนน = 50 คะแนน) | ผู้สอน |
-| `practical/_legacy_line_performance/` | เก็บข้อสอบปฏิบัติชุดเก่า (*Line Performance*) สำหรับอ้างอิงย้อนหลัง (รุ่นที่ 1–2) | อ้างอิง |
+## 3. สูตรคะแนน & เกณฑ์หัก "ขอความช่วยเหลือ" (Help Deduction Formula)
 
-## ขั้นตอนเปิดสอบวันจริง
-
-1. **สอบทฤษฎี + Post-Test:** เปิดลิงก์จาก [00_ศูนย์รวมลิงก์และQR_เปิดสอน.html](../00_ศูนย์รวมลิงก์และQR_เปิดสอน.html) (หรือส่งไฟล์ `ข้อสอบรวม_PostTest_และ_Final_ออนไลน์.html` ให้ผู้เรียนเปิดบนเบราว์เซอร์)
-2. **เตรียมสอบปฏิบัติ:**
-   - รันเซิร์ฟเวอร์บนเครื่องผู้สอน:
-     ```bash
-     python "01_Enterprise_Application/04_Exam_ข้อสอบและเกณฑ์วัดผล/practical/exam_server.py"
-     ```
-   - เปิด `http://localhost:8000/` บนเครื่องผู้สอน และเปิด `http://localhost:8000/prompt` ขึ้นจอโปรเจกเตอร์
-   - แจ้งผู้เรียนเปิดเบราว์เซอร์เข้า **`http://<IP_เครื่องผู้สอน>:8000/download`** (ดู IP ได้บนหน้าจอกระดานผู้สอน) เพื่อกดโหลด `exam_starter.html` และกดคัดลอก `API_URL` / `WEBHOOK_URL` ไปวางใน `TODO 1` (ไม่ต้องส่งลิงก์ Google Drive หรือแตก ZIP)
-   - กดสลับเคสทีละเคส (**ปกติ** → **แรงดันเกิน >240V** → **กระแสเกิน >20A** → **น้ำต่ำ <1.5**) หรือเปิดโหมดวนอัตโนมัติ แล้วดูตารางผู้เรียนที่ส่งแจ้งเตือนผ่านบนหน้าจอผู้สอน (กด Export CSV เก็บไว้ได้)
-   - เมื่อผู้เรียนทำเสร็จ ให้อัปโหลดไฟล์ส่งกลับในส่วน **ข้อ 4. ส่งไฟล์งาน** ที่หน้า **`http://<IP_เครื่องผู้สอน>:8000/download`** (หรือ `/submit`) — ไฟล์จะถูกเก็บใน `practical/submissions/<ชื่อผู้ส่ง>/` และผู้สอนสามารถกดปุ่ม **ดูโค้ด** ในตารางหน้า `http://localhost:8000/` หรือกดโหลดรวมเป็น `.zip` เพื่อตรวจคะแนนทั้ง 5 ข้อได้เลยโดยไม่ต้องเดินดูทีละเครื่อง
-3. **กรอกคะแนน Audit:** นำคะแนน `Post-Test (20)`, `Final (30)` (6 ช่อง × 5), และ `สอบปฏิบัติ (50)` (5 ช่อง × 10) กรอกลงไฟล์รายรุ่นในโฟลเดอร์ `03_Audit_สรุปคะแนนการสอบ/`
+1. **Workshop ระหว่างเรียน (`20 คะแนน`: `W1–W4` ชิ้นละ 5 คะแนน)**
+   - ปัญหาเทคนิค/เครื่อง (`tech_issue`): **ไม่หัก (`0`)**
+   - คำใบ้/ชี้แนะ (`hint`): **2 ครั้งแรกฟรี**, ครั้งที่ 3 เป็นต้นไป หักครั้งละ **`0.5`** คะแนน
+   - ผู้สอนลงมือแก้โค้ดให้ (`code_fix`): หักครั้งละ **`1.5`** คะแนน
+   - **เพดานหักสูงสุด (Max Cap):** ไม่เกิน **`8.0` คะแนน** และไม่เกิน **50% ของคะแนน Workshop ที่ทำได้**
+2. **สอบปฏิบัติ Final (`50 คะแนน`: `TODO 1–5` ข้อละ 10 คะแนน)**
+   - ความสะอาดโค้ด/ไลฟ์สด: พบฟังก์ชันซ้ำ `-1`, ส่งพลาดตอนปกติ (`false_alarm`) `-0.5`/ครั้ง (สูงสุด `-2.5`)
+   - ปัญหาเทคนิค/เครื่อง (`tech_issue`): **ไม่หัก (`0`)**
+   - คำใบ้/ชี้แนะ (`hint`): หักแบบลดแรงกระแทก **`1, 2, 3, 1, 1, ...`** คะแนนตามลำดับครั้ง
+   - ผู้สอนแก้โค้ดให้ (`code_fix`): หักครั้งละ **`3.0`** คะแนน
+   - **เพดานหักสูงสุด (Max Cap):** ไม่เกิน **`15.0` คะแนน** และไม่มีทางหักเกิน **50% ของคะแนนโค้ดที่ทำได้จริง** (รับประกันว่าจะไม่ถูกหักจนเหลือ `0`)
+3. **ผลรวม (`100 คะแนน`):** `ทฤษฎีรวม (30) + Workshop (20) + สอบปฏิบัติ (50)` · ตัดเกรด `A>=80, B>=70, C>=60, D>=50` · เกณฑ์ผ่าน `>= 70`
